@@ -13,7 +13,7 @@ const seed=()=>({version:1,tasks:[
 {id:'t5',name:'C++ polymorphism and OOP practice',category:'Coding',date:dateAdd(today,1),minutes:35,done:false},
 {id:'t6',name:'AMC 10: 15-question pacing drill',category:'Competition',date:dateAdd(today,2),minutes:40,done:false}],
 contests:[{id:'amca',name:'AMC 10A',date:'2026-11-05',kind:'Math'},{id:'amcb',name:'AMC 10B',date:'2026-11-13',kind:'Math'}],
-codeDone:{},codeNotes:{},mistakes:[],mathAttempts:[],mocks:[],activity:{},settings:{theme:'system',progressionTarget:120,lessonTarget:3},aoc:AocCore.blank(),focus:FocusCore.empty(),training:TrainingCore.empty(),amc:AmcCore.empty(),coach:CoachCore.empty(),projects:ProjectCore.blank(),onboarding:OnboardingCore.blank(),school:SchoolCore.blank()});
+codeDone:{},codeNotes:{},mistakes:[],mathAttempts:[],mocks:[],activity:{},settings:{theme:'system',progressionTarget:120,lessonTarget:3},aoc:AocCore.blank(),focus:FocusCore.empty(),training:TrainingCore.empty(),amc:AmcCore.empty(),coach:CoachCore.empty(),projects:ProjectCore.blank(),onboarding:OnboardingCore.blank(),school:SchoolCore.blank(),sparkLab:ForgeSpark.normalizeState(null)});
 const byId=id=>document.getElementById(id);
 
 function normalizeBackup(obj){
@@ -35,7 +35,7 @@ function normalizeBackup(obj){
   const theme=['system','dark','light'].includes(obj.settings?.theme)?obj.settings.theme:'system';
   const progressionTarget=ProgressionCore.normalizeTarget(obj.settings?.progressionTarget);
   const lessonTarget=ProgressionCore.normalizeLessonTarget(obj.settings?.lessonTarget);
-  return {version:1,tasks:obj.tasks,contests:obj.contests,mistakes:obj.mistakes,mathAttempts:obj.mathAttempts,codeDone,codeNotes,activity,mocks,settings:{theme,progressionTarget,lessonTarget},aoc:AocCore.normalize(obj.aoc),focus:FocusCore.normalize(obj.focus),training:TrainingCore.normalize(obj.training),amc:AmcCore.normalize(obj.amc),coach:CoachCore.normalize(obj.coach),projects:ProjectCore.normalize(obj.projects),onboarding:OnboardingCore.normalize(obj.onboarding,{legacy:true}),school:SchoolCore.normalize(obj.school)};
+  return {version:1,tasks:obj.tasks,contests:obj.contests,mistakes:obj.mistakes,mathAttempts:obj.mathAttempts,codeDone,codeNotes,activity,mocks,settings:{theme,progressionTarget,lessonTarget},aoc:AocCore.normalize(obj.aoc),focus:FocusCore.normalize(obj.focus),training:TrainingCore.normalize(obj.training),amc:AmcCore.normalize(obj.amc),coach:CoachCore.normalize(obj.coach),projects:ProjectCore.normalize(obj.projects),onboarding:OnboardingCore.normalize(obj.onboarding,{legacy:true}),school:SchoolCore.normalize(obj.school),sparkLab:ForgeSpark.normalizeState(obj.sparkLab)};
 }
 
 let state;
@@ -349,7 +349,7 @@ function renderInsights(){
   const categories=['Coding','Math','Competition'];byId('focusAreas').innerHTML=categories.map(cat=>{const x=state.tasks.filter(t=>t.category===cat),n=x.filter(t=>t.done).length,rate=x.length?Math.round(100*n/x.length):0;return `<div style="margin:17px 0"><div class="row"><strong>${cat}</strong><span class="tiny muted">${n}/${x.length} missions</span></div><div class="progress" style="margin-top:8px"><div class="fill" style="width:${rate}%"></div></div></div>`}).join('');
 window.DashboardUI?.refresh();
 }
-function renderAll(){applyTheme();renderToday();renderFocusTaskOptions();renderFocusSession();renderPlan();renderProjects();renderCoding();renderMath();renderContests();renderAoc();renderCodeforces();renderMistakes();renderInsights();window.AMCController?.render();window.CoachUI?.refresh();window.LessonsUI?.refresh();window.OnboardingUI?.refresh();window.SchoolUI?.refresh()}
+function renderAll(){applyTheme();renderToday();renderFocusTaskOptions();renderFocusSession();renderPlan();renderProjects();renderCoding();renderMath();renderContests();renderAoc();renderCodeforces();renderMistakes();renderInsights();window.AMCController?.render();window.CoachUI?.refresh();window.LessonsUI?.refresh();window.OnboardingUI?.refresh();window.SchoolUI?.refresh();window.SparkLabUI?.render()}
 function go(view){const code=byId('codeEditor');if(code)saveCode(false);document.querySelectorAll('.tab').forEach(x=>{const active=x.dataset.view===view;x.classList.toggle('active',active);if(active)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current')});document.querySelectorAll('.nav-more').forEach(group=>{group.open=Boolean(group.querySelector('.tab.active'))});document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+view));if(view==='today')window.DashboardUI?.refresh();window.scrollTo({top:0,behavior:'instant'});}
 function trapDialogTab(dialog,event){
   if(event.key!=='Tab')return;

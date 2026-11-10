@@ -1,7 +1,7 @@
 {
   "name": "forge-desktop",
   "productName": "FORGE",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Personal developer and competition command center",
   "private": true,
   "author": "FORGE",
@@ -10,12 +10,16 @@
   "scripts": {
     "postinstall": "node scripts/vendor-pdf.cjs",
     "start": "electron .",
-    "dist": "electron-builder --win nsis portable --x64 --publish never"
+    "dist": "electron-builder --win nsis portable --x64 --publish never",
+    "check": "node scripts/check-syntax.cjs",
+    "test": "node --test tests/spark-core.test.cjs",
+    "test:electron": "node tests/spark-electron.cjs"
   },
   "devDependencies": {
     "electron": "45.0.0",
     "electron-builder": "26.18.0",
-    "pdfjs-dist": "6.4.299"
+    "pdfjs-dist": "6.4.299",
+    "playwright": "1.62.1"
   },
   "build": {
     "appId": "local.forge.commandcenter",

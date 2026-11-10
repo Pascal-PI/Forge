@@ -1,14 +1,15 @@
 # FORGE development progress
 
-Last updated: 2026-11-07
+Last updated: 2026-11-10
 
 ## Current baseline
 
 - **Latest downloadable release:** 1.11.0 Windows Electron application. It reorganizes the complete product around six primary learner destinations plus progressively disclosed secondary tools, and turns School Edition into a focused next-step/path/practice experience. Existing profiles retain all features and progress.
+- **Current source update:** 1.12.0 adds Spark Lab: three original offline learning trails, nine interactive challenges, and saved checkpoints. Windows release artifacts have not been built in this update.
 - **Architecture:** Electron main process + sandboxed renderer; narrow preload API; `forge://` local protocol; localStorage progress with validated JSON import/export; native-process GPT-6 Luna Responses API client; opt-in main-process Judge0 client in current source.
 - **Working product areas:** Grade 7 School Edition quizzes/mocks/homework guidance/review, daily missions, local project recommendations and proposals, local code drafts, opt-in remote sandbox execution, isolated HTML/CSS preview, original math drills, 22 AMC 10 exams / 550 questions, timed and untimed AMC practice, review queue, contest tracker, evidence-aware Insights, AI feedback/hints/practice planning/competition search, interactive lessons, presentation export, local-only voice, language/career guide, and public Codeforces schedule.
 - **Regression baseline:** prior v1.2 and v1.3 source, packaged, portable, live-model, and boundary reports are in `../qa/`. Earlier reports are baseline evidence, not verification of this release's changes.
-- **Repository state:** this source folder has no Git metadata. Milestones cannot be committed unless a repository is created later.
+- **Repository state:** Pascal-PI/Forge; the 1.12.0 update is developed on `feat/interactive-learning-1.12.0` from v1.11.0 main (`40fbbaf`). Main remains unchanged.
 - **Credential handling:** use only the already-configured local OpenAI key-file reference for the explicitly selected `gpt-6-luna` model. Never copy key contents into the renderer, app data, backups, build outputs, test logs, or source. Do not use credentials found in project documents.
 
 ## Implementation order
@@ -48,6 +49,13 @@ The source roadmap is the attached FORGE PDF and its pasted text. The table belo
 | 3.0 advanced platform | Partial | Current source has opt-in Judge0 execution for offered languages, sandboxed HTML/CSS preview, 17-goal language guide, local-only lesson voice, reduced-motion support, focus outlines, and recorded evidence timelines. Racket, verified event discovery, opt-in private leaderboards, broader accessibility, SEO and a full security review remain. |
 
 ## Active milestone log
+
+### 1.12.0 source update — Spark Lab
+
+- **Learning flow:** Learn now starts with Balance Builder, Pattern Garden, and Logic Lights. Nine original challenges combine manipulable figures, retry feedback, optional hints, and worked Python connections revealed after a correct check. Ember, Sprig, and Bit are original SVG emoji companions.
+- **Compatibility:** an additive `sparkLab` field uses the existing schema, origin, profile directory, and storage key. Current settings, checked answers, and trail completion persist; legacy profiles/backups receive empty Spark Lab defaults. Replay confirms before resetting just one trail.
+- **Verification:** 10 core tests and application/test syntax checks pass. The isolated Electron suite creates a populated profile in actual v1.11.0, upgrades it, checks partial and checked checkpoints across restarts, completes all nine challenges and the existing binary-search lab, exercises replay, and round-trips native JSON export/import. Desktop and 390-pixel screens pass named-control, duplicate-ID, and overflow checks in dark/light themes with screenshots for visual review.
+- **Manual testing remaining:** Windows installer/portable launch and upgrade with a real Windows profile, plus assistive-technology usability. No AI calls or real learner data are needed for Spark Lab.
 
 ### 1.11.0 release — focused interactive learning
 

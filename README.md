@@ -2,6 +2,12 @@
 
 A downloadable desktop version of the supplied FORGE starter, with a private Grade 7 School Edition, real AMC 10 past-paper practice, and an AI Coach powered by GPT-6 Luna. Six learner-centered destinations remain visible—Home, School, Learn, Practice, Coach, and Progress—while secondary tools are preserved under **More**.
 
+## New in 1.12.0: Spark Lab
+
+Open **Learn → Spark Lab** for three original, offline learning trails: **Balance Builder**, **Pattern Garden**, and **Logic Lights**. Nine short challenges let you adjust a balance, fill a staircase garden, and flip Boolean switches. Every choice changes the diagram; **Check my idea** gives specific feedback, an optional hint helps you reason, and a correct check reveals a worked Python connection. There are no lives or timers. Ember, Sprig, and Bit are original vector emoji companions drawn locally alongside the interactive figures.
+
+Your selected trail, current setting, checked answer, and completion save automatically and survive restarts and JSON backups. Older profiles and backups start with empty Spark Lab progress; existing missions, lessons, School Edition, AMC work, and drafts keep their existing format. **Replay trail** asks before resetting only that trail. Trail completion describes practice, not a mastery score. The existing binary-search lab and AI lesson tools remain available below Spark Lab.
+
 ## New in 1.11.0: focused interactive learning
 
 The interface now emphasizes one useful next action instead of presenting every feature at once. School Edition leads with a personalized continue card, a visible Practice → Review → Strengthen cycle, compact optional tools, and three subject paths. Activity history is collapsed until requested. Question sessions use a centered stage, clear progress rail, compact question navigation, larger answer targets, and less decorative competition for attention.
@@ -34,8 +40,8 @@ The original mountain artwork was produced with the built-in image generator and
 
 ## Run the app
 
-- **FORGE-Setup-1.11.0-Windows-x64.exe** installs FORGE for your Windows account and creates Start menu and desktop shortcuts.
-- **FORGE-Portable-1.11.0-Windows-x64.exe** runs without installation. Double-click it and allow a few moments for the first launch.
+- **FORGE-Setup-1.12.0-Windows-x64.exe** installs FORGE for your Windows account and creates Start menu and desktop shortcuts.
+- **FORGE-Portable-1.12.0-Windows-x64.exe** runs without installation. Double-click it and allow a few moments for the first launch.
 
 The app includes its runtime. Node.js, Python and a web server are not needed. Offline features need no account; AI Coach needs an OpenAI API key and internet access. Optional code runs also need internet. These builds are for 64-bit Windows. They are unsigned, so Windows may display an unrecognized-publisher warning; managed-device policies can block unsigned builds.
 
@@ -138,7 +144,7 @@ Select any month in the timeline to inspect its timed-paper scores, saved lesson
 
 Progress saves automatically under `%APPDATA%\FORGE`. The installed and portable versions use the same data on the same Windows account. The portable executable does not carry your progress with it.
 
-Use **Progress → Data and backup → Export JSON backup** (or **Ctrl+Shift+S**) to choose a backup location. Backups include School Edition attempts/reviews, AMC answers, active timer deadlines, notes, results, review stages, lessons, AI Coach history/profile, onboarding choices, and local display/progression preferences. Use **Import JSON backup** to restore or transfer progress. Cached PDFs and key-file connections are separate. Existing starter, 1.0, 1.1, 1.2 and 1.3 backups are supported. Import replaces the current workspace after confirmation. Uninstalling the app retains its saved progress. Installing 1.11.0 uses the same profile.
+Use **Progress → Data and backup → Export JSON backup** (or **Ctrl+Shift+S**) to choose a backup location. Backups include Spark Lab checkpoints/completion, School Edition attempts/reviews, AMC answers, active timer deadlines, notes, results, review stages, lessons, AI Coach history/profile, onboarding choices, and local display/progression preferences. Use **Import JSON backup** to restore or transfer progress. Cached PDFs and key-file connections are separate. Existing starter, 1.0, 1.1, 1.2 and 1.3 backups are supported. Import replaces the current workspace after confirmation. Uninstalling the app retains its saved progress. Installing 1.12.0 uses the same profile.
 
 Coding solutions are saved drafts; the app does not automatically grade challenge correctness. Remote code is run only by explicit per-run consent. Keep FORGE in the foreground for focus time to count; minimizing or switching windows pauses the timer. The starter's missions and contest dates are editable defaults.
 
@@ -151,6 +157,16 @@ pnpm install
 pnpm start
 pnpm dist
 ```
+
+For source validation and an isolated Electron smoke test:
+
+```powershell
+pnpm check
+pnpm test
+pnpm test:electron
+```
+
+The Electron check creates a temporary profile in v1.11.0, upgrades it to this source, exercises all nine Spark challenges and the existing binary-search lab, checks desktop/390-pixel layouts in both themes, and verifies JSON export/import and restart. It uses the bundled Electron runtime and Playwright; it does not use your personal profile or make AI requests. Keep the baseline commit `40fbbaf8cc52a4be78f5a5fe5118adc70c9111bb` available in Git, or set `FORGE_BASELINE_DIR` to a v1.11.0 checkout with dependencies installed. Set `FORGE_QA_OUTPUT` to retain screenshots and the JSON report in a chosen directory. The automated test is source-level verification; Windows installer and portable launch still need testing on Windows before distribution.
 
 Build artifacts appear in `dist/`. Runtime and builder versions are pinned in `package.json` and `pnpm-lock.yaml`. The build is unsigned; public distribution under a verified publisher requires your own signing certificate.
 

@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="learning-experience.css">
 <link rel="stylesheet" href="onboarding.css">
 <link rel="stylesheet" href="school.css">
+<link rel="stylesheet" href="spark-lab.css">
 </head>
 <body>
 <div id="onboardingRoot" aria-live="polite"></div>
@@ -36,7 +37,7 @@
     </details>
   </nav>
   <div class="sidebar-landscape"><p>Build skills.<br>Create<br><strong>opportunities.</strong></p><span>ONE STEP AT A TIME</span></div>
-  <div class="sidebar-version">FORGE 1.11.0 <span>•</span> On your device</div>
+  <div class="sidebar-version">FORGE 1.12.0 <span>•</span> On your device</div>
 </aside>
 <header class="topbar"><div class="topinner">
   <button class="global-search" id="globalSearchOpen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>Search lessons, missions, and topics…</span><kbd>Ctrl K</kbd></button>
@@ -68,6 +69,7 @@
 <div class="grid-2 section"><div class="card card-pad"><div class="section-head"><h2>Your self-rated skill ladder</h2><span class="small-badge" id="projectLadderLevel">Beginner</span></div><p class="tiny muted">A suggested sequence at your selected level. It is a guide, not a measured score.</p><div id="projectLadder" class="skill-ladder"></div></div><div class="card card-pad"><div class="section-head"><h2>Suggest an idea</h2><span class="small-badge">Saved locally</span></div><p class="tiny muted">Add a project or study topic to your own plan. FORGE does not send it to a shared submission queue.</p><form id="projectIdeaForm" class="form-grid"><div class="field"><label for="projectIdeaKind">Idea type</label><select id="projectIdeaKind"><option>Project</option><option>Topic</option></select></div><div class="field"><label for="projectIdeaTrack">Focus area</label><select id="projectIdeaTrack"><option>Coding</option><option>Math</option><option>Competition</option></select></div><div class="field"><label for="projectIdeaLevel">Suggested level</label><select id="projectIdeaLevel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div><div class="field full"><label for="projectIdeaTitle">Title</label><input id="projectIdeaTitle" maxlength="100" required></div><div class="field full"><label for="projectIdeaDescription">What should it teach or build?</label><textarea id="projectIdeaDescription" maxlength="500" required></textarea></div><div class="field full"><button class="btn primary" id="saveProjectIdea" type="submit">Save my idea</button><span id="projectIdeaStatus" class="tiny muted" role="status" aria-live="polite"></span></div></form></div></div>
 <div class="card card-pad section"><div class="section-head"><h2>My saved ideas</h2><span class="small-badge" id="projectIdeaCount">0 ideas</span></div><div id="projectIdeas"></div></div><div class="card card-pad section" id="projectPlanStudio"><div class="section-head"><h2 id="projectPlansHeading" tabindex="-1">Your project plans</h2><span class="small-badge" id="projectPlanCount">0 linked</span></div><p class="tiny muted">Preview a dated plan from a recommended project. Progress comes from your mission checkboxes and stays on this device.</p><p class="sr-only" id="projectPlanLiveStatus" role="status" aria-live="polite"></p><div id="projectPlanList"></div></div></section>
 <section class="view" id="view-lessons">
+  <div id="sparkLab"></div>
   <div class="hero"><div><div class="eyebrow">INTERACTIVE LESSON STUDIO</div><h1>Your next lesson, built for you.</h1><p class="lead">Choose the time you have. GPT-6 Luna picks a starting point from your saved progress and teaches math through programming.</p></div><span class="small-badge">GPT-6 Luna · saved on this device</span></div>
   <div class="grid-2 lesson-overview">
     <div class="card card-pad"><h2>Start a lesson</h2><p class="muted tiny">FORGE uses your AMC results, completed lessons, and coding practice to choose a topic and starting level. Every lesson connects a math idea to a Python program, with worked examples, exercises, a quiz, and a coding challenge.</p>
@@ -122,7 +124,7 @@
 <div class="section-head section"><h2>Coach notes</h2><label class="sr-only" for="coachHistory">Saved coach response</label><select class="filter" id="coachHistory"><option value="">No saved responses yet</option></select></div><div id="coachResponse"><div class="empty">Choose a coaching action above. For feedback on one question, open a reviewed AMC question and select Explain my mistake.</div></div>
 </section>
 <section class="view" id="view-school"><div id="schoolRoot"></div></section>
-<footer>FORGE • Personal learning studio • v1.11.0 desktop • Data stored locally</footer>
+<footer>FORGE • Personal learning studio • v1.12.0 desktop • Data stored locally</footer>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <dialog class="focus-mode-dialog" id="focusModeDialog" aria-labelledby="focusModeTitle" aria-describedby="focusModeDescription"><div class="focus-mode-shell"><header class="focus-mode-head"><div class="focus-mode-brand"><span class="focus-mode-mark">F</span><div><strong>FORGE FOCUS MODE</strong><div class="focus-mode-task" id="focusModeTask">Independent focus session</div></div></div><button class="btn focus-mode-exit" id="focusModeExit">Exit focus mode</button></header><section class="focus-mode-content"><span class="small-badge" id="focusModeBadge">Session in progress</span><h1 id="focusModeTitle">One thing at a time.</h1><p class="focus-mode-description" id="focusModeDescription">Work on the session you chose. FORGE pauses if its window loses focus.</p><div class="focus-mode-timer" id="focusModeTimer" role="timer" aria-live="off">25:00</div><div class="focus-mode-progress" id="focusModeProgress" role="progressbar" aria-label="Focus session progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="focusModeProgressFill"></span></div><p class="focus-mode-progress-text" id="focusModeProgressText"></p><p class="focus-mode-state" id="focusModeState" role="status" aria-live="polite"></p><div class="focus-mode-actions"><button class="btn primary" id="focusModeToggle">Pause</button><button class="btn" id="focusModeEnd">End session</button><button class="btn primary" id="focusModeDone" hidden>Done</button></div><p class="focus-mode-privacy">This view only tracks this FORGE session. It does not monitor screens, keystrokes or other apps. A short break after your timer is a good next step; another session never starts automatically.</p></section></div></dialog>
@@ -138,6 +140,7 @@
 <script src="language-guide.js"></script>
 <script src="onboarding-core.js"></script>
 <script src="school-core.js"></script>
+<script src="spark-core.js"></script>
 <script src="app.js"></script>
 <script src="project-planner.js"></script>
 <script src="amc.js"></script>
@@ -145,6 +148,7 @@
 <script src="lesson.js"></script>
 <script src="dashboard.js"></script>
 <script src="learning-experience.js"></script>
+<script src="spark-lab.js"></script>
 <script src="onboarding.js"></script>
 <script src="school.js"></script>
 </body>
