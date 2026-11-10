@@ -1,0 +1,73 @@
+{
+  "name": "forge-desktop",
+  "productName": "FORGE",
+  "version": "1.11.0",
+  "description": "Personal developer and competition command center",
+  "private": true,
+  "author": "FORGE",
+  "license": "UNLICENSED",
+  "main": "main.cjs",
+  "scripts": {
+    "postinstall": "node scripts/vendor-pdf.cjs",
+    "start": "electron .",
+    "dist": "electron-builder --win nsis portable --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0",
+    "pdfjs-dist": "6.4.299"
+  },
+  "build": {
+    "appId": "local.forge.commandcenter",
+    "productName": "FORGE",
+    "asar": true,
+    "compression": "normal",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "coach.cjs",
+      "codeforces.cjs",
+      "runner.cjs",
+      "lesson-pptx.cjs",
+      "third-party/PPTXGENJS-LICENSE.txt",
+      "amc-topics.json",
+      "amc-catalog.json",
+      "renderer/**/*",
+      "!**/ai-key.txt",
+      "!**/.env*",
+      "!**/ai-settings.json",
+      "build/icon.png",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "signAndEditExecutable": true
+    },
+    "nsis": {
+      "artifactName": "FORGE-Setup-${version}-Windows-x64.exe",
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true
+    },
+    "portable": {
+      "useZip": false,
+      "artifactName": "FORGE-Portable-${version}-Windows-x64.exe",
+      "requestExecutionLevel": "user"
+    }
+  },
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
+  }
+}

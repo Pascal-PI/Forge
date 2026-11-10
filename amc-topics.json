@@ -1,0 +1,3302 @@
+[
+  {
+    "examId": "amc10-2016A",
+    "question": 1,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 2,
+    "topic": "Algebra",
+    "concept": "exponent"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 3,
+    "topic": "Arithmetic and reasoning",
+    "concept": "ratio and proportion"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 5,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "place value"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 7,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 8,
+    "topic": "Arithmetic and reasoning",
+    "concept": "work backwards"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 9,
+    "topic": "Arithmetic and reasoning",
+    "concept": "triangular number"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "area"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 11,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 12,
+    "topic": "Counting and probability",
+    "concept": "basic probability"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 13,
+    "topic": "Arithmetic and reasoning",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 14,
+    "topic": "Algebra",
+    "concept": "diophantine equation"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "circle area"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "basic probability"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 18,
+    "topic": "Geometry",
+    "concept": "cube geometry"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 19,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 20,
+    "topic": "Counting and probability",
+    "concept": "stars and bars"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 23,
+    "topic": "Algebra",
+    "concept": "custom operation"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "cyclic quadrilateral"
+  },
+  {
+    "examId": "amc10-2016A",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "least common multiple"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 1,
+    "topic": "Algebra",
+    "concept": "exponent"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 2,
+    "topic": "Algebra",
+    "concept": "custom operation"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 3,
+    "topic": "Arithmetic and reasoning",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 4,
+    "topic": "Number theory",
+    "concept": "triangular number"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 5,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 7,
+    "topic": "Algebra",
+    "concept": "ratio and proportion"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 8,
+    "topic": "Number theory",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 9,
+    "topic": "Geometry",
+    "concept": "parabola"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 11,
+    "topic": "Geometry",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 12,
+    "topic": "Counting and probability",
+    "concept": "basic probability"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 13,
+    "topic": "Algebra",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "lattice point"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 15,
+    "topic": "Arithmetic and reasoning",
+    "concept": "parity"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 16,
+    "topic": "Algebra",
+    "concept": "geometric sequence"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 17,
+    "topic": "Geometry",
+    "concept": "cube geometry"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 19,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "homothety"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "graph theory"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 23,
+    "topic": "Geometry",
+    "concept": "regular polygon"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 24,
+    "topic": "Counting and probability",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2016B",
+    "question": 25,
+    "topic": "Algebra",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "whole number operations"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "money"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 3,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 4,
+    "topic": "Arithmetic and reasoning",
+    "concept": "rate"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "algebraic manipulation"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 7,
+    "topic": "Geometry",
+    "concept": "pythagorean theorem"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 8,
+    "topic": "Counting and probability",
+    "concept": "counting pairs"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 9,
+    "topic": "Arithmetic and reasoning",
+    "concept": "distance rate and time"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "triangle inequality"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 11,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 12,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 13,
+    "topic": "Number theory",
+    "concept": "fibonacci"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 14,
+    "topic": "Algebra",
+    "concept": "percentage"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 15,
+    "topic": "Counting and probability",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 16,
+    "topic": "Number theory",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 17,
+    "topic": "Geometry",
+    "concept": "lattice point"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "recursive probability"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 20,
+    "topic": "Number theory",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 22,
+    "topic": "Geometry",
+    "concept": "equilateral triangle"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 23,
+    "topic": "Counting and probability",
+    "concept": "lattice point"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 24,
+    "topic": "Algebra",
+    "concept": "polynomial"
+  },
+  {
+    "examId": "amc10-2017A",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 1,
+    "topic": "Number theory",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "distance rate and time"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 3,
+    "topic": "Counting and probability",
+    "concept": "inequality"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "rational equation"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 6,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 7,
+    "topic": "Algebra",
+    "concept": "distance rate and time"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 8,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 9,
+    "topic": "Counting and probability",
+    "concept": "binomial probability"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 11,
+    "topic": "Counting and probability",
+    "concept": "conditional probability"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 12,
+    "topic": "Arithmetic and reasoning",
+    "concept": "rate"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 13,
+    "topic": "Algebra",
+    "concept": "inclusion exclusion"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "fermats little theorem"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 16,
+    "topic": "Counting and probability",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 17,
+    "topic": "Arithmetic and reasoning",
+    "concept": "subsets"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 19,
+    "topic": "Geometry",
+    "concept": "area ratio"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 20,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "incircle incenter and inradius"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 22,
+    "topic": "Geometry",
+    "concept": "inscribed angle"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 23,
+    "topic": "Number theory",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "hyperbola"
+  },
+  {
+    "examId": "amc10-2017B",
+    "question": 25,
+    "topic": "Number theory",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "fraction"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "percentage"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 3,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 4,
+    "topic": "Counting and probability",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 6,
+    "topic": "Algebra",
+    "concept": "percentage"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 7,
+    "topic": "Counting and probability",
+    "concept": "exponent"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 8,
+    "topic": "Algebra",
+    "concept": "money"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 9,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 10,
+    "topic": "Algebra",
+    "concept": "radical"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 11,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 12,
+    "topic": "Counting and probability",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "paper folding"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 14,
+    "topic": "Algebra",
+    "concept": "exponent"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "right triangle"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 18,
+    "topic": "Arithmetic and reasoning",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "units digit"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 20,
+    "topic": "Arithmetic and reasoning",
+    "concept": "symmetry"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "parabola"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 22,
+    "topic": "Number theory",
+    "concept": "greatest common divisor"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 23,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "angle bisector theorem"
+  },
+  {
+    "examId": "amc10-2018A",
+    "question": 25,
+    "topic": "Algebra",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 1,
+    "topic": "Geometry",
+    "concept": "area"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "distance rate and time"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 3,
+    "topic": "Counting and probability",
+    "concept": "basic counting"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 4,
+    "topic": "Geometry",
+    "concept": "rectangular prism"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 5,
+    "topic": "Counting and probability",
+    "concept": "subsets"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 6,
+    "topic": "Counting and probability",
+    "concept": "sampling without replacement"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 7,
+    "topic": "Geometry",
+    "concept": "circle area"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 8,
+    "topic": "Algebra",
+    "concept": "quadratic"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 9,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 11,
+    "topic": "Number theory",
+    "concept": "prime"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 12,
+    "topic": "Geometry",
+    "concept": "centroid"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 13,
+    "topic": "Counting and probability",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 14,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mode"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "paper folding"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 16,
+    "topic": "Number theory",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 17,
+    "topic": "Geometry",
+    "concept": "pythagorean theorem"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "casework"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 20,
+    "topic": "Arithmetic and reasoning",
+    "concept": "recursion"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 21,
+    "topic": "Number theory",
+    "concept": "factor"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 23,
+    "topic": "Number theory",
+    "concept": "least common multiple"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "regular polygon"
+  },
+  {
+    "examId": "amc10-2018B",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 1,
+    "topic": "Algebra",
+    "concept": "exponent"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 2,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 3,
+    "topic": "Algebra",
+    "concept": "ages"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 4,
+    "topic": "Counting and probability",
+    "concept": "pigeonhole principle"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 6,
+    "topic": "Geometry",
+    "concept": "cyclic quadrilateral"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 7,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 8,
+    "topic": "Arithmetic and reasoning",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 9,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 10,
+    "topic": "Counting and probability",
+    "concept": "greatest common divisor"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 11,
+    "topic": "Number theory",
+    "concept": "prime factorization"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 12,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "inscribed angle"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "counting intersections"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 15,
+    "topic": "Algebra",
+    "concept": "recursion"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "circle area"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "multiset permutations"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 18,
+    "topic": "Algebra",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 19,
+    "topic": "Algebra",
+    "concept": "difference of squares"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 20,
+    "topic": "Counting and probability",
+    "concept": "parity"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "sphere"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 23,
+    "topic": "Algebra",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 24,
+    "topic": "Arithmetic and reasoning",
+    "concept": "partial fractions"
+  },
+  {
+    "examId": "amc10-2019A",
+    "question": 25,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "fraction"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 2,
+    "topic": "Counting and probability",
+    "concept": "counterexample"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 3,
+    "topic": "Algebra",
+    "concept": "percentage"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 4,
+    "topic": "Geometry",
+    "concept": "linear equation"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 5,
+    "topic": "Geometry",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 6,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 7,
+    "topic": "Number theory",
+    "concept": "least common multiple"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 8,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 9,
+    "topic": "Counting and probability",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "triangle area"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 11,
+    "topic": "Algebra",
+    "concept": "ratio and proportion"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 12,
+    "topic": "Arithmetic and reasoning",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 13,
+    "topic": "Counting and probability",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 14,
+    "topic": "Number theory",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "right triangle"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "angle chasing"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "geometric distribution"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 18,
+    "topic": "Algebra",
+    "concept": "recursion"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "prime factorization"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "sector"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 21,
+    "topic": "Counting and probability",
+    "concept": "basic probability"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "recursive probability"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 23,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 24,
+    "topic": "Algebra",
+    "concept": "recursion"
+  },
+  {
+    "examId": "amc10-2019B",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 1,
+    "topic": "Algebra",
+    "concept": "fraction"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 3,
+    "topic": "Algebra",
+    "concept": "algebraic manipulation"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 4,
+    "topic": "Arithmetic and reasoning",
+    "concept": "rate"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 6,
+    "topic": "Number theory",
+    "concept": "multiplication principle"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 7,
+    "topic": "Algebra",
+    "concept": "magic square"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 8,
+    "topic": "Arithmetic and reasoning",
+    "concept": "summation"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 9,
+    "topic": "Number theory",
+    "concept": "least common multiple"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "surface area"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 11,
+    "topic": "Counting and probability",
+    "concept": "median data"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 12,
+    "topic": "Geometry",
+    "concept": "median geometry"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 13,
+    "topic": "Algebra",
+    "concept": "random walk"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 14,
+    "topic": "Arithmetic and reasoning",
+    "concept": "newtons sums"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 15,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "polynomial"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 18,
+    "topic": "Arithmetic and reasoning",
+    "concept": "parity"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "graph theory"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 21,
+    "topic": "Arithmetic and reasoning",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 23,
+    "topic": "Arithmetic and reasoning",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 24,
+    "topic": "Number theory",
+    "concept": "greatest common divisor"
+  },
+  {
+    "examId": "amc10-2020A",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "whole number operations"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 2,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 3,
+    "topic": "Arithmetic and reasoning",
+    "concept": "ratio and proportion"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 4,
+    "topic": "Geometry",
+    "concept": "prime"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 5,
+    "topic": "Counting and probability",
+    "concept": "multiset permutations"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "palindrome"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 7,
+    "topic": "Number theory",
+    "concept": "perfect square"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 8,
+    "topic": "Geometry",
+    "concept": "right triangle"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 9,
+    "topic": "Algebra",
+    "concept": "diophantine equation"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "cone"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 11,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 12,
+    "topic": "Algebra",
+    "concept": "decimal"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 14,
+    "topic": "Geometry",
+    "concept": "regular polygon"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 15,
+    "topic": "Number theory",
+    "concept": "pattern recognition"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 16,
+    "topic": "Counting and probability",
+    "concept": "combinatorial game"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "graph theory"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "conditional probability"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "square geometry"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 22,
+    "topic": "Number theory",
+    "concept": "difference of squares"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 23,
+    "topic": "Arithmetic and reasoning",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 24,
+    "topic": "Algebra",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2020B",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "prime factorization"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "order of operations"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 2,
+    "topic": "Algebra",
+    "concept": "ratio and proportion"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 3,
+    "topic": "Algebra",
+    "concept": "place value"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "distance rate and time"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 7,
+    "topic": "Arithmetic and reasoning",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 8,
+    "topic": "Algebra",
+    "concept": "repeating decimal"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 9,
+    "topic": "Algebra",
+    "concept": "optimization"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 10,
+    "topic": "Arithmetic and reasoning",
+    "concept": "difference of squares"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 11,
+    "topic": "Number theory",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 12,
+    "topic": "Geometry",
+    "concept": "cone"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 14,
+    "topic": "Algebra",
+    "concept": "vietas formulas"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 15,
+    "topic": "Counting and probability",
+    "concept": "parabola"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 16,
+    "topic": "Arithmetic and reasoning",
+    "concept": "median data"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 17,
+    "topic": "Geometry",
+    "concept": "trapezoid"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 18,
+    "topic": "Number theory",
+    "concept": "functional equation"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 19,
+    "topic": "Geometry",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 20,
+    "topic": "Arithmetic and reasoning",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "equiangular polygon"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 22,
+    "topic": "Algebra",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 23,
+    "topic": "Counting and probability",
+    "concept": "random walk"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "parallel lines"
+  },
+  {
+    "examId": "amc10-2021A",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 1,
+    "topic": "Counting and probability",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "radical"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 3,
+    "topic": "Algebra",
+    "concept": "percentage"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 4,
+    "topic": "Counting and probability",
+    "concept": "counting pairs"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 5,
+    "topic": "Arithmetic and reasoning",
+    "concept": "factor"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 7,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 8,
+    "topic": "Arithmetic and reasoning",
+    "concept": "pattern recognition"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 9,
+    "topic": "Geometry",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 11,
+    "topic": "Arithmetic and reasoning",
+    "concept": "simons favorite factoring trick"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 12,
+    "topic": "Number theory",
+    "concept": "sum of factors"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 13,
+    "topic": "Algebra",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 14,
+    "topic": "Geometry",
+    "concept": "chord"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 15,
+    "topic": "Algebra",
+    "concept": "algebraic manipulation"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 16,
+    "topic": "Number theory",
+    "concept": "subsets"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 17,
+    "topic": "Arithmetic and reasoning",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 19,
+    "topic": "Algebra",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "paper folding"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "inclusion exclusion"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 23,
+    "topic": "Geometry",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 24,
+    "topic": "Counting and probability",
+    "concept": "combinatorial game"
+  },
+  {
+    "examId": "amc10-2021B",
+    "question": 25,
+    "topic": "Algebra",
+    "concept": "lattice point"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 1,
+    "topic": "Algebra",
+    "concept": "fraction"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 2,
+    "topic": "Geometry",
+    "concept": "rectangle"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 3,
+    "topic": "Geometry",
+    "concept": "volume"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 4,
+    "topic": "Arithmetic and reasoning",
+    "concept": "distance rate and time"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 5,
+    "topic": "Number theory",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 6,
+    "topic": "Counting and probability",
+    "concept": "ratio and proportion"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 7,
+    "topic": "Geometry",
+    "concept": "angle chasing"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 8,
+    "topic": "Number theory",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 9,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 10,
+    "topic": "Arithmetic and reasoning",
+    "concept": "expected value"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 11,
+    "topic": "Arithmetic and reasoning",
+    "concept": "relative speed"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 12,
+    "topic": "Number theory",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 13,
+    "topic": "Counting and probability",
+    "concept": "basic probability"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "circumcircle circumcenter and circumradius"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 16,
+    "topic": "Algebra",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 17,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 19,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 20,
+    "topic": "Algebra",
+    "concept": "quadratic"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 21,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 22,
+    "topic": "Geometry",
+    "concept": "3d geometry"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 23,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2021C",
+    "question": 25,
+    "topic": "Algebra",
+    "concept": "quadratic"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "place value"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 2,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 3,
+    "topic": "Arithmetic and reasoning",
+    "concept": "fraction"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "exponent"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 6,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 7,
+    "topic": "Number theory",
+    "concept": "fraction"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 8,
+    "topic": "Number theory",
+    "concept": "prime factorization"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 9,
+    "topic": "Algebra",
+    "concept": "weighted mean"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 10,
+    "topic": "Number theory",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 11,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 12,
+    "topic": "Algebra",
+    "concept": "algebraic manipulation"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "square geometry"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 16,
+    "topic": "Counting and probability",
+    "concept": "expected value"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 17,
+    "topic": "Arithmetic and reasoning",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 18,
+    "topic": "Geometry",
+    "concept": "area decomposition"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 19,
+    "topic": "Algebra",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 20,
+    "topic": "Counting and probability",
+    "concept": "conditional probability"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "counting intersections"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 22,
+    "topic": "Number theory",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 23,
+    "topic": "Counting and probability",
+    "concept": "graph theory"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "burnsides lemma"
+  },
+  {
+    "examId": "amc10-2021D",
+    "question": 25,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "continued fraction"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "ratio and proportion"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 3,
+    "topic": "Algebra",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 4,
+    "topic": "Arithmetic and reasoning",
+    "concept": "unit conversion"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 5,
+    "topic": "Geometry",
+    "concept": "square geometry"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 7,
+    "topic": "Number theory",
+    "concept": "least common multiple"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 8,
+    "topic": "Counting and probability",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 9,
+    "topic": "Arithmetic and reasoning",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "rectangle"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 11,
+    "topic": "Algebra",
+    "concept": "exponent"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 12,
+    "topic": "Arithmetic and reasoning",
+    "concept": "truth tellers and liars"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "angle bisector theorem"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 14,
+    "topic": "Arithmetic and reasoning",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "cyclic quadrilateral"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "vietas formulas"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 17,
+    "topic": "Algebra",
+    "concept": "repeating decimal"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 18,
+    "topic": "Arithmetic and reasoning",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 19,
+    "topic": "Number theory",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 20,
+    "topic": "Algebra",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "3d geometry"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 23,
+    "topic": "Geometry",
+    "concept": "trapezoid"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 24,
+    "topic": "Counting and probability",
+    "concept": "parking functions"
+  },
+  {
+    "examId": "amc10-2022A",
+    "question": 25,
+    "topic": "Number theory",
+    "concept": "lattice point"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "custom operation"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 2,
+    "topic": "Geometry",
+    "concept": "rhombus"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 3,
+    "topic": "Arithmetic and reasoning",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 5,
+    "topic": "Arithmetic and reasoning",
+    "concept": "difference of squares"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 6,
+    "topic": "Number theory",
+    "concept": "prime"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 7,
+    "topic": "Arithmetic and reasoning",
+    "concept": "vietas formulas"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 8,
+    "topic": "Counting and probability",
+    "concept": "multiple"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 9,
+    "topic": "Number theory",
+    "concept": "telescoping"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 10,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 11,
+    "topic": "Arithmetic and reasoning",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 12,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 13,
+    "topic": "Number theory",
+    "concept": "prime"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 14,
+    "topic": "Arithmetic and reasoning",
+    "concept": "subsets"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 15,
+    "topic": "Algebra",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "congruence geometry"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 17,
+    "topic": "Number theory",
+    "concept": "factoring"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "process simulation"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "angle chasing"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 21,
+    "topic": "Algebra",
+    "concept": "polynomial"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 22,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 23,
+    "topic": "Counting and probability",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 24,
+    "topic": "Algebra",
+    "concept": "function"
+  },
+  {
+    "examId": "amc10-2022B",
+    "question": 25,
+    "topic": "Number theory",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "relative speed"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 2,
+    "topic": "Algebra",
+    "concept": "linear equation"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 3,
+    "topic": "Number theory",
+    "concept": "perfect square"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 4,
+    "topic": "Geometry",
+    "concept": "triangle inequality"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 5,
+    "topic": "Number theory",
+    "concept": "prime factorization"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 6,
+    "topic": "Geometry",
+    "concept": "double counting"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 7,
+    "topic": "Counting and probability",
+    "concept": "dice probability"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 8,
+    "topic": "Algebra",
+    "concept": "linear equation"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 9,
+    "topic": "Counting and probability",
+    "concept": "digits"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 10,
+    "topic": "Algebra",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 11,
+    "topic": "Geometry",
+    "concept": "square geometry"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 12,
+    "topic": "Counting and probability",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "inscribed angle"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "circle area"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 16,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 17,
+    "topic": "Geometry",
+    "concept": "pythagorean triple"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "eulers polyhedron formula"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 19,
+    "topic": "Geometry",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 20,
+    "topic": "Counting and probability",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 21,
+    "topic": "Algebra",
+    "concept": "polynomial"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 22,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 23,
+    "topic": "Algebra",
+    "concept": "difference of squares"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "regular polygon"
+  },
+  {
+    "examId": "amc10-2023A",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "graph theory"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "fraction"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 2,
+    "topic": "Algebra",
+    "concept": "percentage"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 3,
+    "topic": "Geometry",
+    "concept": "circumcircle circumcenter and circumradius"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 4,
+    "topic": "Geometry",
+    "concept": "unit conversion"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 5,
+    "topic": "Algebra",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 6,
+    "topic": "Arithmetic and reasoning",
+    "concept": "parity"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 7,
+    "topic": "Geometry",
+    "concept": "angle chasing"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 8,
+    "topic": "Number theory",
+    "concept": "units digit"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 9,
+    "topic": "Counting and probability",
+    "concept": "perfect square"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 10,
+    "topic": "Counting and probability",
+    "concept": "combinatorial game"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 11,
+    "topic": "Counting and probability",
+    "concept": "diophantine equation"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 12,
+    "topic": "Algebra",
+    "concept": "polynomial"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "diophantine equation"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 15,
+    "topic": "Number theory",
+    "concept": "perfect square"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 16,
+    "topic": "Arithmetic and reasoning",
+    "concept": "subsets"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 17,
+    "topic": "Geometry",
+    "concept": "rectangular prism"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 18,
+    "topic": "Number theory",
+    "concept": "greatest common divisor"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "sphere"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 21,
+    "topic": "Counting and probability",
+    "concept": "roots of unity"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 22,
+    "topic": "Algebra",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 23,
+    "topic": "Number theory",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2023B",
+    "question": 25,
+    "topic": "Geometry",
+    "concept": "regular polygon"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 1,
+    "topic": "Arithmetic and reasoning",
+    "concept": "whole number operations"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 2,
+    "topic": "Algebra",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 3,
+    "topic": "Number theory",
+    "concept": "prime"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "inequality"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 5,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 6,
+    "topic": "Counting and probability",
+    "concept": "permutations"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 7,
+    "topic": "Counting and probability",
+    "concept": "factor"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 8,
+    "topic": "Arithmetic and reasoning",
+    "concept": "rate"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 9,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 10,
+    "topic": "Number theory",
+    "concept": "recursion"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 11,
+    "topic": "Algebra",
+    "concept": "diophantine equation"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 12,
+    "topic": "Arithmetic and reasoning",
+    "concept": "data and graph interpretation"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 13,
+    "topic": "Counting and probability",
+    "concept": "transformation"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 14,
+    "topic": "Geometry",
+    "concept": "tangent line"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 15,
+    "topic": "Arithmetic and reasoning",
+    "concept": "perfect square"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 16,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "independent events"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 19,
+    "topic": "Number theory",
+    "concept": "geometric sequence"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 20,
+    "topic": "Arithmetic and reasoning",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 21,
+    "topic": "Algebra",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 22,
+    "topic": "Geometry",
+    "concept": "kite"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 23,
+    "topic": "Algebra",
+    "concept": "system of equations"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 24,
+    "topic": "Geometry",
+    "concept": "basic probability"
+  },
+  {
+    "examId": "amc10-2024A",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "bijection"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 1,
+    "topic": "Counting and probability",
+    "concept": "basic counting"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 2,
+    "topic": "Number theory",
+    "concept": "factorial"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 3,
+    "topic": "Counting and probability",
+    "concept": "absolute value"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 4,
+    "topic": "Number theory",
+    "concept": "triangular number"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 5,
+    "topic": "Arithmetic and reasoning",
+    "concept": "summation"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 6,
+    "topic": "Geometry",
+    "concept": "factor"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 7,
+    "topic": "Number theory",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 8,
+    "topic": "Counting and probability",
+    "concept": "factor counting"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 9,
+    "topic": "Algebra",
+    "concept": "algebraic manipulation"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "parallelogram"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 11,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 12,
+    "topic": "Counting and probability",
+    "concept": "subsets"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 13,
+    "topic": "Number theory",
+    "concept": "radical"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 15,
+    "topic": "Counting and probability",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 16,
+    "topic": "Arithmetic and reasoning",
+    "concept": "parity"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 17,
+    "topic": "Counting and probability",
+    "concept": "permutations"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 18,
+    "topic": "Counting and probability",
+    "concept": "eulers totient function"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 19,
+    "topic": "Counting and probability",
+    "concept": "lattice point"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 20,
+    "topic": "Counting and probability",
+    "concept": "arrangements with restrictions"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 21,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 23,
+    "topic": "Arithmetic and reasoning",
+    "concept": "fibonacci"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 24,
+    "topic": "Counting and probability",
+    "concept": "modular arithmetic"
+  },
+  {
+    "examId": "amc10-2024B",
+    "question": 25,
+    "topic": "Counting and probability",
+    "concept": "diophantine equation"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 1,
+    "topic": "Algebra",
+    "concept": "distance rate and time"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 2,
+    "topic": "Algebra",
+    "concept": "mixture"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 3,
+    "topic": "Geometry",
+    "concept": "isosceles triangle"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 5,
+    "topic": "Arithmetic and reasoning",
+    "concept": "pattern recognition"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 6,
+    "topic": "Geometry",
+    "concept": "equilateral triangle"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 7,
+    "topic": "Algebra",
+    "concept": "polynomial"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 8,
+    "topic": "Counting and probability",
+    "concept": "logical deduction"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 9,
+    "topic": "Algebra",
+    "concept": "function"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 10,
+    "topic": "Geometry",
+    "concept": "circle area"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 11,
+    "topic": "Number theory",
+    "concept": "arithmetic sequence"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 12,
+    "topic": "Counting and probability",
+    "concept": "casework"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "geometric sequence"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "circular arrangements"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 15,
+    "topic": "Geometry",
+    "concept": "similarity"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 16,
+    "topic": "Counting and probability",
+    "concept": "expected value"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 17,
+    "topic": "Number theory",
+    "concept": "greatest common divisor"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 18,
+    "topic": "Algebra",
+    "concept": "vietas formulas"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 19,
+    "topic": "Arithmetic and reasoning",
+    "concept": "recursion"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "tangent line"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 21,
+    "topic": "Arithmetic and reasoning",
+    "concept": "subsets"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 22,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 23,
+    "topic": "Geometry",
+    "concept": "angle bisector theorem"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 24,
+    "topic": "Counting and probability",
+    "concept": "combinations"
+  },
+  {
+    "examId": "amc10-2025A",
+    "question": 25,
+    "topic": "Geometry",
+    "concept": "geometric probability"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 1,
+    "topic": "Algebra",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 2,
+    "topic": "Arithmetic and reasoning",
+    "concept": "units digit"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 3,
+    "topic": "Geometry",
+    "concept": "pascals triangle"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 4,
+    "topic": "Algebra",
+    "concept": "number base"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 5,
+    "topic": "Geometry",
+    "concept": "circumcircle circumcenter and circumradius"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 6,
+    "topic": "Geometry",
+    "concept": "trapezoid"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 7,
+    "topic": "Geometry",
+    "concept": "coordinate geometry"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 8,
+    "topic": "Number theory",
+    "concept": "divisibility"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 9,
+    "topic": "Algebra",
+    "concept": "substitution"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 10,
+    "topic": "Number theory",
+    "concept": "polynomial"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 11,
+    "topic": "Counting and probability",
+    "concept": "derangements"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 12,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 13,
+    "topic": "Geometry",
+    "concept": "special right triangle"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 14,
+    "topic": "Counting and probability",
+    "concept": "basic probability"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 15,
+    "topic": "Arithmetic and reasoning",
+    "concept": "partial fractions"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 16,
+    "topic": "Counting and probability",
+    "concept": "graph theory"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 17,
+    "topic": "Arithmetic and reasoning",
+    "concept": "mean"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 18,
+    "topic": "Algebra",
+    "concept": "floor and ceiling functions"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 19,
+    "topic": "Geometry",
+    "concept": "power scaling of length area and volume"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 20,
+    "topic": "Geometry",
+    "concept": "tangent circles"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 21,
+    "topic": "Counting and probability",
+    "concept": "burnsides lemma"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 22,
+    "topic": "Counting and probability",
+    "concept": "conditional probability"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 23,
+    "topic": "Number theory",
+    "concept": "diophantine equation"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 24,
+    "topic": "Counting and probability",
+    "concept": "random walk"
+  },
+  {
+    "examId": "amc10-2025B",
+    "question": 25,
+    "topic": "Geometry",
+    "concept": "reflection geometry"
+  }
+]
