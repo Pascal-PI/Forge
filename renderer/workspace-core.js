@@ -120,7 +120,7 @@
           typeof session.pinned !== 'boolean') throw Error('Invalid learning session');
       const messages = session.messages.map(message => {
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
-        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line', 'coding', 'equation-balance'].includes(message.activity))) throw Error('Invalid suggested activity');
+        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line', 'coding', 'equation-balance', 'projectile'].includes(message.activity))) throw Error('Invalid suggested activity');
         return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}) };
       });
       let activity = null;
