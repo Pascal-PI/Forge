@@ -12,7 +12,7 @@
   let renderedSession = null;
   const current = () => state.workspace.sessions.find(item => item.id === state.workspace.selected);
   const touch = session => { session.updatedAt = Date.now(); save(); };
-  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line', coding: 'Coding challenge', 'equation-balance': 'Equation balance' };
+  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line', coding: 'Coding challenge', 'equation-balance': 'Equation balance', projectile: 'Projectile playground' };
   const activityActions = { 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line', coding: 'coding-challenge', 'equation-balance': 'equation-balance' };
   function archiveActivity(session) {
     if (!session.activity) return true;
@@ -26,6 +26,25 @@
   function activityMarkup(session) {
     const activity = session?.activity;
     if (!activity) return '';
+    if (activity.type === 'projectile') {
+      if (activity.stage === 'practice') {
+        const choices = ['The range doubles', 'The range becomes four times larger', 'The range stays the same'];
+        return `<aside class="workspace-activity workspace-projectile" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Check your understanding</h2><button data-action="close-activity" aria-label="Close activity">×</button></div><p>Keep the angle at 45°. If you double the launch speed, what happens to the range?</p><div class="workspace-answers">${choices.map((choice, i) => `<button data-projectile-answer="${i}" aria-pressed="${activity.answer === i}">${String.fromCharCode(65 + i)}. ${choice}</button>`).join('')}</div>${activity.answer === null ? '<p>Think about how speed appears in the range equation.</p>' : activity.answer === 1 ? '<p role="status"><strong>Correct.</strong> Range is proportional to speed squared: doubling speed multiplies the range by four.</p><button data-action="projectile-build">Build the simulation</button>' : '<p role="status">Not quite. Range is proportional to speed squared. What is two squared? Try again.</p>'}<button data-action="projectile-explore">Back to the lab</button></aside>`;
+      }
+      if (activity.stage === 'build') {
+        const result = activity.result === null ? null : activity.result ** 2 / 9.81;
+        const endX = result === null ? 20 : 20 + 360 * result / (900 / 9.81);
+        const peak = result === null ? 0 : 105 * (result / 4) / (900 / (4 * 9.81));
+        const trajectory = `M 20 160 Q ${((20 + endX) / 2).toFixed(2)} ${(160 - 2 * peak).toFixed(2)} ${endX.toFixed(2)} 160`;
+        const graph = result === null ? '<div class="projectile-ready">Run the simulation to see the launch.</div>' : `<svg class="projectile-simulation" viewBox="0 0 400 180" role="img" aria-label="Launch at ${activity.result} meters per second, predicted range ${result.toFixed(1)} meters"><path d="M 20 160 H 385" stroke="currentColor" opacity=".3"/><path d="${trajectory}" fill="none" stroke="#df7756" stroke-width="3"/><circle r="6" fill="#df7756" class="projectile-flight" style="offset-path:path('${trajectory}')"/><circle cx="${endX.toFixed(2)}" cy="160" r="3" fill="#47755b"/></svg>`;
+        return `<aside class="workspace-activity workspace-projectile" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Build a launch simulation</h2><button data-action="close-activity" aria-label="Close activity">×</button></div><p>Choose a launch speed and run the model. This simulation uses a 45° angle, Earth gravity and level ground.</p><label for="projectileSpeed">Launch speed: <strong>${activity.speed} m/s</strong></label><input id="projectileSpeed" type="range" min="5" max="30" value="${activity.speed}"><pre class="projectile-code"><code>speed = ${activity.speed}\ngravity = 9.81\nrange_m = speed ** 2 / gravity\nprint(range_m)</code></pre><button data-action="projectile-run">Run simulation</button>${graph}${result === null ? '' : `<p role="status"><strong>${result.toFixed(1)} m</strong> predicted range at ${activity.result} m/s.${activity.result !== activity.speed ? ' Change the speed and run again to update the result.' : ''}</p>`}<p>The result is calculated locally in FORGE. The Python shown expresses the same calculation.</p><button data-action="projectile-explore">Return to the lab</button></aside>`;
+      }
+      const angle = activity.angle * Math.PI / 180;
+      const range = 324 * Math.sin(2 * angle) / 9.81;
+      const height = 324 * Math.sin(angle) ** 2 / 19.62;
+      const points = Array.from({ length: 41 }, (_, i) => { const f = i / 40; return `${(20 + f * range / 33.03 * 360).toFixed(1)},${(200 - 4 * f * (1 - f) * height / 16.5 * 160).toFixed(1)}`; }).join(' ');
+      return `<aside class="workspace-activity workspace-projectile" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Projectile playground</h2><button data-action="close-activity" aria-label="Close activity">×</button></div><p>How does launch angle change the distance? Move the slider and compare the shape and range.</p><svg viewBox="0 0 400 220" role="img" aria-label="Trajectory for ${activity.angle} degrees, range ${range.toFixed(1)} meters"><path d="M20 15V200H385" fill="none" stroke="currentColor" opacity=".35"/><polyline points="${points}" fill="none" stroke="#ed7958" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><label for="projectileAngle">Launch angle: <strong>${activity.angle}°</strong></label><input id="projectileAngle" type="range" min="10" max="80" step="1" value="${activity.angle}"><div class="projectile-metrics"><p>Range <strong>${range.toFixed(1)} m</strong></p><p>Maximum height <strong>${height.toFixed(1)} m</strong></p><p>Launch speed <strong>18 m/s</strong></p></div><p>Earth gravity · Level ground · Air resistance excluded</p><p>At 45°, horizontal speed and flight time balance to maximize range on level ground.</p><button data-action="projectile-practice">Try a challenge</button></aside>`;
+    }
     if (activity.type === 'equation-balance') {
       const result = WorkspaceCore.balanceState(activity);
       const left = result.constant === 0 ? 'x' : `x ${result.constant < 0 ? '−' : '+'} ${Math.abs(result.constant)}`;
@@ -110,6 +129,7 @@
     const now = new Date();
     const today = now.toDateString();
     const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toDateString();
+    const welcome = `<section class="workspace-welcome" aria-label="Start learning"><div class="welcome-copy"><span class="workspace-kicker">MAKE ROOM FOR CURIOSITY</span><h2>Bring the question.<br>Build understanding.</h2><p>Ask your tutor, explore an interactive lab, and practice what you learn. Start by choosing how much time you have.</p><div class="welcome-steps"><span>01 <strong>Ask</strong></span><span>02 <strong>Explore</strong></span><span>03 <strong>Practice</strong></span></div></div><div class="welcome-art"><div><span>YOUR NEXT DISCOVERY</span><strong>From curiosity<br>to capability.</strong><small>One question can lead anywhere.</small></div></div></section>`;
     const sessionGroups = [
       ['Pinned', sessions.filter(item => item.pinned)],
       ['Today', sessions.filter(item => !item.pinned && new Date(item.updatedAt).toDateString() === today)],
@@ -119,13 +139,30 @@
     root.innerHTML = `<div class="workspace-layout${session?.expanded && session.activity ? ' workspace-expanded' : ''}"><aside class="workspace-sessions" aria-label="Learning sessions">
       <h2>Sessions</h2><button class="workspace-new" data-action="new">+ New learning session</button><label for="workspaceSearch">Search conversations</label><input id="workspaceSearch" value="${esc(filter)}" placeholder="Search">
       <div class="workspace-list">${sessionGroups.filter(([, items]) => items.length).map(([label, items]) => `<section aria-label="${label}"><h3>${label}</h3>${items.map(item => `<button data-session="${esc(item.id)}" ${item.id === session?.id ? 'aria-current="true"' : ''}>${esc(item.title)}<small>${new Date(item.updatedAt).toLocaleDateString()}</small></button>`).join('')}</section>`).join('')}</div>
-      <div class="workspace-links"><button data-go="projects">Projects</button><button data-go="math">Practice exams</button><button data-go="coach">Coach settings</button><button data-go="insights">Profile and backups</button></div></aside>
+      <div class="workspace-links"><button data-go="projects">Projects</button><button data-go="math">Practice exams</button><button data-go="coach">Coach settings</button><button data-go="insights">Progress and backups</button></div></aside>
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
-      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong>${message.role === 'assistant' ? `<div class="workspace-rich-text">${WorkspaceMarkup.render(message.text)}</div>` : `<p>${esc(message.text)}</p>`}${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${pendingStream && pendingStream.session === session ? `<article class="workspace-message streaming"><strong>FORGE</strong><p id="workspaceStream" aria-live="off">${esc(pendingStream.text)}</p></article><p role="status">FORGE is responding…</p>` : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
+      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong>${message.role === 'assistant' ? `<div class="workspace-rich-text">${WorkspaceMarkup.render(message.text)}</div>` : `<p>${esc(message.text)}</p>`}${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : welcome}${pendingStream && pendingStream.session === session ? `<article class="workspace-message streaming"><strong>FORGE</strong><p id="workspaceStream" aria-live="off">${esc(pendingStream.text)}</p></article><p role="status">FORGE is responding…</p>` : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
       ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…">${esc(session.draft || '')}</textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${pendingStream?.session === session ? '<button type="button" data-action="stop-tutor">Stop response</button>' : ''}${session.messages.at(-1)?.role === 'user' && !busy ? '<button type="button" data-action="retry">Retry last message</button>' : ''}${session.messages.length === 0 ? `<button type="button" data-action="suggest" ${busy ? 'disabled' : ''}>Suggest a starting point</button>` : ''}</div><p class="workspace-privacy">Sending shares recent messages, your learning goal, and short School and activity summaries with OpenAI. API usage is billed to your key. Drafts stay on this device until sent.</p></form>`}
-      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
+      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="projectile">Projectile playground</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
       </div>${activityMarkup(session)}</div>`;
     sidebar.replaceChildren(root.querySelector('.workspace-sessions'));
+    if (session) {
+      const historyIndex = session.activities?.findLastIndex(item => item.type === 'projectile') ?? -1;
+      const active = session.activity?.type === 'projectile';
+      const path = active ? session.activity : historyIndex >= 0 ? session.activities[historyIndex] : null;
+      if (path) {
+        const steps = [
+          ['Explore a trajectory', path.explored ? 'Angle adjusted' : 'Try changing the launch angle', Boolean(path.explored)],
+          ['Check your understanding', path.answer === 1 ? 'Answered correctly' : path.answer === null ? 'Ready when you are' : 'Try the question again', path.answer === 1],
+          ['Run the simulation', path.result === null ? 'Build and run the model' : `Ran at ${path.result} m/s · ${(path.result ** 2 / 9.81).toFixed(1)} m`, path.result !== null]
+        ];
+        const panel = document.createElement('section');
+        panel.className = 'workspace-path';
+        panel.setAttribute('aria-label', 'Projectile learning path');
+        panel.innerHTML = `<div class="workspace-path-heading"><div><span class="workspace-kicker">YOUR LEARNING PATH</span><h2>From question to project</h2></div><span>${steps.filter(step => step[2]).length} / 3 steps</span></div><ol>${steps.map(([title, detail, done]) => `<li><span class="path-check" aria-hidden="true">${done ? '✓' : '○'}</span><div><strong>${title}</strong><small>${detail}</small></div></li>`).join('')}</ol>${active ? '<button data-action="projectile-resume">Continue learning</button>' : `<button data-activity-index="${historyIndex}">Resume saved path</button>`}<p>Progress reflects actions recorded in this session.</p>`;
+        root.querySelector('.workspace-tools')?.before(panel);
+      }
+    }
     root.querySelectorAll('.workspace-rich-text pre').forEach(pre => {
       if (!pre.querySelector('code')) return;
       const wrapper = document.createElement('div');
@@ -148,6 +185,13 @@
     }
     const search = document.getElementById('workspaceSearch');
     search.addEventListener('input', () => { filter = search.value; render(); });
+    const composer = document.getElementById('workspaceForm');
+    if (composer) {
+      const importer = document.createElement('div');
+      importer.className = 'workspace-import';
+      importer.innerHTML = '<label for="workspaceNotes">Add notes for a learning path (.txt or .pdf)</label><input id="workspaceNotes" type="file" accept=".txt,text/plain,.pdf,application/pdf"><p>Notes are read on this device and added to your editable draft. They are sent to the tutor only when you choose Send.</p>';
+      composer.querySelector('textarea').after(importer);
+    }
     document.getElementById('workspaceForm')?.addEventListener('submit', event => {
       event.preventDefault();
       const input = document.getElementById('workspaceInput');
@@ -172,6 +216,12 @@
     try {
       const messages = session.messages.slice(-12).map(message => ({ role: message.role, text: message.text.slice(0, 3000) }));
       const activity = session.activity;
+      if (activity?.type === 'projectile' && messages.at(-1)?.role === 'user') {
+        const range = 324 * Math.sin(2 * activity.angle * Math.PI / 180) / 9.81;
+        const answer = activity.answer === null ? 'not answered' : activity.answer === 1 ? 'correct' : 'incorrect';
+        const run = activity.result === null ? 'not yet run' : `${activity.result} m/s, ${(activity.result ** 2 / 9.81).toFixed(1)} m range`;
+        messages.at(-1).text = (messages.at(-1).text + `\n\nProjectile lab: angle ${activity.angle} degrees at 18 m/s, range ${range.toFixed(1)} m; challenge ${answer}; 45-degree build ${run}. Level ground, Earth gravity, no air resistance.`).slice(0, 4000);
+      }
       if (activity?.type === 'school-question' && activity.answer !== null && messages.at(-1)?.role === 'user') {
         const question = SchoolCore.byId.get(activity.questionId);
         messages.at(-1).text += `\n\nRecent practice: ${question.subject}, ${question.topic}. The learner answered ${activity.answer === question.answer ? 'correctly' : 'incorrectly'} on: ${question.prompt}`;
@@ -235,7 +285,87 @@
     }
   }
 
+  root.addEventListener('change', async event => {
+    if (event.target.id !== 'workspaceNotes') return;
+    const file = event.target.files?.[0], session = current();
+    if (!file || !session) return;
+    event.target.value = '';
+    try {
+      const pdf = /\.pdf$/i.test(file.name), textFile = /\.txt$/i.test(file.name);
+      if (!pdf && !textFile) throw Error('Choose a .txt or .pdf file.');
+      if (file.size > (pdf ? 10 * 1024 * 1024 : 1024 * 1024)) throw Error(pdf ? 'Choose a PDF under 10 MB.' : 'Choose a text file under 1 MB.');
+      let content = '', partial = false;
+      if (pdf) {
+        const module = await import('./vendor/pdf.mjs');
+        module.GlobalWorkerOptions.workerSrc = new URL('./vendor/pdf.worker.mjs', location.href).href;
+        const base = new URL('./vendor/', location.href).href;
+        const task = module.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false, useWasm: false, useWorkerFetch: false, cMapUrl: base + 'cmaps/', cMapPacked: true, standardFontDataUrl: base + 'standard_fonts/', iccUrl: base + 'iccs/' });
+        try {
+          const doc = await task.promise;
+          const pages = Math.min(doc.numPages, 15);
+          partial = doc.numPages > pages;
+          for (let i = 1; i <= pages; i++) {
+            const page = await doc.getPage(i), text = await page.getTextContent();
+            content += text.items.map(item => item.str || '').join(' ') + '\n';
+            page.cleanup();
+            if (content.length > 4000) { partial = true; break; }
+          }
+        } finally { await task.destroy(); }
+      } else content = await file.text();
+      content = content.trim();
+      if (!content) throw Error('No selectable text found. Scanned PDFs need text recognition before importing.');
+      if (!state.workspace.sessions.includes(session)) return;
+      const prefix = 'Please create a clear learning path from these notes, with a first step, practice, and a small project.\n\nNotes:\n';
+      const previous = session.draft || '', separator = previous ? '\n\n' : '';
+      const available = 4000 - previous.length - separator.length - prefix.length;
+      if (available < 100) throw Error('Your draft is nearly full. Shorten it before adding notes.');
+      partial ||= content.length > available;
+      session.draft = previous + separator + prefix + content.slice(0, available);
+      touch(session);
+      if (current() === session) { error = ''; render(); document.getElementById('workspaceInput')?.focus(); }
+      toast(partial ? 'Part of the notes was added. Review the draft before sending.' : 'Notes added to your draft. Review before sending.');
+    } catch (failure) {
+      if (current() === session) { error = String(failure.message || 'Could not read those notes.'); render(); }
+    }
+  });
+
   root.addEventListener('input', event => {
+    if (event.target.id === 'projectileSpeed' && current()?.activity?.type === 'projectile' && current().activity.stage === 'build') {
+      const speed = Number(event.target.value);
+      if (!Number.isInteger(speed) || speed < 5 || speed > 30) return;
+      const activity = current().activity;
+      activity.speed = speed;
+      touch(current());
+      const panel = root.querySelector('.workspace-projectile');
+      panel.querySelector('label strong').textContent = `${speed} m/s`;
+      panel.querySelector('.projectile-code code').textContent = `speed = ${speed}\ngravity = 9.81\nrange_m = speed ** 2 / gravity\nprint(range_m)`;
+      const status = panel.querySelector('[role="status"]');
+      if (status && activity.result !== speed) status.textContent = `Previous run: ${(activity.result ** 2 / 9.81).toFixed(1)} m at ${activity.result} m/s. Run again to update.`;
+      return;
+    }
+    if (event.target.id === 'projectileAngle' && current()?.activity?.type === 'projectile') {
+      const angle = Number(event.target.value);
+      if (!Number.isInteger(angle) || angle < 10 || angle > 80) return;
+      current().activity.angle = angle;
+      current().activity.explored = true;
+      const pathSummary = root.querySelector('.workspace-path');
+      if (pathSummary) {
+        pathSummary.querySelector('li:first-child small').textContent = 'Angle adjusted';
+        pathSummary.querySelector('li:first-child .path-check').textContent = '✓';
+        pathSummary.querySelector('.workspace-path-heading > span').textContent = `${1 + Number(current().activity.answer === 1) + Number(current().activity.result !== null)} / 3 steps`;
+      }
+      touch(current());
+      const panel = root.querySelector('.workspace-projectile');
+      if (panel) {
+        const template = document.createElement('template');
+        template.innerHTML = activityMarkup(current());
+        const updated = template.content.querySelector('.workspace-projectile');
+        panel.querySelector('svg').replaceWith(updated.querySelector('svg'));
+        panel.querySelector('label strong').textContent = `${angle}°`;
+        panel.querySelector('.projectile-metrics').replaceWith(updated.querySelector('.projectile-metrics'));
+      }
+      return;
+    }
     if (event.target.id === 'workspaceInput' && current()) {
       const session = current();
       session.draft = event.target.value.slice(0, 4000);
@@ -274,6 +404,30 @@
     const session = current();
     if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
     if (!session) return;
+    if (button.dataset.action === 'projectile') {
+      if (!archiveActivity(session)) return;
+      session.activity = { type: 'projectile', angle: 35, stage: 'explore', answer: null, speed: 18, result: null, explored: false };
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
+    if (session.activity?.type === 'projectile') {
+      const activity = session.activity;
+      if (button.dataset.action === 'projectile-resume') { document.getElementById('workspaceActivityHeading')?.focus(); document.getElementById('workspaceActivityHeading')?.scrollIntoView({ block: 'nearest' }); return; }
+      if (button.dataset.projectileAnswer !== undefined && activity.stage === 'practice') {
+        const answer = Number(button.dataset.projectileAnswer);
+        if (!Number.isInteger(answer) || answer < 0 || answer > 2) return;
+        activity.answer = answer;
+        touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+      }
+      const stages = { 'projectile-practice': 'practice', 'projectile-build': 'build', 'projectile-explore': 'explore' };
+      if (Object.hasOwn(stages, button.dataset.action) && (button.dataset.action !== 'projectile-build' || activity.answer === 1)) {
+        activity.stage = stages[button.dataset.action];
+        touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+      }
+      if (button.dataset.action === 'projectile-run' && activity.stage === 'build') {
+        activity.result = activity.speed;
+        touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+      }
+    }
     if (button.dataset.action === 'stop-tutor' && pendingStream?.session === session) { window.forgeDesktop.coachCancel().catch(() => {}); return; }
     if (button.dataset.action === 'equation-balance') {
       const previous = session.activity?.type === 'equation-balance' ? session.activity.problem : -1;
@@ -417,7 +571,36 @@
     const expanded = document.body.classList.toggle('workspace-sessions-open');
     event.currentTarget.setAttribute('aria-expanded', String(expanded));
   });
-  window.WorkspaceUI = { refresh: render };
+  const progress = document.createElement('section');
+  progress.id = 'workspaceProgress';
+  progress.className = 'workspace-progress card card-pad section';
+  document.getElementById('insightsMetrics').after(progress);
+  function renderProgress() {
+    const summary = WorkspaceCore.learningProgress(state.workspace);
+    const rows = summary.pathsByRecency.slice(0, 6).map(({ sessionId, title, activity, index }) => {
+      const steps = Number(Boolean(activity.explored)) + Number(activity.answer === 1) + Number(Number.isInteger(activity.result));
+      const next = !activity.explored ? 'Adjust the launch angle' : activity.answer !== 1 ? 'Try the understanding check' : !Number.isInteger(activity.result) ? 'Run your simulation' : 'Review your simulation';
+      return `<li><div><strong>${esc(title)}</strong><small>Projectile playground · ${steps}/3 steps · ${next}</small></div><button class="btn sm" data-progress-session="${esc(sessionId)}" ${index === null ? '' : `data-progress-index="${index}"`}>${steps === 3 ? 'Review' : 'Continue'}</button></li>`;
+    }).join('');
+    progress.innerHTML = `<div class="section-head"><div><span class="workspace-kicker">YOUR LEARNING</span><h2>Progress you can return to</h2></div><span class="small-badge">Saved on this device</span></div><p class="tiny muted">Counts reflect saved sessions and current activity results, not a measurement of mastery.</p><div class="workspace-progress-metrics"><div><strong>${summary.sessions}</strong><span>learning sessions</span></div><div><strong>${summary.paths}</strong><span>projectile paths</span></div><div><strong>${summary.checks}</strong><span>correct checks</span></div><div><strong>${summary.simulations}</strong><span>simulations run</span></div></div>${rows ? `<h3>Pick up where you left off</h3><ul>${rows}</ul>` : '<p class="muted">Start a learning session and open Projectile playground to see your path here.</p>'}`;
+  }
+  progress.addEventListener('click', event => {
+    const button = event.target.closest('[data-progress-session]');
+    if (!button) return;
+    const session = state.workspace.sessions.find(item => item.id === button.dataset.progressSession);
+    if (!session) { renderProgress(); return; }
+    if (button.hasAttribute('data-progress-index')) {
+      const index = Number(button.dataset.progressIndex), selected = session.activities?.[index];
+      if (!Number.isInteger(index) || selected?.type !== 'projectile') { renderProgress(); return; }
+      session.activities.splice(index, 1);
+      if (session.activity) session.activities.push(session.activity);
+      session.activity = selected;
+    }
+    state.workspace.selected = session.id;
+    save(); go('workspace');
+    document.getElementById('workspaceActivityHeading')?.focus();
+  });
+  window.WorkspaceUI = { refresh: render, refreshProgress: renderProgress };
   render();
   go('workspace');
 })();

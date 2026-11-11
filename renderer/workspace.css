@@ -41,8 +41,10 @@
 .workspace-chat form button,.workspace-durations button { margin:8px 8px 0 0; border:0; border-radius:9px; background:#8067e8; color:white; padding:11px 18px; cursor:pointer; }
 .workspace-error { color:#f69f9f; }
 .workspace-privacy { font-size:.78rem; opacity:.75; }
-.workspace-layout:has(.workspace-activity) { grid-template-columns:minmax(0,1fr) minmax(260px,340px); }
-.workspace-activity { border-left:1px solid #30364b; padding-left:20px; }
+.workspace-layout:has(.workspace-activity) { grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr); align-items:start; }
+.workspace-activity { min-width:0; border:1px solid var(--border); border-radius:16px; background:var(--panel); padding:22px; }
+.workspace-activity h2 { font-size:1.25rem; line-height:1.25; }
+.workspace-activity p { line-height:1.6; }
 .workspace-activity-header { display:flex; justify-content:space-between; align-items:center; }
 .workspace-activity-header h2 { margin-right:auto; }
 .workspace-activity-header button { margin-left:8px; }
@@ -81,5 +83,60 @@
 :root[data-theme=light] .workspace-activity-header button,:root[data-theme=light] .workspace-activity>button,:root[data-theme=light] .workspace-tools button,:root[data-theme=light] .workspace-answers button,:root[data-theme=light] .workspace-search-controls button,:root[data-theme=light] .workspace-history button { background:#eef1fa; border-color:#aab7d2; color:#182542; }
 :root[data-theme=light] .workspace-search-array li.middle { background:#d6edf1; border-color:#438a9b; }
 :root[data-theme=light] .workspace-error { color:#a12626; }
-@media(max-width:1100px) { .workspace-layout:has(.workspace-activity) { grid-template-columns:1fr; } .workspace-activity { grid-column:1; border-left:0; border-top:1px solid var(--border); padding:20px 0; } }
+@media(max-width:1100px) { .workspace-layout:has(.workspace-activity) { grid-template-columns:1fr; } .workspace-activity { grid-column:1; padding:20px; } }
 @media(max-width:760px) { .workspace-mode .workspace-sidebar-toggle { display:inline-block; margin:0 12px 8px; } .workspace-mode #workspaceSidebar { display:none; } .workspace-mode.workspace-sessions-open #workspaceSidebar { display:block; } .workspace-mode .workspace-tools-toggle { display:inline-block; margin:0 0 8px; } .workspace-mode.workspace-nav-open .sidebar .tabs { display:flex; } .workspace-list { max-height:180px; overflow:auto; } .workspace-links { display:flex; flex-wrap:wrap; } }
+.workspace-projectile svg { display:block; width:100%; max-height:240px; background:var(--surface, #eef2e9); border-radius:12px; margin:1rem 0; }
+.workspace-projectile input[type="range"] { width:100%; accent-color:#ed7958; margin:1rem 0; }
+.projectile-metrics { display:flex; flex-wrap:wrap; gap:1rem; }
+.projectile-metrics p { flex:1 1 100px; }
+.projectile-metrics strong { display:block; font-size:1.25rem; }
+.projectile-code { overflow:auto; padding:16px; border-radius:10px; background:#202b27; color:#e9f3e7; font: .9rem/1.6 Consolas,monospace; }
+.projectile-ready { margin:12px 0; padding:18px; border-radius:10px; background:var(--panel2); color:var(--muted); }
+.projectile-simulation .projectile-flight { offset-rotate:0deg; offset-distance:100%; animation:projectile-launch 2.2s ease-in-out both; }
+@keyframes projectile-launch { from { offset-distance:0%; } to { offset-distance:100%; } }
+@media(prefers-reduced-motion:reduce) { .projectile-simulation .projectile-flight { animation:none; offset-distance:100%; } }
+.workspace-import { margin:12px 0; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--panel); }
+.workspace-import label { font-weight:700; }
+.workspace-import input { max-width:100%; color:var(--text); }
+.workspace-import p { color:var(--muted); font-size:.78rem; line-height:1.5; margin:8px 0 0; }
+.workspace-path { padding:20px; border:1px solid var(--border); background:var(--panel); border-radius:14px; }
+.workspace-path-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.workspace-path-heading h2 { margin:6px 0; font-size:1.15rem; }
+.workspace-path-heading > span { color:var(--muted); font-size:.8rem; white-space:nowrap; }
+.workspace-path ol { list-style:none; display:grid; gap:12px; padding:0; margin:16px 0; }
+.workspace-path li { display:flex; align-items:flex-start; gap:10px; }
+.workspace-path .path-check { color:#e87557; font-weight:700; font-size:1.1rem; }
+.workspace-path li strong,.workspace-path li small { display:block; }
+.workspace-path li small,.workspace-path p { color:var(--muted); margin-top:3px; font-size:.8rem; }
+.workspace-path button { border:1px solid var(--border); color:var(--text); background:var(--panel2); border-radius:8px; padding:9px 12px; cursor:pointer; }
+.workspace-progress h2 { margin:6px 0; }
+.workspace-progress h3 { margin:22px 0 8px; }
+.workspace-progress-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:18px; }
+.workspace-progress-metrics > div { padding:16px; border:1px solid var(--border); border-radius:10px; background:var(--panel2); }
+.workspace-progress-metrics strong,.workspace-progress-metrics span { display:block; }
+.workspace-progress-metrics strong { font-size:1.7rem; }
+.workspace-progress-metrics span { color:var(--muted); font-size:.8rem; }
+.workspace-progress ul { list-style:none; margin:0; padding:0; }
+.workspace-progress li { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-top:1px solid var(--border); }
+.workspace-progress li small { display:block; margin-top:4px; color:var(--muted); }
+@media(max-width:650px) { .workspace-progress-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+/* Learning home: a welcoming entry point without changing the user's theme. */
+.workspace-welcome { display:grid; grid-template-columns:1fr 1fr; overflow:hidden; border:1px solid var(--border); border-radius:16px; background:var(--panel); }
+.welcome-copy { padding:clamp(22px,3vw,34px); display:flex; flex-direction:column; align-items:flex-start; }
+.welcome-copy h2 { margin:18px 0 12px; font-size:clamp(1.55rem,2.6vw,2.2rem); line-height:1.15; letter-spacing:-.035em; }
+.welcome-copy p { color:var(--muted); line-height:1.7; max-width:340px; margin:0; }
+.welcome-steps { display:flex; flex-wrap:wrap; gap:16px; margin-top:auto; padding-top:26px; }
+.welcome-steps span { color:var(--muted); font-size:.75rem; letter-spacing:.04em; }
+.welcome-steps strong { display:block; color:var(--text); font-size:.9rem; margin-top:4px; letter-spacing:0; }
+.welcome-art { min-height:290px; display:flex; align-items:flex-end; padding:26px; background:linear-gradient(0deg,rgba(17,26,24,.94),rgba(17,26,24,.05) 88%),url('assets/learning-hero.webp') center / cover; color:#fff; }
+.welcome-art span,.welcome-art small { display:block; color:#e3e7df; font-size:.75rem; }
+.welcome-art span { letter-spacing:.14em; font-weight:700; }
+.welcome-art strong { display:block; margin:10px 0; font-size:clamp(1.5rem,2.4vw,2rem); line-height:1.2; letter-spacing:-.025em; }
+.workspace-durations { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.workspace-durations::before { content:'Choose your session'; width:100%; color:var(--muted); font-size:.85rem; font-weight:700; }
+.workspace-durations button,.workspace-chat form button[type=submit],.workspace-sessions .workspace-new { background:#e95e42; color:#fff; }
+.workspace-durations button:hover,.workspace-chat form button[type=submit]:hover,.workspace-sessions .workspace-new:hover { background:#c9452c; }
+.workspace-kicker { color:#ff9b7f; font-weight:700; letter-spacing:.14em; }
+:root[data-theme=light] .workspace-kicker { color:#a33c25; }
+@media(max-width:650px) { .workspace-welcome { grid-template-columns:1fr; } .welcome-art { min-height:180px; } .welcome-copy { padding:22px; } .workspace-messages { max-height:55vh; } }

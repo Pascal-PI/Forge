@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 require('../renderer/school-core.js');
-const { normalize, searchState, searchValues, sortingState, sortingSets, lineState, balanceState, balanceProblems, codingChallenge } = require('../renderer/workspace-core.js');
+const { normalize, learningProgress, searchState, searchValues, sortingState, sortingSets, lineState, balanceState, balanceProblems, codingChallenge } = require('../renderer/workspace-core.js');
 
 assert.deepEqual(normalize(undefined), { sessions: [], selected: null });
 const saved = { sessions: [{ id: 'session-1', title: 'Binary search', minutes: 25, createdAt: 1, updatedAt: 2, pinned: true, messages: [{ role: 'user', text: 'How does it work?' }, { role: 'assistant', text: 'Start in the middle.' }], activity: {type:'school-question',questionId:globalThis.SchoolCore.QUESTIONS[0].id,answer:1,hint:true}, activities: [], draft:'unfinished thought', expanded:false }], selected: 'session-1' };
@@ -51,4 +51,13 @@ const coding = {type:'coding',challengeId:codingChallenge.id,code:'print(7)',att
 assert.deepEqual(normalize({...saved,sessions:[{...saved.sessions[0],activity:coding}]}).sessions[0].activity,coding);
 assert.throws(() => normalize({...saved,sessions:[{...saved.sessions[0],activity:{...coding,challengeId:'unknown'}}]}));
 assert.throws(() => normalize({...saved,sessions:[{...saved.sessions[0],activity:{...coding,attempts:[{code:'x',createdAt:3,tests:Array(3).fill({status:'Accepted',output:'7'})}]}}]}));
+const projectile = {type:'projectile',angle:60,stage:'build',answer:1,speed:25,result:20,explored:true};
+const summary = learningProgress({...saved,sessions:[{...saved.sessions[0],activity:projectile,activities:[{...projectile,answer:null,result:null}]}]});
+assert.deepEqual([summary.sessions,summary.paths,summary.checks,summary.simulations],[1,2,1,1]);
+assert.equal(summary.pathsByRecency[0].index,null);
+assert.equal(summary.pathsByRecency[1].index,0);
+assert.deepEqual([learningProgress({sessions:[]}).sessions,learningProgress({sessions:[]}).paths],[0,0]);
+assert.deepEqual(normalize({...saved,sessions:[{...saved.sessions[0],activity:projectile}]}).sessions[0].activity,projectile);
+assert.deepEqual(normalize({...saved,sessions:[{...saved.sessions[0],activity:{type:'projectile',angle:35}}]}).sessions[0].activity,{type:'projectile',angle:35,stage:'explore',answer:null,speed:18,result:null,explored:false});
+for (const change of [{angle:81},{stage:'other'},{answer:3},{speed:31},{result:-1},{explored:'yes'}]) assert.throws(() => normalize({...saved,sessions:[{...saved.sessions[0],activity:{...projectile,...change}}]}));
 console.log('Workspace backup validation passed');

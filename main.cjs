@@ -34,6 +34,7 @@ const files = new Map([
   ['/school.css', ['school.css', 'text/css; charset=utf-8']],
   ['/summit.css', ['summit.css', 'text/css; charset=utf-8']],
   ['/assets/summit-hero.png', ['assets/summit-hero.png', 'image/png']],
+  ['/assets/learning-hero.webp', ['assets/learning-hero.webp', 'image/webp']],
   ['/aoc-core.js', ['aoc-core.js', 'text/javascript; charset=utf-8']],
   ['/focus-core.js', ['focus-core.js', 'text/javascript; charset=utf-8']],
   ['/training-core.js', ['training-core.js', 'text/javascript; charset=utf-8']],

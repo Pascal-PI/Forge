@@ -68,6 +68,12 @@
 
   function normalizeActivity(item) {
     if (!item || typeof item !== 'object') throw Error('Invalid learning activity');
+    if (item.type === 'projectile') {
+      if (!Number.isInteger(item.angle) || item.angle < 10 || item.angle > 80) throw Error('Invalid projectile activity');
+      const stage = item.stage ?? 'explore', answer = item.answer ?? null, speed = item.speed ?? 18, result = item.result ?? null, explored = item.explored ?? false;
+      if (!['explore', 'practice', 'build'].includes(stage) || ![null, 0, 1, 2].includes(answer) || !Number.isInteger(speed) || speed < 5 || speed > 30 || !(result === null || Number.isInteger(result) && result >= 5 && result <= 30) || typeof explored !== 'boolean') throw Error('Invalid projectile activity');
+      return { type: item.type, angle: item.angle, stage, answer, speed, result, explored };
+    }
     if (item.type === 'binary-search') {
       searchState(item);
       return { type: item.type, target: item.target, moves: [...item.moves] };
@@ -131,6 +137,15 @@
     return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null };
   }
 
-  root.WorkspaceCore = { normalize, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge };
+  function learningProgress(workspace) {
+    const sessions = workspace?.sessions || [];
+    const paths = sessions.flatMap(session => [
+      ...(session.activities || []).map((activity, index) => ({ activity, index })),
+      ...(session.activity ? [{ activity: session.activity, index: null }] : [])
+    ].filter(item => item.activity.type === 'projectile').map(item => ({ sessionId: session.id, title: session.title, updatedAt: session.updatedAt, ...item })));
+    paths.sort((a, b) => b.updatedAt - a.updatedAt || (b.index ?? Infinity) - (a.index ?? Infinity));
+    return { sessions: sessions.length, paths: paths.length, checks: paths.filter(item => item.activity.answer === 1).length, simulations: paths.filter(item => Number.isInteger(item.activity.result)).length, pathsByRecency: paths };
+  }
+  root.WorkspaceCore = { normalize, learningProgress, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge };
   if (typeof module !== 'undefined') module.exports = root.WorkspaceCore;
 })(typeof window !== 'undefined' ? window : globalThis);
