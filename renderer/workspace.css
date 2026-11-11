@@ -96,6 +96,7 @@
 @keyframes projectile-launch { from { offset-distance:0%; } to { offset-distance:100%; } }
 @media(prefers-reduced-motion:reduce) { .projectile-simulation .projectile-flight { animation:none; offset-distance:100%; } }
 .workspace-import { margin:12px 0; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--panel); }
+.workspace-import-over { border-color:#df7054; box-shadow:0 0 0 3px #df705433; }
 .workspace-import label { font-weight:700; }
 .workspace-import input { max-width:100%; color:var(--text); }
 .workspace-import p { color:var(--muted); font-size:.78rem; line-height:1.5; margin:8px 0 0; }

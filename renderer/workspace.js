@@ -189,7 +189,7 @@
     if (composer) {
       const importer = document.createElement('div');
       importer.className = 'workspace-import';
-      importer.innerHTML = '<label for="workspaceNotes">Add notes for a learning path (.txt or .pdf)</label><input id="workspaceNotes" type="file" accept=".txt,text/plain,.pdf,application/pdf"><p>Notes are read on this device and added to your editable draft. They are sent to the tutor only when you choose Send.</p>';
+      importer.innerHTML = '<label for="workspaceNotes">Drop notes here or choose a file (.txt or .pdf)</label><input id="workspaceNotes" type="file" accept=".txt,text/plain,.pdf,application/pdf"><p>Notes are read on this device and added to your editable draft. They are sent to the tutor only when you choose Send.</p>';
       composer.querySelector('textarea').after(importer);
     }
     document.getElementById('workspaceForm')?.addEventListener('submit', event => {
@@ -214,7 +214,7 @@
   async function respond(session) {
     busy = true; error = ''; pendingStream = { requestId: crypto.randomUUID(), session, text: '' }; render();
     try {
-      const messages = session.messages.slice(-12).map(message => ({ role: message.role, text: message.text.slice(0, 3000) }));
+      const messages = session.messages.slice(-12).map(message => ({ role: message.role, text: message.text.slice(0, 4000) }));
       const activity = session.activity;
       if (activity?.type === 'projectile' && messages.at(-1)?.role === 'user') {
         const range = 324 * Math.sin(2 * activity.angle * Math.PI / 180) / 9.81;
@@ -285,11 +285,8 @@
     }
   }
 
-  root.addEventListener('change', async event => {
-    if (event.target.id !== 'workspaceNotes') return;
-    const file = event.target.files?.[0], session = current();
+  async function importNotes(file, session) {
     if (!file || !session) return;
-    event.target.value = '';
     try {
       const pdf = /\.pdf$/i.test(file.name), textFile = /\.txt$/i.test(file.name);
       if (!pdf && !textFile) throw Error('Choose a .txt or .pdf file.');
@@ -327,6 +324,32 @@
     } catch (failure) {
       if (current() === session) { error = String(failure.message || 'Could not read those notes.'); render(); }
     }
+  }
+  root.addEventListener('change', event => {
+    if (event.target.id !== 'workspaceNotes') return;
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    importNotes(file, current());
+  });
+  root.addEventListener('dragover', event => {
+    const zone = event.target.closest('.workspace-import');
+    if (!zone || !Array.from(event.dataTransfer?.types || []).includes('Files')) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    zone.classList.add('workspace-import-over');
+  });
+  root.addEventListener('dragleave', event => {
+    const zone = event.target.closest('.workspace-import');
+    if (zone && !zone.contains(event.relatedTarget)) zone.classList.remove('workspace-import-over');
+  });
+  root.addEventListener('drop', event => {
+    const zone = event.target.closest('.workspace-import');
+    if (!zone) return;
+    event.preventDefault();
+    zone.classList.remove('workspace-import-over');
+    const files = event.dataTransfer?.files;
+    if (files?.length !== 1) { error = 'Drop one .txt or .pdf file at a time.'; render(); return; }
+    importNotes(files[0], current());
   });
 
   root.addEventListener('input', event => {
