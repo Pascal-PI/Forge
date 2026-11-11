@@ -98,7 +98,10 @@
 .workspace-import { margin:12px 0; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--panel); }
 .workspace-import-over { border-color:#df7054; box-shadow:0 0 0 3px #df705433; }
 .workspace-import label { font-weight:700; }
+.workspace-import label span { font-weight:400; color:var(--muted); }
 .workspace-import input { max-width:100%; color:var(--text); }
+.workspace-import input[type=text] { display:block; width:100%; box-sizing:border-box; padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--panel2); }
+.workspace-import button { margin:8px 0 14px; border:1px solid var(--border); border-radius:8px; padding:8px 12px; background:var(--panel2); color:var(--text); cursor:pointer; }
 .workspace-import p { color:var(--muted); font-size:.78rem; line-height:1.5; margin:8px 0 0; }
 .workspace-path { padding:20px; border:1px solid var(--border); background:var(--panel); border-radius:14px; }
 .workspace-path-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }

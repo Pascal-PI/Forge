@@ -121,7 +121,7 @@
     const sameSession = renderedSession === (session?.id || null);
     const scrollTop = oldMessages?.scrollTop || 0;
     const followLatest = !sameSession || !oldMessages || oldMessages.scrollHeight - oldMessages.scrollTop - oldMessages.clientHeight < 32;
-    const focused = sameSession && ['workspaceInput', 'workspaceCode', 'workspaceSearch'].includes(document.activeElement?.id) ? document.activeElement.id : null;
+    const focused = sameSession && ['workspaceInput', 'workspaceCode', 'workspaceSearch', 'workspaceLearningGoal'].includes(document.activeElement?.id) ? document.activeElement.id : null;
     const selectionStart = focused ? document.activeElement.selectionStart : null;
     const selectionEnd = focused ? document.activeElement.selectionEnd : null;
     const sessions = [...state.workspace.sessions].sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt)
@@ -189,7 +189,7 @@
     if (composer) {
       const importer = document.createElement('div');
       importer.className = 'workspace-import';
-      importer.innerHTML = '<label for="workspaceNotes">Drop notes here or choose a file (.txt or .pdf)</label><input id="workspaceNotes" type="file" accept=".txt,text/plain,.pdf,application/pdf"><p>Notes are read on this device and added to your editable draft. They are sent to the tutor only when you choose Send.</p>';
+      importer.innerHTML = `<label for="workspaceLearningGoal">What do you want to learn or build? <span>(optional)</span></label><input id="workspaceLearningGoal" type="text" maxlength="300" value="${esc(session.learningGoal || '')}" placeholder="e.g. Build a launch simulator"><button type="button" data-action="prepare-learning-path">Use goal in draft</button><label for="workspaceNotes">Drop notes here or choose a file (.txt or .pdf)</label><input id="workspaceNotes" type="file" accept=".txt,text/plain,.pdf,application/pdf"><p>Your goal and notes stay on this device until you send the draft to the tutor.</p>`;
       composer.querySelector('textarea').after(importer);
     }
     document.getElementById('workspaceForm')?.addEventListener('submit', event => {
@@ -200,7 +200,7 @@
       if (session.messages.length >= 299) { error = 'This session is full. Start a new session to continue.'; render(); return; }
       session.messages.push({ role: 'user', text });
       session.draft = '';
-      if (session.messages.length === 1) session.title = text.slice(0, 70);
+      if (session.messages.length === 1) session.title = (session.learningGoal?.trim() || text).slice(0, 70);
       touch(session);
       respond(session);
     });
@@ -312,7 +312,8 @@
       content = content.trim();
       if (!content) throw Error('No selectable text found. Scanned PDFs need text recognition before importing.');
       if (!state.workspace.sessions.includes(session)) return;
-      const prefix = 'Please create a clear learning path from these notes, with a first step, practice, and a small project.\n\nNotes:\n';
+      const goal = (session.learningGoal || '').trim();
+      const prefix = 'Please create a clear learning path with a first step, practice, and a small project.' + (goal ? `\n\nMy learning goal:\n${goal}` : '') + '\n\nNotes:\n';
       const previous = session.draft || '', separator = previous ? '\n\n' : '';
       const available = 4000 - previous.length - separator.length - prefix.length;
       if (available < 100) throw Error('Your draft is nearly full. Shorten it before adding notes.');
@@ -353,6 +354,11 @@
   });
 
   root.addEventListener('input', event => {
+    if (event.target.id === 'workspaceLearningGoal' && current()) {
+      current().learningGoal = event.target.value.slice(0, 300);
+      touch(current());
+      return;
+    }
     if (event.target.id === 'projectileSpeed' && current()?.activity?.type === 'projectile' && current().activity.stage === 'build') {
       const speed = Number(event.target.value);
       if (!Number.isInteger(speed) || speed < 5 || speed > 30) return;
@@ -427,6 +433,15 @@
     const session = current();
     if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
     if (!session) return;
+    if (button.dataset.action === 'prepare-learning-path') {
+      const goal = (session.learningGoal || '').trim();
+      if (!goal) { error = 'Enter a learning goal first.'; render(); document.getElementById('workspaceLearningGoal')?.focus(); return; }
+      const request = `Please create a clear learning path with a first step, practice, and a small project.\n\nMy learning goal:\n${goal}`;
+      const draft = session.draft || '', separator = draft ? '\n\n' : '';
+      if (draft.length + separator.length + request.length > 4000) { error = 'Your draft is nearly full. Shorten it before adding the goal.'; render(); return; }
+      session.draft = draft + separator + request;
+      error = ''; touch(session); render(); document.getElementById('workspaceInput')?.focus(); return;
+    }
     if (button.dataset.action === 'projectile') {
       if (!archiveActivity(session)) return;
       session.activity = { type: 'projectile', angle: 35, stage: 'explore', answer: null, speed: 18, result: null, explored: false };

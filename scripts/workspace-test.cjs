@@ -14,6 +14,8 @@ assert.throws(() => normalize({ ...saved, sessions: [{ ...saved.sessions[0], act
 assert.equal(normalize({ ...saved, sessions: [{ ...saved.sessions[0], activity: undefined }] }).sessions[0].activity, null);
 assert.equal(normalize({ ...saved, sessions: [{ ...saved.sessions[0], draft: undefined }] }).sessions[0].draft, '');
 assert.throws(() => normalize({ ...saved, sessions: [{ ...saved.sessions[0], draft: 'x'.repeat(4001) }] }));
+assert.equal(normalize({...saved,sessions:[{...saved.sessions[0],learningGoal:'Build a simulator'}]}).sessions[0].learningGoal,'Build a simulator');
+assert.throws(() => normalize({...saved,sessions:[{...saved.sessions[0],learningGoal:'x'.repeat(301)}]}));
 const search = {type:'binary-search',target:72,moves:[]};
 while (!searchState(search).finished) {
   const before = searchState(search);
