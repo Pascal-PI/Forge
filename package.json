@@ -10,7 +10,8 @@
   "scripts": {
     "postinstall": "node scripts/vendor-pdf.cjs",
     "start": "electron .",
-    "dist": "electron-builder --win nsis portable --x64 --publish never"
+    "dist": "electron-builder --win nsis portable --x64 --publish never",
+    "dist:store": "node scripts/package-store.cjs"
   },
   "devDependencies": {
     "electron": "45.0.0",

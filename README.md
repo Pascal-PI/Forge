@@ -1,5 +1,9 @@
 # FORGE for Windows
 
+## Microsoft Store package
+
+Run `pnpm install --frozen-lockfile`, then set `FORGE_STORE_IDENTITY` and `FORGE_STORE_PUBLISHER` to the package identity name and publisher from Partner Center. Set `FORGE_STORE_PUBLISHER_DISPLAY_NAME` if the Store publisher display name differs from Voriq Studios. Run `pnpm dist:store` to create the x64 AppX package in `dist/`. The package uses the FORGE icon assets in `build/appx/` and is built for Store signing during submission. Verify profile migration, backup and restore on a Store-installed build before release.
+
 A downloadable desktop version of the supplied FORGE starter, with a private Grade 7 School Edition, real AMC 10 past-paper practice, and an AI Coach powered by GPT-6 Luna. Six learner-centered destinations remain visible—Home, School, Learn, Practice, Coach, and Progress—while secondary tools are preserved under **More**.
 
 ## New in 1.11.0: focused interactive learning
