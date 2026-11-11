@@ -121,7 +121,8 @@
       const messages = session.messages.map(message => {
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
         if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line', 'coding', 'equation-balance', 'projectile'].includes(message.activity))) throw Error('Invalid suggested activity');
-        return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}) };
+        if (message.plan != null && (message.role !== 'assistant' || !Array.isArray(message.plan) || message.plan.length < 2 || message.plan.length > 5 || !message.plan.every(step => step && typeof step.text === 'string' && step.text.trim() && step.text.length <= 500 && typeof step.done === 'boolean'))) throw Error('Invalid saved learning path');
+        return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}), ...(message.plan ? { plan: message.plan.map(step => ({text:step.text,done:step.done})) } : {}) };
       });
       let activity = null;
       if (session.activity != null) {

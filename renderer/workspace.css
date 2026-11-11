@@ -30,6 +30,12 @@
 .workspace-rich-text p { white-space:normal; }
 .workspace-rich-text a { color:#a9d9ff; text-decoration:underline; }
 .workspace-rich-text .katex-display { overflow-x:auto; overflow-y:hidden; padding:4px 0; }
+.workspace-tutor-plan { margin-top:16px; padding:16px; border:1px solid var(--border); border-radius:10px; background:var(--panel); }
+.workspace-tutor-plan h3 { font-size:1rem; margin:0 0 12px; }
+.workspace-tutor-plan ol { list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+.workspace-tutor-plan label { display:flex; gap:10px; align-items:flex-start; margin:0; line-height:1.5; cursor:pointer; }
+.workspace-tutor-plan input { flex:none; margin-top:4px; accent-color:#df7054; }
+.workspace-tutor-plan small { display:block; color:var(--muted); margin-top:12px; }
 .workspace-code-block { margin:12px 0; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#11192a; }
 .workspace-code-block button { display:block; margin:8px 8px 0 auto; font-size:.8rem; }
 .workspace-code-block pre { margin:0; padding:14px; overflow:auto; white-space:pre; font: .85rem/1.6 Consolas,monospace; color:#e7ebff; }
