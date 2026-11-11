@@ -150,3 +150,40 @@
 .workspace-kicker { color:#ff9b7f; font-weight:700; letter-spacing:.14em; }
 :root[data-theme=light] .workspace-kicker { color:#a33c25; }
 @media(max-width:650px) { .workspace-welcome { grid-template-columns:1fr; } .welcome-art { min-height:180px; } .welcome-copy { padding:22px; } .workspace-messages { max-height:55vh; } }
+
+/* The learning workspace has its own palette while preserving the chosen theme. */
+body.workspace-mode { background:#151c19; }
+body.workspace-mode:before { opacity:0; }
+body.workspace-mode #workspaceRoot { --bg:#151c19; --panel:#202a25; --panel2:#27332c; --border:#405147; --text:#edf2e9; --muted:#bdc8bb; color:var(--text); }
+body.workspace-mode .sidebar { --text:#edf2e9; --muted:#bec9bd; --panel2:#303d35; --border:#536457; background:#202b25; color:var(--text); border-color:#415047; }
+body.workspace-mode .sidebar .brand { color:#f1f5ed; }
+body.workspace-mode .sidebar .forge-star { background:none; -webkit-text-fill-color:#f18462; filter:none; }
+body.workspace-mode .workspace-links { border-color:#536457; }
+body.workspace-mode .workspace-list button[aria-current=true],body.workspace-mode .workspace-list button:hover { background:#405148; }
+body.workspace-mode .workspace-message { background:#26362e; }
+body.workspace-mode .workspace-message.user { background:#3b4231; }
+body.workspace-mode .workspace-chat form button:not([type=submit]) { background:#34473b; color:#f1f5ed; border:1px solid #607267; }
+body.workspace-mode .workspace-projectile svg { background:#2f4035; color:#e0e9d8; }
+body.workspace-mode .workspace-activity-header button,body.workspace-mode .workspace-activity>button,body.workspace-mode .workspace-tools button,body.workspace-mode .workspace-answers button,body.workspace-mode .workspace-search-controls button,body.workspace-mode .workspace-history button { background:#28362e; border-color:#607267; color:#edf2e9; }
+body.workspace-mode .topbar { background:#1d2722ef; border-color:#405147; }
+body.workspace-mode .global-search { background:#27342d; border-color:#536457; color:#d8e2d5; }
+body.workspace-mode .global-search>svg { stroke:#c5d4c4; }
+body.workspace-mode .global-search kbd { background:#405148; color:#edf2e9; }
+body.workspace-mode #workspaceRoot input::placeholder,body.workspace-mode #workspaceRoot textarea::placeholder,body.workspace-mode .sidebar input::placeholder { color:#afbead; opacity:1; }
+:root[data-theme=light] body.workspace-mode { background:#f5f3ed; }
+:root[data-theme=light] body.workspace-mode #workspaceRoot { --bg:#f5f3ed; --panel:#fffefa; --panel2:#f0f2e9; --border:#d4dccf; --text:#202b25; --muted:#58675a; color:var(--text); }
+:root[data-theme=light] body.workspace-mode .sidebar { background:#202b25; border-color:#415047; color:#edf2e9; }
+:root[data-theme=light] body.workspace-mode .sidebar .brand { color:#f1f5ed; }
+:root[data-theme=light] body.workspace-mode .sidebar .tab { color:#c8d4c6; }
+:root[data-theme=light] body.workspace-mode .sidebar .tab:hover,:root[data-theme=light] body.workspace-mode .sidebar .tab.active { background:#405148; color:#fff; border-color:#6d8273; }
+:root[data-theme=light] body.workspace-mode .workspace-list button[aria-current=true],:root[data-theme=light] body.workspace-mode .workspace-list button:hover { background:#405148; }
+:root[data-theme=light] body.workspace-mode .topbar { background:#faf9f4f5; border-color:#d4dccf; }
+:root[data-theme=light] body.workspace-mode .global-search { background:#fffefa; border-color:#d4dccf; color:#526256; }
+:root[data-theme=light] body.workspace-mode .global-search>svg { stroke:#526256; }
+:root[data-theme=light] body.workspace-mode .global-search kbd { background:#e9eee4; color:#526256; }
+:root[data-theme=light] body.workspace-mode #workspaceRoot input::placeholder,:root[data-theme=light] body.workspace-mode #workspaceRoot textarea::placeholder { color:#687b69; }
+:root[data-theme=light] body.workspace-mode .workspace-message { background:#eff2e9; }
+:root[data-theme=light] body.workspace-mode .workspace-message.user { background:#e7eee1; }
+:root[data-theme=light] body.workspace-mode .workspace-chat form button:not([type=submit]) { background:#e9eee4; color:#263d2e; border:1px solid #c9d4c6; }
+:root[data-theme=light] body.workspace-mode .workspace-projectile svg { background:#eaf0e5; color:#445e49; }
+:root[data-theme=light] body.workspace-mode .workspace-activity-header button,:root[data-theme=light] body.workspace-mode .workspace-activity>button,:root[data-theme=light] body.workspace-mode .workspace-tools button,:root[data-theme=light] body.workspace-mode .workspace-answers button,:root[data-theme=light] body.workspace-mode .workspace-search-controls button,:root[data-theme=light] body.workspace-mode .workspace-history button { background:#f0f3ea; border-color:#c9d4c6; color:#273c2f; }
