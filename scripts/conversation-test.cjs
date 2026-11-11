@@ -21,10 +21,10 @@ const { createCoach } = require('../coach.cjs');
     }
   });
   try {
-    const result = await coach.conversation({ minutes: 25, goal: 'Learn search', messages: [{ role: 'user', text: 'Help me' }] });
+    const result = await coach.conversation({ minutes: 25, goal: 'Learn search', schoolTopics: [{subject:'Mathematics',topic:'Geometry',answered:4,correct:2},{subject:'Math',topic:'Invalid',answered:1,correct:2}], messages: [{ role: 'user', text: 'Help me' }] });
     assert.deepEqual(result, { reply: 'Try the search.', activity: 'binary-search' });
     assert.equal(requestBody.text.format.schema.additionalProperties, false);
-    assert.equal(requestBody.input[0].content[0].text, JSON.stringify({ learnerGoal: 'Learn search' }));
+    assert.equal(requestBody.input[0].content[0].text, JSON.stringify({ learnerGoal: 'Learn search', schoolTopics:[{subject:'Mathematics',topic:'Geometry',answered:4,correct:2}] }));
     assert(!requestBody.instructions.includes('Learn search'));
     responseText = JSON.stringify({ reply: 'Place the point.', activity: 'number-line' });
     assert.equal((await coach.conversation({ minutes: 25, messages: [{ role: 'user', text: 'Integers' }] })).activity, 'number-line');

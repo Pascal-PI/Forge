@@ -107,7 +107,8 @@
       }
       if (session.activities != null && (!Array.isArray(session.activities) || session.activities.length > 100)) throw Error('Invalid activity history');
       const activities = (session.activities || []).map(normalizeActivity);
-      return { id: session.id, title: session.title, minutes: session.minutes, createdAt: session.createdAt, updatedAt: session.updatedAt, pinned: session.pinned, messages, activity, activities };
+      if (session.draft != null && (typeof session.draft !== 'string' || session.draft.length > 4000)) throw Error('Invalid message draft');
+      return { id: session.id, title: session.title, minutes: session.minutes, createdAt: session.createdAt, updatedAt: session.updatedAt, pinned: session.pinned, messages, activity, activities, draft: session.draft || '' };
     });
     if (new Set(sessions.map(session => session.id)).size !== sessions.length) throw Error('Duplicate learning session');
     return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null };
