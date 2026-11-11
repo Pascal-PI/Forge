@@ -9,6 +9,7 @@
   let codeCancelRequested = false;
   let error = '';
   let filter = '';
+  let workspacePage = 'learn';
   let renderedSession = null;
   const current = () => state.workspace.sessions.find(item => item.id === state.workspace.selected);
   const touch = session => { session.updatedAt = Date.now(); save(); };
@@ -139,11 +140,11 @@
     root.innerHTML = `<div class="workspace-layout${session?.expanded && session.activity ? ' workspace-expanded' : ''}"><aside class="workspace-sessions" aria-label="Learning sessions">
       <h2>Sessions</h2><button class="workspace-new" data-action="new">+ New learning session</button><label for="workspaceSearch">Search conversations</label><input id="workspaceSearch" value="${esc(filter)}" placeholder="Search">
       <div class="workspace-list">${sessionGroups.filter(([, items]) => items.length).map(([label, items]) => `<section aria-label="${label}"><h3>${label}</h3>${items.map(item => `<button data-session="${esc(item.id)}" ${item.id === session?.id ? 'aria-current="true"' : ''}>${esc(item.title)}<small>${new Date(item.updatedAt).toLocaleDateString()}</small></button>`).join('')}</section>`).join('')}</div>
-      <div class="workspace-links"><button data-go="projects">Projects</button><button data-go="math">Practice exams</button><button data-go="coach">Coach settings</button><button data-go="insights">Progress and backups</button></div></aside>
+      <div class="workspace-links"><button data-action="workspace-learn">Learning workspace</button><button data-action="workspace-progress">Progress</button><button data-action="workspace-settings">Settings and backups</button></div></aside>
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
-      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map((message, messageIndex) => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong>${message.role === 'assistant' ? `<div class="workspace-rich-text">${WorkspaceMarkup.render(message.text)}</div>` : `<p>${esc(message.text)}</p>`}${message.plan ? `<section class="workspace-tutor-plan" aria-label="Suggested learning path"><h3>Your suggested path</h3><ol>${message.plan.map((step, stepIndex) => `<li><label><input type="checkbox" data-plan-message="${messageIndex}" data-plan-step="${stepIndex}" ${step.done ? 'checked' : ''}><span>${esc(step.text)}</span></label></li>`).join('')}</ol><small>Mark steps yourself as you work. Saved in this session.</small></section>` : ''}${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : welcome}${pendingStream && pendingStream.session === session ? `<article class="workspace-message streaming"><strong>FORGE</strong><p id="workspaceStream" aria-live="off">${esc(pendingStream.text)}</p></article><p role="status">FORGE is responding…</p>` : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
+      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map((message, messageIndex) => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong>${message.role === 'assistant' ? `<div class="workspace-rich-text">${WorkspaceMarkup.render(message.text)}</div>` : `<p>${esc(message.text)}</p>`}${message.plan ? `<section class="workspace-tutor-plan" id="workspace-plan-${messageIndex}" tabindex="-1" aria-label="Suggested learning path"><h3>Your suggested path</h3><ol>${message.plan.map((step, stepIndex) => `<li><label><input type="checkbox" data-plan-message="${messageIndex}" data-plan-step="${stepIndex}" ${step.done ? 'checked' : ''}><span>${esc(step.text)}</span></label></li>`).join('')}</ol><small>Mark steps yourself as you work. Saved in this session.</small></section>` : ''}${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : welcome}${pendingStream && pendingStream.session === session ? `<article class="workspace-message streaming"><strong>FORGE</strong><p id="workspaceStream" aria-live="off">${esc(pendingStream.text)}</p></article><p role="status">FORGE is responding…</p>` : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
       ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…">${esc(session.draft || '')}</textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${pendingStream?.session === session ? '<button type="button" data-action="stop-tutor">Stop response</button>' : ''}${session.messages.at(-1)?.role === 'user' && !busy ? '<button type="button" data-action="retry">Retry last message</button>' : ''}${session.messages.length === 0 ? `<button type="button" data-action="suggest" ${busy ? 'disabled' : ''}>Suggest a starting point</button>` : ''}</div><p class="workspace-privacy">Sending shares recent messages, your learning goal, and short School, activity and checklist summaries with OpenAI. API usage is billed to your key. Drafts stay on this device until sent.</p></form>`}
-      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="projectile">Projectile playground</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
+      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="projectile">Projectile playground</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
       </div>${activityMarkup(session)}</div>`;
     sidebar.replaceChildren(root.querySelector('.workspace-sessions'));
     if (session) {
@@ -185,6 +186,15 @@
     }
     const search = document.getElementById('workspaceSearch');
     search.addEventListener('input', () => { filter = search.value; render(); });
+    if (workspacePage !== 'learn') {
+      const layout = root.querySelector('.workspace-layout');
+      layout.classList.remove('workspace-expanded');
+      const panel = workspacePage === 'progress' ? progress : settings;
+      layout.replaceChildren(panel);
+      if (workspacePage === 'progress') renderProgress(); else renderSettings();
+      renderedSession = session?.id || null;
+      return;
+    }
     const composer = document.getElementById('workspaceForm');
     if (composer) {
       const importer = document.createElement('div');
@@ -433,15 +443,20 @@
     if (copy) { const code = copy.closest('.workspace-code-block')?.querySelector('code')?.textContent; if (typeof code === 'string') window.forgeDesktop.copyText(code).then(() => toast('Code copied.')).catch(() => toast('Could not copy code.')); return; }
     const button = event.target.closest('button');
     if (!button) return;
-    if (button.dataset.session) { state.workspace.selected = button.dataset.session; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); return; }
+    if (button.dataset.session) { workspacePage = 'learn'; state.workspace.selected = button.dataset.session; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); return; }
     if (button.dataset.minutes) {
       if (state.workspace.sessions.length >= 100) { error = 'Delete a session before creating another.'; render(); return; }
       const now = Date.now();
       const session = { id: crypto.randomUUID(), title: 'New learning session', minutes: Number(button.dataset.minutes), createdAt: now, updatedAt: now, pinned: false, messages: [], activity: null, activities: [], draft: '', expanded: false };
       state.workspace.sessions.push(session); state.workspace.selected = session.id; error = ''; save(); render(); document.getElementById('workspaceInput')?.focus(); return;
     }
+    if (['workspace-learn','workspace-progress','workspace-settings'].includes(button.dataset.action)) {
+      workspacePage = button.dataset.action.slice('workspace-'.length);
+      error = ''; render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false');
+      root.querySelector('h1,h2')?.focus(); return;
+    }
     const session = current();
-    if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
+    if (button.dataset.action === 'new') { workspacePage = 'learn'; state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
     if (!session) return;
     if (button.dataset.action === 'prepare-learning-path') {
       const goal = (session.learningGoal || '').trim();
@@ -622,7 +637,26 @@
   const progress = document.createElement('section');
   progress.id = 'workspaceProgress';
   progress.className = 'workspace-progress card card-pad section';
-  document.getElementById('insightsMetrics').after(progress);
+  const settings = document.createElement('section');
+  settings.className = 'workspace-settings card card-pad section';
+  function renderSettings() {
+    settings.innerHTML = `<h2 tabindex="-1">Settings and backups</h2><p>Manage your tutor connection and the data saved on this device.</p><section><h3>AI tutor</h3><p id="workspaceConnection" role="status">Checking connection…</p><button data-settings="connect">Choose key file</button><button data-settings="disconnect">Disconnect</button><p class="tiny muted">Your key stays on this device and is not included in backups. Tutor requests use your API account.</p></section><section><h3>Personalization</h3><p>Review your learning preferences and goals.</p><button data-settings="personalize">Review preferences</button></section><section><h3>Appearance</h3><label for="workspaceTheme">Color theme</label><select id="workspaceTheme"><option value="system">System default</option><option value="light">Light</option><option value="dark">Dark</option></select></section><section><h3>Backups</h3><p>Export your local progress or restore a backup.</p><button data-settings="export">Export backup</button><button data-settings="import">Import backup</button></section>`;
+    settings.querySelector('#workspaceTheme').value = state.settings?.theme || 'system';
+    window.forgeDesktop.coachStatus().then(status => { const target = settings.querySelector('#workspaceConnection'); if (target && settings.isConnected) target.textContent = status.configured ? `Connected · ${status.model}` : 'No tutor key connected.'; }).catch(() => { const target=settings.querySelector('#workspaceConnection'); if(target && settings.isConnected) target.textContent='Could not check tutor connection.'; });
+  }
+  settings.addEventListener('change', event => {
+    if (event.target.id === 'workspaceTheme' && ['system','light','dark'].includes(event.target.value)) { state.settings.theme=event.target.value; save(); applyTheme(); }
+  });
+  settings.addEventListener('click', async event => {
+    const action=event.target.closest('[data-settings]')?.dataset.settings;
+    if (action === 'personalize') { window.OnboardingUI?.open(); return; }
+    if (action === 'export') { document.getElementById('exportData').click(); return; }
+    if (action === 'import') { document.getElementById('importFile').click(); return; }
+    if (action !== 'connect' && action !== 'disconnect') return;
+    const status=settings.querySelector('#workspaceConnection');
+    try { const result=await (action === 'connect' ? window.forgeDesktop.coachConnect() : window.forgeDesktop.coachDisconnect()); if(status && settings.isConnected) status.textContent=result.configured ? `Connected · ${result.model}` : 'No tutor key connected.'; }
+    catch (failure) { if(status && settings.isConnected) status.textContent=String(failure.message || 'Could not update the connection.'); }
+  });
   function renderProgress() {
     const summary = WorkspaceCore.learningProgress(state.workspace);
     const rows = summary.pathsByRecency.slice(0, 6).map(({ sessionId, title, activity, index }) => {
@@ -630,13 +664,20 @@
       const next = !activity.explored ? 'Adjust the launch angle' : activity.answer !== 1 ? 'Try the understanding check' : !Number.isInteger(activity.result) ? 'Run your simulation' : 'Review your simulation';
       return `<li><div><strong>${esc(title)}</strong><small>Projectile playground · ${steps}/3 steps · ${next}</small></div><button class="btn sm" data-progress-session="${esc(sessionId)}" ${index === null ? '' : `data-progress-index="${index}"`}>${steps === 3 ? 'Review' : 'Continue'}</button></li>`;
     }).join('');
-    progress.innerHTML = `<div class="section-head"><div><span class="workspace-kicker">YOUR LEARNING</span><h2>Progress you can return to</h2></div><span class="small-badge">Saved on this device</span></div><p class="tiny muted">Counts reflect saved sessions and current activity results, not a measurement of mastery.</p><div class="workspace-progress-metrics"><div><strong>${summary.sessions}</strong><span>learning sessions</span></div><div><strong>${summary.paths}</strong><span>projectile paths</span></div><div><strong>${summary.checks}</strong><span>correct checks</span></div><div><strong>${summary.simulations}</strong><span>simulations run</span></div></div>${rows ? `<h3>Pick up where you left off</h3><ul>${rows}</ul>` : '<p class="muted">Start a learning session and open Projectile playground to see your path here.</p>'}`;
+    const planRows = summary.tutorPlans.slice(0,6).map(({sessionId,title,messageIndex,steps}) => { const done=steps.filter(step=>step.done).length; return `<li><div><strong>${esc(title)}</strong><small>Suggested path · ${done}/${steps.length} steps self-marked</small></div><button class="btn sm" data-progress-session="${esc(sessionId)}" data-progress-message="${messageIndex}">${done===steps.length?'Review':'Continue'}</button></li>`; }).join('');
+    progress.innerHTML = `<div class="section-head"><div><span class="workspace-kicker">YOUR LEARNING</span><h2 tabindex="-1">Progress you can return to</h2></div><span class="small-badge">Saved on this device</span></div><p class="tiny muted">Counts reflect saved sessions, self-marked steps, and activity results; they are not a measurement of mastery.</p><div class="workspace-progress-metrics"><div><strong>${summary.sessions}</strong><span>learning sessions</span></div><div><strong>${summary.tutorPlans.length}</strong><span>suggested paths</span></div><div><strong>${summary.selfMarkedSteps}</strong><span>steps self-marked</span></div><div><strong>${summary.simulations}</strong><span>simulations run</span></div></div>${planRows ? `<h3>Your suggested paths</h3><ul>${planRows}</ul>` : ''}${rows ? `<h3>Interactive labs</h3><ul>${rows}</ul>` : ''}${!rows&&!planRows ? '<p class="muted">Start a session and create a learning path or open a lab to see your progress here.</p>' : ''}`;
   }
   progress.addEventListener('click', event => {
     const button = event.target.closest('[data-progress-session]');
     if (!button) return;
     const session = state.workspace.sessions.find(item => item.id === button.dataset.progressSession);
     if (!session) { renderProgress(); return; }
+    let planIndex = null;
+    if (button.hasAttribute('data-progress-message')) {
+      planIndex = Number(button.dataset.progressMessage);
+      if (!Number.isInteger(planIndex) || !session.messages[planIndex]?.plan) { renderProgress(); return; }
+      session.expanded = false;
+    }
     if (button.hasAttribute('data-progress-index')) {
       const index = Number(button.dataset.progressIndex), selected = session.activities?.[index];
       if (!Number.isInteger(index) || selected?.type !== 'projectile') { renderProgress(); return; }
@@ -645,8 +686,9 @@
       session.activity = selected;
     }
     state.workspace.selected = session.id;
-    save(); go('workspace');
-    document.getElementById('workspaceActivityHeading')?.focus();
+    workspacePage = 'learn'; save(); render();
+    if (planIndex !== null) document.getElementById(`workspace-plan-${planIndex}`)?.focus();
+    else document.getElementById('workspaceActivityHeading')?.focus();
   });
   window.WorkspaceUI = { refresh: render, refreshProgress: renderProgress };
   render();

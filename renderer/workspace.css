@@ -187,3 +187,9 @@ body.workspace-mode #workspaceRoot input::placeholder,body.workspace-mode #works
 :root[data-theme=light] body.workspace-mode .workspace-chat form button:not([type=submit]) { background:#e9eee4; color:#263d2e; border:1px solid #c9d4c6; }
 :root[data-theme=light] body.workspace-mode .workspace-projectile svg { background:#eaf0e5; color:#445e49; }
 :root[data-theme=light] body.workspace-mode .workspace-activity-header button,:root[data-theme=light] body.workspace-mode .workspace-activity>button,:root[data-theme=light] body.workspace-mode .workspace-tools button,:root[data-theme=light] body.workspace-mode .workspace-answers button,:root[data-theme=light] body.workspace-mode .workspace-search-controls button,:root[data-theme=light] body.workspace-mode .workspace-history button { background:#f0f3ea; border-color:#c9d4c6; color:#273c2f; }
+body.workspace-mode .workspace-tools-toggle,body.workspace-mode #globalSearchOpen,body.workspace-mode #headerReviewOpen,body.workspace-mode #headerSettingsOpen { display:none; }
+body.workspace-mode .topinner::before { content:'Learning workspace'; color:var(--muted); font-weight:600; }
+.workspace-settings { width:min(100%,850px); margin:0 auto; }
+.workspace-settings section { border-top:1px solid var(--border); margin-top:20px; padding-top:15px; }
+.workspace-settings label { display:block; }
+.workspace-settings button,.workspace-settings select { margin:6px 8px 6px 0; padding:10px 14px; border:1px solid var(--border); border-radius:8px; background:var(--panel2); color:var(--text); }

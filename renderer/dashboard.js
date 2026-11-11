@@ -203,6 +203,7 @@
 
   document.addEventListener('keydown', event => {
     if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'k') {
+      if (document.body.classList.contains('workspace-mode')) return;
       if (document.querySelector('dialog[open]')) return;
       event.preventDefault(); openSearch(); return;
     }

@@ -146,7 +146,9 @@
       ...(session.activity ? [{ activity: session.activity, index: null }] : [])
     ].filter(item => item.activity.type === 'projectile').map(item => ({ sessionId: session.id, title: session.title, updatedAt: session.updatedAt, ...item })));
     paths.sort((a, b) => b.updatedAt - a.updatedAt || (b.index ?? Infinity) - (a.index ?? Infinity));
-    return { sessions: sessions.length, paths: paths.length, checks: paths.filter(item => item.activity.answer === 1).length, simulations: paths.filter(item => Number.isInteger(item.activity.result)).length, pathsByRecency: paths };
+    const tutorPlans = sessions.flatMap(session => (session.messages || []).flatMap((message, messageIndex) => message.role === 'assistant' && message.plan?.length ? [{sessionId:session.id,title:session.title,updatedAt:session.updatedAt,messageIndex,steps:message.plan}] : []));
+    tutorPlans.sort((a,b) => b.updatedAt - a.updatedAt || b.messageIndex - a.messageIndex);
+    return { sessions: sessions.length, paths: paths.length, checks: paths.filter(item => item.activity.answer === 1).length, simulations: paths.filter(item => Number.isInteger(item.activity.result)).length, pathsByRecency: paths, tutorPlans, selfMarkedSteps:tutorPlans.reduce((sum,plan) => sum + plan.steps.filter(step => step.done).length,0) };
   }
   root.WorkspaceCore = { normalize, learningProgress, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge };
   if (typeof module !== 'undefined') module.exports = root.WorkspaceCore;

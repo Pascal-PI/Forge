@@ -11,6 +11,10 @@ assert.throws(() => normalize({ ...saved, sessions: [{ ...saved.sessions[0], mes
 assert.equal(normalize({...saved,sessions:[{...saved.sessions[0],messages:[{role:'assistant',text:'Try this lab.',activity:'projectile'}]}]}).sessions[0].messages[0].activity,'projectile');
 const planMessage={role:'assistant',text:'A path',plan:[{text:'Explore',done:true},{text:'Practice',done:false}]};
 assert.deepEqual(normalize({...saved,sessions:[{...saved.sessions[0],messages:[planMessage]}]}).sessions[0].messages[0],planMessage);
+const planProgress=learningProgress({...saved,sessions:[{...saved.sessions[0],messages:[planMessage]}]});
+assert.equal(planProgress.tutorPlans.length,1);
+assert.equal(planProgress.tutorPlans[0].messageIndex,0);
+assert.equal(planProgress.selfMarkedSteps,1);
 assert.throws(()=>normalize({...saved,sessions:[{...saved.sessions[0],messages:[{...planMessage,plan:[{text:'Only one',done:false}]}]}]}));
 assert.throws(()=>normalize({...saved,sessions:[{...saved.sessions[0],messages:[{...planMessage,role:'user'}]}]}));
 assert.throws(() => normalize({ ...saved, sessions: [saved.sessions[0], saved.sessions[0]] }));
