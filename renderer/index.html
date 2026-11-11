@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="learning-experience.css">
 <link rel="stylesheet" href="onboarding.css">
 <link rel="stylesheet" href="school.css">
+<link rel="stylesheet" href="workspace.css">
 </head>
 <body>
 <div id="onboardingRoot" aria-live="polite"></div>
@@ -17,6 +18,7 @@
 <aside class="sidebar">
   <div class="brand"><span class="forge-star" aria-hidden="true">✦</span><span>FORGE</span></div>
   <nav class="tabs" aria-label="Main navigation">
+    <button class="tab" data-view="workspace">✦ Learning sessions</button>
     <button class="tab active" data-view="today" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></span><span>Home</span></button>
     <button class="tab school-nav-tab" data-view="school"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Zm3 3v5c3 3 9 3 12 0v-5m3-3v7"/></svg></span><span>School<small>Grade 7</small></span></button>
     <button class="tab" data-view="lessons"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5C8 2 4 3 3 4v15c3-2 6-1 9 1m0-15c4-3 8-2 9-1v15c-3-2-6-1-9 1V5Z"/></svg></span><span>Learn</span></button>
@@ -43,6 +45,7 @@
   <div class="topaction"><div class="header-streak"><span class="streak-flame" aria-hidden="true">♨</span><div><strong id="headerStreak">0</strong><small id="headerStreakLabel">day streak</small></div></div><button class="header-icon" id="headerReviewOpen" aria-label="Open review queue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button><button class="profile-button" id="headerSettingsOpen" aria-label="Open settings and backups"><span class="profile-orbit" aria-hidden="true">✦</span><span>My workspace<small>Personal & private</small></span><span aria-hidden="true">⌄</span></button></div>
 </div></header>
 <main class="shell" id="mainContent" tabindex="-1">
+<section class="view" id="view-workspace"><div id="workspaceRoot"></div></section>
 <section class="view active" id="view-today">
   <div class="dashboard-welcome"><div><div class="eyebrow" id="todayDate"></div><h1 id="dashboardGreeting">Your next breakthrough starts here.</h1><p class="lead">Small steps today. Bigger possibilities tomorrow.</p></div><span class="workspace-status"><i aria-hidden="true"></i> Your progress, saved locally</span></div>
   <section class="mission-hero" aria-labelledby="dashboardMissionTitle"><div class="mission-copy"><div class="mission-kicker"><span aria-hidden="true">◎</span> TODAY’S MISSION</div><h2 id="dashboardMissionTitle">Make room for your next idea.</h2><p id="dashboardMissionDescription"></p><div class="mission-actions"><button class="btn primary" id="dashboardMissionAction">View my plan <span aria-hidden="true">→</span></button><span id="dashboardMissionMeta"></span></div></div><div class="mission-checklist"><h3>Your progress today</h3><div id="dashboardChecklist"></div><button class="linkish" data-go="plan">View all missions <span aria-hidden="true">→</span></button></div></section>
@@ -138,6 +141,7 @@
 <script src="language-guide.js"></script>
 <script src="onboarding-core.js"></script>
 <script src="school-core.js"></script>
+<script src="workspace-core.js"></script>
 <script src="app.js"></script>
 <script src="project-planner.js"></script>
 <script src="amc.js"></script>
@@ -147,5 +151,6 @@
 <script src="learning-experience.js"></script>
 <script src="onboarding.js"></script>
 <script src="school.js"></script>
+<script src="workspace.js"></script>
 </body>
 </html>

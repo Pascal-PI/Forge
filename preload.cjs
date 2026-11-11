@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('forgeDesktop', {
   coachCheck:()=>ipcRenderer.invoke('forge:coach-check'),
   coachTopics:()=>ipcRenderer.invoke('forge:coach-topics'),
   coachRequest:payload=>ipcRenderer.invoke('forge:coach-request',payload),
+  coachConversation:payload=>ipcRenderer.invoke('forge:coach-conversation',payload),
   coachCancel:()=>ipcRenderer.invoke('forge:coach-cancel'),
   codeforcesContests:()=>ipcRenderer.invoke('forge:codeforces-contests'),
   runnerStatus:force=>ipcRenderer.invoke('forge:runner-status',force===true),

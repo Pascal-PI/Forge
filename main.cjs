@@ -14,6 +14,9 @@ const CSP = "default-src 'none'; script-src 'self'; worker-src 'self'; style-src
 const files = new Map([
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
+  ['/workspace-core.js', ['workspace-core.js', 'text/javascript; charset=utf-8']],
+  ['/workspace.js', ['workspace.js', 'text/javascript; charset=utf-8']],
+  ['/workspace.css', ['workspace.css', 'text/css; charset=utf-8']],
   ['/amc.js', ['amc.js', 'text/javascript; charset=utf-8']],
   ['/amc-core.js', ['amc-core.js', 'text/javascript; charset=utf-8']],
   ['/coach-core.js', ['coach-core.js', 'text/javascript; charset=utf-8']],
@@ -118,6 +121,7 @@ else {
       'forge:coach-check':()=>coach.check(),
       'forge:coach-topics':()=>coach.topics(),
       'forge:coach-request':payload=>coach.request(payload),
+      'forge:coach-conversation':payload=>coach.conversation(payload),
       'forge:coach-cancel':()=>{coach.cancel();return true;},
       'forge:codeforces-contests':()=>codeforces.getUpcoming(),
       'forge:runner-status':()=>runner.status(),
