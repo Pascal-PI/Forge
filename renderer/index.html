@@ -17,7 +17,10 @@
 <a class="skip-link" href="#mainContent">Skip to content</a>
 <aside class="sidebar">
   <div class="brand"><span class="forge-star" aria-hidden="true">✦</span><span>FORGE</span></div>
-  <nav class="tabs" aria-label="Main navigation">
+  <button class="workspace-sidebar-toggle" id="workspaceSidebarToggle" aria-expanded="false" aria-controls="workspaceSidebar">Sessions</button>
+  <div id="workspaceSidebar"></div>
+  <button class="workspace-tools-toggle" id="workspaceToolsToggle" aria-expanded="false" aria-controls="legacyNavigation">Other tools</button>
+  <nav class="tabs" id="legacyNavigation" aria-label="Main navigation">
     <button class="tab" data-view="workspace">✦ Learning sessions</button>
     <button class="tab active" data-view="today" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></span><span>Home</span></button>
     <button class="tab school-nav-tab" data-view="school"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Zm3 3v5c3 3 9 3 12 0v-5m3-3v7"/></svg></span><span>School<small>Grade 7</small></span></button>

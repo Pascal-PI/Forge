@@ -1,6 +1,7 @@
 (function () {
   'use strict';
   const root = document.getElementById('workspaceRoot');
+  const sidebar = document.getElementById('workspaceSidebar');
   let busy = false;
   let codeBusy = null;
   let codeError = null;
@@ -95,17 +96,36 @@
     const selectionEnd = focused ? document.activeElement.selectionEnd : null;
     const sessions = [...state.workspace.sessions].sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt)
       .filter(item => item.title.toLowerCase().includes(filter.toLowerCase()));
-    root.innerHTML = `<div class="workspace-layout"><aside class="workspace-sessions" aria-label="Learning sessions">
-      <h2>Sessions</h2><label for="workspaceSearch">Search conversations</label><input id="workspaceSearch" value="${esc(filter)}" placeholder="Search">
-      <div class="workspace-list">${sessions.map(item => `<button data-session="${esc(item.id)}" ${item.id === session?.id ? 'aria-current="true"' : ''}>${item.pinned ? '★ ' : ''}${esc(item.title)}<small>${new Date(item.updatedAt).toLocaleDateString()}</small></button>`).join('')}</div>
-      <div class="workspace-links"><button data-go="projects">Projects</button><button data-go="math">Practice exams</button><button data-go="coach">Coach settings</button></div></aside>
+    const now = new Date();
+    const today = now.toDateString();
+    const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).toDateString();
+    const sessionGroups = [
+      ['Pinned', sessions.filter(item => item.pinned)],
+      ['Today', sessions.filter(item => !item.pinned && new Date(item.updatedAt).toDateString() === today)],
+      ['Yesterday', sessions.filter(item => !item.pinned && new Date(item.updatedAt).toDateString() === yesterday)],
+      ['Earlier', sessions.filter(item => !item.pinned && ![today, yesterday].includes(new Date(item.updatedAt).toDateString()))]
+    ];
+    root.innerHTML = `<div class="workspace-layout${session?.expanded && session.activity ? ' workspace-expanded' : ''}"><aside class="workspace-sessions" aria-label="Learning sessions">
+      <h2>Sessions</h2><button class="workspace-new" data-action="new">+ New learning session</button><label for="workspaceSearch">Search conversations</label><input id="workspaceSearch" value="${esc(filter)}" placeholder="Search">
+      <div class="workspace-list">${sessionGroups.filter(([, items]) => items.length).map(([label, items]) => `<section aria-label="${label}"><h3>${label}</h3>${items.map(item => `<button data-session="${esc(item.id)}" ${item.id === session?.id ? 'aria-current="true"' : ''}>${esc(item.title)}<small>${new Date(item.updatedAt).toLocaleDateString()}</small></button>`).join('')}</section>`).join('')}</div>
+      <div class="workspace-links"><button data-go="projects">Projects</button><button data-go="math">Practice exams</button><button data-go="coach">Coach settings</button><button data-go="insights">Profile and backups</button></div></aside>
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
       <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong><p>${esc(message.text)}</p>${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${busy ? '<p role="status">FORGE is thinking…</p>' : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
       ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…">${esc(session.draft || '')}</textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${session.messages.at(-1)?.role === 'user' && !busy ? '<button type="button" data-action="retry">Retry last message</button>' : ''}${session.messages.length === 0 ? `<button type="button" data-action="suggest" ${busy ? 'disabled' : ''}>Suggest a starting point</button>` : ''}</div><p class="workspace-privacy">Sending shares recent messages, your learning goal, and short School and activity summaries with OpenAI. API usage is billed to your key. Drafts stay on this device until sent.</p></form>`}
       ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
-      <button class="workspace-new" data-action="new">+ New learning session</button></div>${activityMarkup(session)}</div>`;
+      </div>${activityMarkup(session)}</div>`;
+    sidebar.replaceChildren(root.querySelector('.workspace-sessions'));
+    const activityHeader = root.querySelector('.workspace-activity-header');
+    if (activityHeader) {
+      const expand = document.createElement('button');
+      expand.type = 'button';
+      expand.dataset.action = 'expand-activity';
+      expand.setAttribute('aria-pressed', String(Boolean(session.expanded)));
+      expand.textContent = session.expanded ? 'Exit expanded view' : 'Expand';
+      activityHeader.insertBefore(expand, activityHeader.lastElementChild);
+    }
     const search = document.getElementById('workspaceSearch');
-    search.addEventListener('change', () => { filter = search.value; render(); });
+    search.addEventListener('input', () => { filter = search.value; render(); });
     document.getElementById('workspaceForm')?.addEventListener('submit', event => {
       event.preventDefault();
       const input = document.getElementById('workspaceInput');
@@ -211,19 +231,20 @@
     touch(session);
   });
 
-  root.addEventListener('click', event => {
+  function handleWorkspaceClick(event) {
     const button = event.target.closest('button');
     if (!button) return;
-    if (button.dataset.session) { state.workspace.selected = button.dataset.session; error = ''; save(); render(); return; }
+    if (button.dataset.session) { state.workspace.selected = button.dataset.session; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); return; }
     if (button.dataset.minutes) {
       if (state.workspace.sessions.length >= 100) { error = 'Delete a session before creating another.'; render(); return; }
       const now = Date.now();
-      const session = { id: crypto.randomUUID(), title: 'New learning session', minutes: Number(button.dataset.minutes), createdAt: now, updatedAt: now, pinned: false, messages: [], activity: null, activities: [], draft: '' };
+      const session = { id: crypto.randomUUID(), title: 'New learning session', minutes: Number(button.dataset.minutes), createdAt: now, updatedAt: now, pinned: false, messages: [], activity: null, activities: [], draft: '', expanded: false };
       state.workspace.sessions.push(session); state.workspace.selected = session.id; error = ''; save(); render(); document.getElementById('workspaceInput')?.focus(); return;
     }
     const session = current();
-    if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); }
+    if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
     if (!session) return;
+    if (button.dataset.action === 'expand-activity' && session.activity) { session.expanded = !session.expanded; touch(session); render(); document.querySelector('[data-action="expand-activity"]')?.focus(); return; }
     if (button.dataset.action === 'suggest' && !busy && session.messages.length === 0) {
       session.messages.push({ role: 'user', text: 'Suggest a learning objective and a first step based on my goals and practice.' });
       touch(session); respond(session); return;
@@ -310,7 +331,7 @@
       session.activity = { type: 'school-question', questionId: question.id, answer: null, hint: false };
       touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
     }
-    if (button.dataset.action === 'close-activity') { if (!archiveActivity(session)) return; touch(session); render(); return; }
+    if (button.dataset.action === 'close-activity') { if (!archiveActivity(session)) return; session.expanded = false; touch(session); render(); return; }
     if (button.dataset.action === 'hint' && session.activity && session.activity.answer === null) { session.activity.hint = true; touch(session); render(); return; }
     if (button.dataset.answer !== undefined && session.activity?.answer === null) {
       const answer = Number(button.dataset.answer);
@@ -329,6 +350,16 @@
     if (button.dataset.action === 'rename') { const title = prompt('Session name', session.title)?.trim(); if (title) { session.title = title.slice(0, 100); touch(session); render(); } }
     if (button.dataset.action === 'delete' && confirm('Delete this learning session?')) { state.workspace.sessions = state.workspace.sessions.filter(item => item !== session); state.workspace.selected = null; save(); render(); }
     if (button.dataset.action === 'retry' && !busy) respond(session);
+  }
+  root.addEventListener('click', handleWorkspaceClick);
+  sidebar.addEventListener('click', handleWorkspaceClick);
+  document.getElementById('workspaceToolsToggle').addEventListener('click', event => {
+    const expanded = document.body.classList.toggle('workspace-nav-open');
+    event.currentTarget.setAttribute('aria-expanded', String(expanded));
+  });
+  document.getElementById('workspaceSidebarToggle').addEventListener('click', event => {
+    const expanded = document.body.classList.toggle('workspace-sessions-open');
+    event.currentTarget.setAttribute('aria-expanded', String(expanded));
   });
   window.WorkspaceUI = { refresh: render };
   render();
