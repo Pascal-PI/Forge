@@ -3,6 +3,7 @@
   const root = document.getElementById('workspaceRoot');
   const sidebar = document.getElementById('workspaceSidebar');
   let busy = false;
+  let pendingStream = null;
   let codeBusy = null;
   let codeError = null;
   let codeCancelRequested = false;
@@ -120,8 +121,8 @@
       <div class="workspace-list">${sessionGroups.filter(([, items]) => items.length).map(([label, items]) => `<section aria-label="${label}"><h3>${label}</h3>${items.map(item => `<button data-session="${esc(item.id)}" ${item.id === session?.id ? 'aria-current="true"' : ''}>${esc(item.title)}<small>${new Date(item.updatedAt).toLocaleDateString()}</small></button>`).join('')}</section>`).join('')}</div>
       <div class="workspace-links"><button data-go="projects">Projects</button><button data-go="math">Practice exams</button><button data-go="coach">Coach settings</button><button data-go="insights">Profile and backups</button></div></aside>
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
-      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong><p>${esc(message.text)}</p>${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${busy ? '<p role="status">FORGE is thinking…</p>' : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
-      ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…">${esc(session.draft || '')}</textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${session.messages.at(-1)?.role === 'user' && !busy ? '<button type="button" data-action="retry">Retry last message</button>' : ''}${session.messages.length === 0 ? `<button type="button" data-action="suggest" ${busy ? 'disabled' : ''}>Suggest a starting point</button>` : ''}</div><p class="workspace-privacy">Sending shares recent messages, your learning goal, and short School and activity summaries with OpenAI. API usage is billed to your key. Drafts stay on this device until sent.</p></form>`}
+      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong><p>${esc(message.text)}</p>${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${pendingStream && pendingStream.session === session ? `<article class="workspace-message streaming"><strong>FORGE</strong><p id="workspaceStream" aria-live="off">${esc(pendingStream.text)}</p></article><p role="status">FORGE is responding…</p>` : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
+      ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…">${esc(session.draft || '')}</textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${pendingStream?.session === session ? '<button type="button" data-action="stop-tutor">Stop response</button>' : ''}${session.messages.at(-1)?.role === 'user' && !busy ? '<button type="button" data-action="retry">Retry last message</button>' : ''}${session.messages.length === 0 ? `<button type="button" data-action="suggest" ${busy ? 'disabled' : ''}>Suggest a starting point</button>` : ''}</div><p class="workspace-privacy">Sending shares recent messages, your learning goal, and short School and activity summaries with OpenAI. API usage is billed to your key. Drafts stay on this device until sent.</p></form>`}
       ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
       </div>${activityMarkup(session)}</div>`;
     sidebar.replaceChildren(root.querySelector('.workspace-sessions'));
@@ -156,7 +157,7 @@
   }
 
   async function respond(session) {
-    busy = true; error = ''; render();
+    busy = true; error = ''; pendingStream = { requestId: crypto.randomUUID(), session, text: '' }; render();
     try {
       const messages = session.messages.slice(-12).map(message => ({ role: message.role, text: message.text.slice(0, 3000) }));
       const activity = session.activity;
@@ -189,11 +190,11 @@
         messages.at(-1).text = (messages.at(-1).text + `\n\nCoding practice: ${passed} of ${WorkspaceCore.codingChallenge.tests.length} public tests passed; ${tests.length} tests completed${draftChanged ? ' on an earlier draft' : ''}.`).slice(0, 4000);
       }
       const schoolTopics = SchoolCore.weakTopics(state.school).filter(item => item.answered > 0).slice(0, 6).map(({ subject, topic, answered, correct }) => ({ subject, topic, answered, correct }));
-      const response = await window.forgeDesktop.coachConversation({ minutes: session.minutes, goal: state.coach.profile?.goal || '', schoolTopics, messages });
+      const response = await window.forgeDesktop.coachConversation({ requestId: pendingStream.requestId, minutes: session.minutes, goal: state.coach.profile?.goal || '', schoolTopics, messages });
       if (!response || typeof response.reply !== 'string' || !response.reply.trim() || response.reply.length > 8000 || response.activity !== 'none' && !Object.hasOwn(activityActions, response.activity)) throw Error('The tutor returned an invalid response. Please retry.');
       if (state.workspace.sessions.includes(session)) { session.messages.push({ role: 'assistant', text: response.reply, ...(response.activity !== 'none' ? { activity: response.activity } : {}) }); touch(session); }
     } catch (failure) { if (current() === session) error = String(failure.message || failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/, ''); }
-    finally { busy = false; render(); }
+    finally { busy = false; pendingStream = null; render(); }
   }
 
   async function runCode(session, activity) {
@@ -258,6 +259,7 @@
     const session = current();
     if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
     if (!session) return;
+    if (button.dataset.action === 'stop-tutor' && pendingStream?.session === session) { window.forgeDesktop.coachCancel().catch(() => {}); return; }
     if (button.dataset.action === 'equation-balance') {
       const previous = session.activity?.type === 'equation-balance' ? session.activity.problem : -1;
       if (!archiveActivity(session)) return;
@@ -382,6 +384,16 @@
   }
   root.addEventListener('click', handleWorkspaceClick);
   sidebar.addEventListener('click', handleWorkspaceClick);
+  window.forgeDesktop.onCoachStream(message => {
+    if (!pendingStream || message?.requestId !== pendingStream.requestId || typeof message.text !== 'string' || message.text.length > 8000) return;
+    pendingStream.text = message.text;
+    const target = document.getElementById('workspaceStream');
+    const messages = document.getElementById('workspaceMessages');
+    if (!target || current() !== pendingStream.session || !messages) return;
+    const following = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 32;
+    target.textContent = message.text;
+    if (following) messages.scrollTop = messages.scrollHeight;
+  });
   document.getElementById('workspaceToolsToggle').addEventListener('click', event => {
     const expanded = document.body.classList.toggle('workspace-nav-open');
     event.currentTarget.setAttribute('aria-expanded', String(expanded));

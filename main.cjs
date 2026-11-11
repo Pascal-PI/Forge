@@ -121,7 +121,6 @@ else {
       'forge:coach-check':()=>coach.check(),
       'forge:coach-topics':()=>coach.topics(),
       'forge:coach-request':payload=>coach.request(payload),
-      'forge:coach-conversation':payload=>coach.conversation(payload),
       'forge:coach-cancel':()=>{coach.cancel();return true;},
       'forge:codeforces-contests':()=>codeforces.getUpcoming(),
       'forge:runner-status':()=>runner.status(),
@@ -141,6 +140,14 @@ else {
       },
       'forge:coach-source':async url=>shell.openExternal(await coach.openSource(url))
     }))ipcMain.handle(channel,(event,payload)=>{checkSender(event);return handler(payload);});
+
+    ipcMain.handle('forge:coach-conversation',(event,payload)=>{
+      checkSender(event);
+      if(!payload||typeof payload.requestId!=='string'||!/^[0-9a-f-]{36}$/i.test(payload.requestId))throw Error('Invalid tutor request.');
+      return coach.conversation(payload,text=>{
+        if(!event.sender.isDestroyed()&&event.sender===mainWindow?.webContents)event.sender.send('forge:coach-stream',{requestId:payload.requestId,text});
+      });
+    });
 
     ipcMain.handle('forge:amc-catalog',async event=>{
       checkSender(event);

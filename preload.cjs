@@ -14,6 +14,12 @@ contextBridge.exposeInMainWorld('forgeDesktop', {
   coachTopics:()=>ipcRenderer.invoke('forge:coach-topics'),
   coachRequest:payload=>ipcRenderer.invoke('forge:coach-request',payload),
   coachConversation:payload=>ipcRenderer.invoke('forge:coach-conversation',payload),
+  onCoachStream:callback=>{
+    if(typeof callback!=='function')throw Error('A stream callback is required.');
+    const listener=(_event,message)=>callback(message);
+    ipcRenderer.on('forge:coach-stream',listener);
+    return ()=>ipcRenderer.removeListener('forge:coach-stream',listener);
+  },
   coachCancel:()=>ipcRenderer.invoke('forge:coach-cancel'),
   codeforcesContests:()=>ipcRenderer.invoke('forge:codeforces-contests'),
   runnerStatus:force=>ipcRenderer.invoke('forge:runner-status',force===true),
