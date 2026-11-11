@@ -5,6 +5,13 @@
   const searchTargets = [3, 19, 35, 56, 68, 72];
   const sortingSets = [[7, 2, 5, 1], [4, 6, 1, 3], [5, 5, 2, 4]];
   const lineTargets = [-7, -3, 4, 8];
+  const codingChallenge = Object.freeze({
+    id: 'sum-two-integers',
+    title: 'Add two integers',
+    prompt: 'Read two integers separated by a space and print their sum. Your program should work for negative numbers too.',
+    starter: 'a, b = map(int, input().split())\n# Print their sum.\n',
+    tests: [{ input: '3 4\n', expected: '7' }, { input: '-5 9\n', expected: '4' }]
+  });
 
   function sortingState(activity) {
     if (!Number.isInteger(activity.set) || !sortingSets[activity.set] || !Array.isArray(activity.moves) || activity.moves.length > 50 || !activity.moves.every(move => ['swap', 'keep'].includes(move))) throw Error('Invalid sorting activity');
@@ -61,6 +68,18 @@
       lineState(item);
       return { type: item.type, target: item.target, position: item.position, attempts: [...item.attempts] };
     }
+    if (item.type === 'coding') {
+      if (item.challengeId !== codingChallenge.id || typeof item.code !== 'string' || item.code.length > 8000 || !Array.isArray(item.attempts) || item.attempts.length > 10) throw Error('Invalid coding activity');
+      const attempts = item.attempts.map(attempt => {
+        if (!attempt || typeof attempt.code !== 'string' || attempt.code.length > 8000 || !Number.isFinite(attempt.createdAt) || !Array.isArray(attempt.tests) || attempt.tests.length > codingChallenge.tests.length) throw Error('Invalid coding attempt');
+        const tests = attempt.tests.map(test => {
+          if (!test || typeof test.output !== 'string' || test.output.length > 1000 || typeof test.status !== 'string' || test.status.length > 100) throw Error('Invalid coding test');
+          return { output: test.output, status: test.status };
+        });
+        return { code: attempt.code, createdAt: attempt.createdAt, tests };
+      });
+      return { type: item.type, challengeId: item.challengeId, code: item.code, attempts };
+    }
     if (item.type !== 'school-question' || typeof item.questionId !== 'string' ||
         !root.SchoolCore?.byId.has(item.questionId) ||
         !(item.answer === null || Number.isInteger(item.answer) && item.answer >= 0 && item.answer <= 3) ||
@@ -79,7 +98,7 @@
           typeof session.pinned !== 'boolean') throw Error('Invalid learning session');
       const messages = session.messages.map(message => {
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
-        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line'].includes(message.activity))) throw Error('Invalid suggested activity');
+        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line', 'coding'].includes(message.activity))) throw Error('Invalid suggested activity');
         return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}) };
       });
       let activity = null;
@@ -94,6 +113,6 @@
     return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null };
   }
 
-  root.WorkspaceCore = { normalize, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets };
+  root.WorkspaceCore = { normalize, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, codingChallenge };
   if (typeof module !== 'undefined') module.exports = root.WorkspaceCore;
 })(typeof window !== 'undefined' ? window : globalThis);

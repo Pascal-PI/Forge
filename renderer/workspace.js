@@ -2,12 +2,15 @@
   'use strict';
   const root = document.getElementById('workspaceRoot');
   let busy = false;
+  let codeBusy = null;
+  let codeError = null;
+  let codeCancelRequested = false;
   let error = '';
   let filter = '';
   const current = () => state.workspace.sessions.find(item => item.id === state.workspace.selected);
   const touch = session => { session.updatedAt = Date.now(); save(); };
-  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line' };
-  const activityActions = { 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line' };
+  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line', coding: 'Coding challenge' };
+  const activityActions = { 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line', coding: 'coding-challenge' };
   function archiveActivity(session) {
     if (!session.activity) return true;
     session.activities ||= [];
@@ -20,6 +23,21 @@
   function activityMarkup(session) {
     const activity = session?.activity;
     if (!activity) return '';
+    if (activity.type === 'coding') {
+      const challenge = WorkspaceCore.codingChallenge;
+      const running = codeBusy === activity;
+      const last = activity.attempts.at(-1);
+      const results = last ? last.tests.map((test, index) => {
+        const expected = challenge.tests[index].expected;
+        const passed = test.status === 'Accepted' && test.output.trim() === expected;
+        return `<li>${passed ? 'Passed' : 'Not passed'} · input ${esc(challenge.tests[index].input.trim())} · expected ${esc(expected)} · output ${esc(test.output.trim() || '(empty)')} · ${esc(test.status)}</li>`;
+      }).join('') : '';
+      return `<aside class="workspace-activity workspace-coding" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">${esc(challenge.title)}</h2><button data-action="close-activity" aria-label="Close coding challenge">×</button></div>
+        <p>${esc(challenge.prompt)}</p><p>Python · ${challenge.tests.length} public tests</p><label for="workspaceCode">Your solution</label><textarea id="workspaceCode" maxlength="8000" spellcheck="false" ${running ? 'disabled' : ''}>${esc(activity.code)}</textarea>
+        <p>Your draft and test results are saved on this device and included in backups.</p><label class="workspace-run-consent"><input id="workspaceRunConsent" type="checkbox" ${running ? 'disabled' : ''}> I agree to send this code and the test inputs to Judge0 Community Edition. Judge0 stores submissions.</label>
+        <div class="workspace-search-controls"><button data-action="run-code" ${codeBusy ? 'disabled' : ''}>${running ? 'Running tests…' : 'Run public tests'}</button>${running ? '<button data-action="stop-code">Stop waiting</button>' : ''}</div>
+        ${running ? '<p role="status">Running public tests…</p>' : codeError?.activity === activity ? `<p role="alert">${esc(codeError.message)}</p>` : ''}${last ? `<section><h3>Last run</h3>${last.code !== activity.code ? '<p>These results are from an earlier draft.</p>' : ''}<ol>${results}</ol>${last.tests.length < challenge.tests.length ? '<p>The run did not finish all tests.</p>' : ''}</section>` : ''}</aside>`;
+    }
     if (activity.type === 'sorting') {
       const result = WorkspaceCore.sortingState(activity);
       const cells = result.values.map((value, index) => `<li class="${!result.finished && (index === result.index || index === result.index + 1) ? 'middle' : ''}"><span>${index}</span><strong>${value}</strong></li>`).join('');
@@ -76,7 +94,7 @@
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
       <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong><p>${esc(message.text)}</p>${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${busy ? '<p role="status">FORGE is thinking…</p>' : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
       ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…"></textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${error && session.messages.at(-1)?.role === 'user' ? `<button type="button" data-action="retry" ${busy ? 'disabled' : ''}>Retry</button>` : ''}</div></form>`}
-      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
+      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
       <button class="workspace-new" data-action="new">+ New learning session</button></div>${activityMarkup(session)}</div>`;
     const search = document.getElementById('workspaceSearch');
     search.addEventListener('change', () => { filter = search.value; render(); });
@@ -116,6 +134,12 @@
         const result = WorkspaceCore.lineState(activity);
         messages.at(-1).text = (messages.at(-1).text + `\n\nNumber line practice: target ${activity.target}, ${result.attempts} attempts, ${result.finished ? 'completed' : 'in progress'}.`).slice(0, 4000);
       }
+      if (activity?.type === 'coding' && activity.attempts.length && messages.at(-1)?.role === 'user') {
+        const tests = activity.attempts.at(-1).tests;
+        const passed = tests.filter((test, index) => test.status === 'Accepted' && test.output.trim() === WorkspaceCore.codingChallenge.tests[index].expected).length;
+        const draftChanged = activity.attempts.at(-1).code !== activity.code;
+        messages.at(-1).text = (messages.at(-1).text + `\n\nCoding practice: ${passed} of ${WorkspaceCore.codingChallenge.tests.length} public tests passed; ${tests.length} tests completed${draftChanged ? ' on an earlier draft' : ''}.`).slice(0, 4000);
+      }
       const response = await window.forgeDesktop.coachConversation({ minutes: session.minutes, goal: state.coach.profile?.goal || '', messages });
       if (!response || typeof response.reply !== 'string' || !response.reply.trim() || response.reply.length > 8000 || response.activity !== 'none' && !Object.hasOwn(activityActions, response.activity)) throw Error('The tutor returned an invalid response. Please retry.');
       if (state.workspace.sessions.includes(session)) { session.messages.push({ role: 'assistant', text: response.reply, ...(response.activity !== 'none' ? { activity: response.activity } : {}) }); touch(session); }
@@ -123,7 +147,40 @@
     finally { busy = false; render(); }
   }
 
+  async function runCode(session, activity) {
+    const source = activity.code;
+    const attempt = { code: source, createdAt: Date.now(), tests: [] };
+    activity.attempts.push(attempt);
+    activity.attempts = activity.attempts.slice(-10);
+    codeBusy = activity;
+    codeError = null;
+    codeCancelRequested = false;
+    touch(session);
+    render();
+    try {
+      for (const test of WorkspaceCore.codingChallenge.tests) {
+        if (codeCancelRequested) throw Error('Stopped waiting. Judge0 may finish a submitted test.');
+        const result = await window.forgeDesktop.runnerRun({ language: 'Python', sourceCode: source, stdin: test.input, remoteConsent: true });
+        if (!state.workspace.sessions.includes(session)) return;
+        attempt.tests.push({ status: String(result.status || 'Unknown').slice(0, 100), output: String(result.stdout || result.stderr || result.compileOutput || result.message || '').slice(0, 1000) });
+        touch(session);
+      }
+      if (state.workspace.sessions.includes(session)) { addActivity('practice'); touch(session); }
+    } catch (failure) {
+      codeError = { activity, message: String(failure.message || failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/, '') };
+    } finally {
+      codeBusy = null;
+      render();
+    }
+  }
+
   root.addEventListener('input', event => {
+    if (event.target.id === 'workspaceCode' && current()?.activity?.type === 'coding') {
+      const session = current();
+      session.activity.code = event.target.value.slice(0, 8000);
+      touch(session);
+      return;
+    }
     if (event.target.id !== 'workspaceLine' || current()?.activity?.type !== 'number-line') return;
     const session = current();
     const position = Number(event.target.value);
@@ -146,6 +203,25 @@
     const session = current();
     if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); }
     if (!session) return;
+    if (button.dataset.action === 'coding-challenge') {
+      if (!archiveActivity(session)) return;
+      session.activity = { type: 'coding', challengeId: WorkspaceCore.codingChallenge.id, code: WorkspaceCore.codingChallenge.starter, attempts: [] };
+      codeError = null;
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
+    if (button.dataset.action === 'stop-code' && codeBusy === session.activity) {
+      codeCancelRequested = true;
+      window.forgeDesktop.runnerCancel().catch(() => {});
+      return;
+    }
+    if (button.dataset.action === 'run-code' && session.activity?.type === 'coding') {
+      const activity = session.activity;
+      if (codeBusy) return;
+      if (!document.getElementById('workspaceRunConsent')?.checked) { codeError = { activity, message: 'Agree to the Judge0 notice before running the public tests.' }; render(); return; }
+      if (!activity.code.trim()) { codeError = { activity, message: 'Write a solution before running it.' }; render(); return; }
+      runCode(session, activity);
+      return;
+    }
     if (button.dataset.action === 'sorting') {
       const previous = session.activity?.type === 'sorting' ? session.activity.set : -1;
       if (!archiveActivity(session)) return;

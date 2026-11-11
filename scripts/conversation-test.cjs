@@ -30,6 +30,8 @@ const { createCoach } = require('../coach.cjs');
     assert.equal((await coach.conversation({ minutes: 25, messages: [{ role: 'user', text: 'Integers' }] })).activity, 'number-line');
     responseText = JSON.stringify({ reply: 'Try sorting.', activity: 'sorting' });
     assert.equal((await coach.conversation({ minutes: 25, messages: [{ role: 'user', text: 'Sorting' }] })).activity, 'sorting');
+    responseText = JSON.stringify({ reply: 'Try coding.', activity: 'coding' });
+    assert.equal((await coach.conversation({ minutes: 25, messages: [{ role: 'user', text: 'Coding' }] })).activity, 'coding');
     responseText = JSON.stringify({ reply: 'Hello', activity: 'execute-code' });
     await assert.rejects(coach.conversation({ minutes: 25, messages: [{ role: 'user', text: 'Hi' }] }), /invalid response/);
     responseText = '{';

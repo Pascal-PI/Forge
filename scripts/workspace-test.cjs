@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 require('../renderer/school-core.js');
-const { normalize, searchState, searchValues, sortingState, sortingSets, lineState } = require('../renderer/workspace-core.js');
+const { normalize, searchState, searchValues, sortingState, sortingSets, lineState, codingChallenge } = require('../renderer/workspace-core.js');
 
 assert.deepEqual(normalize(undefined), { sessions: [], selected: null });
 const saved = { sessions: [{ id: 'session-1', title: 'Binary search', minutes: 25, createdAt: 1, updatedAt: 2, pinned: true, messages: [{ role: 'user', text: 'How does it work?' }, { role: 'assistant', text: 'Start in the middle.' }], activity: {type:'school-question',questionId:globalThis.SchoolCore.QUESTIONS[0].id,answer:1,hint:true}, activities: [] }], selected: 'session-1' };
@@ -36,4 +36,8 @@ assert.equal(sortingState({type:'sorting',set:0,moves:['keep']}).mistakes, 1);
 assert.equal(lineState({type:'number-line',target:-7,position:-7,attempts:[0,-7]}).finished, true);
 assert.throws(() => lineState({type:'number-line',target:-7,position:0,attempts:[-7,0]}));
 assert.throws(() => lineState({type:'number-line',target:100,position:0,attempts:[]}));
+const coding = {type:'coding',challengeId:codingChallenge.id,code:'print(7)',attempts:[{code:'print(7)',createdAt:3,tests:[{status:'Accepted',output:'7\n'}]}]};
+assert.deepEqual(normalize({...saved,sessions:[{...saved.sessions[0],activity:coding}]}).sessions[0].activity,coding);
+assert.throws(() => normalize({...saved,sessions:[{...saved.sessions[0],activity:{...coding,challengeId:'unknown'}}]}));
+assert.throws(() => normalize({...saved,sessions:[{...saved.sessions[0],activity:{...coding,attempts:[{code:'x',createdAt:3,tests:Array(3).fill({status:'Accepted',output:'7'})}]}}]}));
 console.log('Workspace backup validation passed');
