@@ -3,6 +3,31 @@
 
   const searchValues = [3, 8, 12, 19, 27, 35, 42, 56, 68];
   const searchTargets = [3, 19, 35, 56, 68, 72];
+  const sortingSets = [[7, 2, 5, 1], [4, 6, 1, 3], [5, 5, 2, 4]];
+  const lineTargets = [-7, -3, 4, 8];
+
+  function sortingState(activity) {
+    if (!Number.isInteger(activity.set) || !sortingSets[activity.set] || !Array.isArray(activity.moves) || activity.moves.length > 50 || !activity.moves.every(move => ['swap', 'keep'].includes(move))) throw Error('Invalid sorting activity');
+    const values = [...sortingSets[activity.set]];
+    let pass = 0, index = 0, mistakes = 0, comparisons = 0;
+    for (const move of activity.moves) {
+      if (pass >= values.length - 1) throw Error('Invalid sorting activity');
+      const expected = values[index] > values[index + 1] ? 'swap' : 'keep';
+      if (move !== expected) { mistakes++; continue; }
+      if (move === 'swap') [values[index], values[index + 1]] = [values[index + 1], values[index]];
+      comparisons++;
+      index++;
+      if (index >= values.length - 1 - pass) { pass++; index = 0; }
+    }
+    return { values, pass, index, mistakes, comparisons, finished: pass >= values.length - 1 };
+  }
+
+  function lineState(activity) {
+    if (!lineTargets.includes(activity.target) || !Number.isInteger(activity.position) || activity.position < -10 || activity.position > 10 ||
+        !Array.isArray(activity.attempts) || activity.attempts.length > 50 || !activity.attempts.every(value => Number.isInteger(value) && value >= -10 && value <= 10) ||
+        activity.attempts.slice(0, -1).includes(activity.target)) throw Error('Invalid number line activity');
+    return { finished: activity.attempts.at(-1) === activity.target, attempts: activity.attempts.length };
+  }
 
   function searchState(activity) {
     if (!searchTargets.includes(activity.target) || !Array.isArray(activity.moves) || activity.moves.length > 50 ||
@@ -28,6 +53,14 @@
       searchState(item);
       return { type: item.type, target: item.target, moves: [...item.moves] };
     }
+    if (item.type === 'sorting') {
+      sortingState(item);
+      return { type: item.type, set: item.set, moves: [...item.moves] };
+    }
+    if (item.type === 'number-line') {
+      lineState(item);
+      return { type: item.type, target: item.target, position: item.position, attempts: [...item.attempts] };
+    }
     if (item.type !== 'school-question' || typeof item.questionId !== 'string' ||
         !root.SchoolCore?.byId.has(item.questionId) ||
         !(item.answer === null || Number.isInteger(item.answer) && item.answer >= 0 && item.answer <= 3) ||
@@ -46,7 +79,7 @@
           typeof session.pinned !== 'boolean') throw Error('Invalid learning session');
       const messages = session.messages.map(message => {
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
-        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question'].includes(message.activity))) throw Error('Invalid suggested activity');
+        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line'].includes(message.activity))) throw Error('Invalid suggested activity');
         return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}) };
       });
       let activity = null;
@@ -61,6 +94,6 @@
     return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null };
   }
 
-  root.WorkspaceCore = { normalize, searchState, searchValues, searchTargets };
+  root.WorkspaceCore = { normalize, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets };
   if (typeof module !== 'undefined') module.exports = root.WorkspaceCore;
 })(typeof window !== 'undefined' ? window : globalThis);

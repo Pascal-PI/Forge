@@ -6,6 +6,8 @@
   let filter = '';
   const current = () => state.workspace.sessions.find(item => item.id === state.workspace.selected);
   const touch = session => { session.updatedAt = Date.now(); save(); };
+  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line' };
+  const activityActions = { 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line' };
   function archiveActivity(session) {
     if (!session.activity) return true;
     session.activities ||= [];
@@ -18,6 +20,24 @@
   function activityMarkup(session) {
     const activity = session?.activity;
     if (!activity) return '';
+    if (activity.type === 'sorting') {
+      const result = WorkspaceCore.sortingState(activity);
+      const cells = result.values.map((value, index) => `<li class="${!result.finished && (index === result.index || index === result.index + 1) ? 'middle' : ''}"><span>${index}</span><strong>${value}</strong></li>`).join('');
+      const prior = activity.moves.length ? WorkspaceCore.sortingState({ ...activity, moves: activity.moves.slice(0, -1) }) : result;
+      const feedback = result.finished ? 'The list is in ascending order.' : result.mistakes > prior.mistakes ? 'Try again. The smaller value should be on the left.' : activity.moves.length ? 'Correct. Compare the next pair.' : 'Compare the highlighted adjacent values.';
+      return `<aside class="workspace-activity" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Sorting lab</h2><button data-action="close-activity" aria-label="Close activity">×</button></div>
+        <p>Use bubble sort to put the values in ascending order. Compare each highlighted pair and decide whether to swap it.</p>
+        <ol class="workspace-search-array" aria-label="Values and indices">${cells}</ol><p>Comparisons ${result.comparisons} · Tries to revisit ${result.mistakes}</p><p role="status">${esc(feedback)}</p>
+        ${result.finished || activity.moves.length >= 50 ? '<button data-action="sorting">Try another list</button>' : '<div class="workspace-search-controls"><button data-sort-move="keep">Keep in order</button><button data-sort-move="swap">Swap values</button></div>'}</aside>`;
+    }
+    if (activity.type === 'number-line') {
+      const result = WorkspaceCore.lineState(activity);
+      const last = activity.attempts.at(-1);
+      const feedback = result.finished ? `Correct. The point is at ${activity.target}.` : last !== undefined ? `${last} is ${last < activity.target ? 'left' : 'right'} of the target. Try again.` : 'Move the point, then check your answer.';
+      return `<aside class="workspace-activity" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Number line</h2><button data-action="close-activity" aria-label="Close activity">×</button></div>
+        <p>Place the point at <strong>${activity.target}</strong>. Use the slider or arrow keys to move it.</p><div class="workspace-number-line"><div class="workspace-line-labels"><span>−10</span><span>0</span><span>10</span></div><input id="workspaceLine" type="range" min="-10" max="10" step="1" value="${activity.position}" aria-label="Point on number line" ${result.finished ? 'disabled' : ''}><output id="workspaceLineValue" for="workspaceLine">${activity.position}</output></div>
+        <p role="status">${esc(feedback)}</p>${result.finished || activity.attempts.length >= 50 ? '<button data-action="number-line">Try another number</button>' : '<button data-action="check-line">Check point</button>'}</aside>`;
+    }
     if (activity.type === 'binary-search') {
       const result = WorkspaceCore.searchState(activity);
       const mid = Math.floor((result.low + result.high) / 2);
@@ -54,9 +74,9 @@
       <div class="workspace-list">${sessions.map(item => `<button data-session="${esc(item.id)}" ${item.id === session?.id ? 'aria-current="true"' : ''}>${item.pinned ? '★ ' : ''}${esc(item.title)}<small>${new Date(item.updatedAt).toLocaleDateString()}</small></button>`).join('')}</div>
       <div class="workspace-links"><button data-go="projects">Projects</button><button data-go="math">Practice exams</button><button data-go="coach">Coach settings</button></div></aside>
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
-      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong><p>${esc(message.text)}</p>${message.activity ? `<button data-action="${message.activity === 'binary-search' ? 'binary' : 'practice'}">${message.activity === 'binary-search' ? 'Open binary search lab' : 'Practice a reviewed question'}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${busy ? '<p role="status">FORGE is thinking…</p>' : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
+      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong><p>${esc(message.text)}</p>${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${busy ? '<p role="status">FORGE is thinking…</p>' : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
       ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…"></textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${error && session.messages.at(-1)?.role === 'user' ? `<button type="button" data-action="retry" ${busy ? 'disabled' : ''}>Retry</button>` : ''}</div></form>`}
-      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${item.type === 'binary-search' ? 'Binary search · target ' + item.target : esc(SchoolCore.byId.get(item.questionId).topic) + ' · question'}</button>`).join('')}</div></details>` : ''}` : ''}
+      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
       <button class="workspace-new" data-action="new">+ New learning session</button></div>${activityMarkup(session)}</div>`;
     const search = document.getElementById('workspaceSearch');
     search.addEventListener('change', () => { filter = search.value; render(); });
@@ -88,12 +108,30 @@
         messages.at(-1).text += `\n\nRecent binary search practice: target ${activity.target}, ${result.comparisons} correct comparisons, ${result.mistakes} incorrect choices, ${result.finished ? (result.found ? 'found' : 'not present') : 'in progress'}.`;
         messages.at(-1).text = messages.at(-1).text.slice(0, 4000);
       }
+      if (activity?.type === 'sorting' && messages.at(-1)?.role === 'user') {
+        const result = WorkspaceCore.sortingState(activity);
+        messages.at(-1).text = (messages.at(-1).text + `\n\nSorting practice: ${result.comparisons} correct comparisons, ${result.mistakes} incorrect choices, ${result.finished ? 'completed' : 'in progress'}.`).slice(0, 4000);
+      }
+      if (activity?.type === 'number-line' && messages.at(-1)?.role === 'user') {
+        const result = WorkspaceCore.lineState(activity);
+        messages.at(-1).text = (messages.at(-1).text + `\n\nNumber line practice: target ${activity.target}, ${result.attempts} attempts, ${result.finished ? 'completed' : 'in progress'}.`).slice(0, 4000);
+      }
       const response = await window.forgeDesktop.coachConversation({ minutes: session.minutes, goal: state.coach.profile?.goal || '', messages });
-      if (!response || typeof response.reply !== 'string' || !response.reply.trim() || response.reply.length > 8000 || !['none', 'binary-search', 'school-question'].includes(response.activity)) throw Error('The tutor returned an invalid response. Please retry.');
+      if (!response || typeof response.reply !== 'string' || !response.reply.trim() || response.reply.length > 8000 || response.activity !== 'none' && !Object.hasOwn(activityActions, response.activity)) throw Error('The tutor returned an invalid response. Please retry.');
       if (state.workspace.sessions.includes(session)) { session.messages.push({ role: 'assistant', text: response.reply, ...(response.activity !== 'none' ? { activity: response.activity } : {}) }); touch(session); }
     } catch (failure) { error = String(failure.message || failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/, ''); }
     finally { busy = false; render(); }
   }
+
+  root.addEventListener('input', event => {
+    if (event.target.id !== 'workspaceLine' || current()?.activity?.type !== 'number-line') return;
+    const session = current();
+    const position = Number(event.target.value);
+    if (!Number.isInteger(position) || position < -10 || position > 10) return;
+    session.activity.position = position;
+    document.getElementById('workspaceLineValue').textContent = String(position);
+    touch(session);
+  });
 
   root.addEventListener('click', event => {
     const button = event.target.closest('button');
@@ -108,6 +146,33 @@
     const session = current();
     if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); }
     if (!session) return;
+    if (button.dataset.action === 'sorting') {
+      const previous = session.activity?.type === 'sorting' ? session.activity.set : -1;
+      if (!archiveActivity(session)) return;
+      session.activity = { type: 'sorting', set: (previous + 1) % WorkspaceCore.sortingSets.length, moves: [] };
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
+    if (button.dataset.sortMove && session.activity?.type === 'sorting') {
+      const activity = session.activity;
+      if (WorkspaceCore.sortingState(activity).finished || activity.moves.length >= 50 || !['swap', 'keep'].includes(button.dataset.sortMove)) return;
+      activity.moves.push(button.dataset.sortMove);
+      if (WorkspaceCore.sortingState(activity).finished) addActivity('practice');
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
+    if (button.dataset.action === 'number-line') {
+      const previous = session.activity?.type === 'number-line' ? session.activity.target : null;
+      const target = WorkspaceCore.lineTargets[(WorkspaceCore.lineTargets.indexOf(previous) + 1) % WorkspaceCore.lineTargets.length];
+      if (!archiveActivity(session)) return;
+      session.activity = { type: 'number-line', target, position: 0, attempts: [] };
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
+    if (button.dataset.action === 'check-line' && session.activity?.type === 'number-line') {
+      const activity = session.activity;
+      if (WorkspaceCore.lineState(activity).finished || activity.attempts.length >= 50) return;
+      activity.attempts.push(activity.position);
+      if (WorkspaceCore.lineState(activity).finished) addActivity('practice');
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
     if (button.dataset.activityIndex !== undefined) {
       const index = Number(button.dataset.activityIndex);
       if (!Number.isInteger(index) || !session.activities?.[index]) return;
