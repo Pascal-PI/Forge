@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, dialog, ipcMain, Menu, protocol, session, shell } = require('electron');
+const { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, protocol, session, shell } = require('electron');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { createCoach } = require('./coach.cjs');
@@ -17,6 +17,7 @@ const files = new Map([
   ['/workspace-core.js', ['workspace-core.js', 'text/javascript; charset=utf-8']],
   ['/workspace.js', ['workspace.js', 'text/javascript; charset=utf-8']],
   ['/workspace.css', ['workspace.css', 'text/css; charset=utf-8']],
+  ['/workspace-markup.js', ['workspace-markup.js', 'text/javascript; charset=utf-8']],
   ['/amc.js', ['amc.js', 'text/javascript; charset=utf-8']],
   ['/amc-core.js', ['amc-core.js', 'text/javascript; charset=utf-8']],
   ['/coach-core.js', ['coach-core.js', 'text/javascript; charset=utf-8']],
@@ -103,7 +104,7 @@ else {
         const relative=url.pathname.slice(1);
         if(/^vendor\/[a-zA-Z0-9_./-]+$/.test(relative)&&!relative.split('/').includes('..')){
           const ext=path.extname(relative);
-          const types={'.mjs':'text/javascript; charset=utf-8','.wasm':'application/wasm','.bcmap':'application/octet-stream','.pfb':'application/octet-stream','.ttf':'font/ttf','.icc':'application/octet-stream'};
+          const types={'.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.wasm':'application/wasm','.bcmap':'application/octet-stream','.pfb':'application/octet-stream','.ttf':'font/ttf','.woff':'font/woff','.woff2':'font/woff2','.icc':'application/octet-stream'};
           if(types[ext])entry=[relative,types[ext]];
         }
       }
@@ -140,6 +141,19 @@ else {
       },
       'forge:coach-source':async url=>shell.openExternal(await coach.openSource(url))
     }))ipcMain.handle(channel,(event,payload)=>{checkSender(event);return handler(payload);});
+
+    ipcMain.handle('forge:copy-text',async(event,text)=>{
+      checkSender(event);
+      if(typeof text!=='string'||text.length>20000)throw Error('Text is too large to copy.');
+      await clipboard.writeText(text);
+    });
+    ipcMain.handle('forge:open-learning-link',async(event,value)=>{
+      checkSender(event);
+      if(typeof value!=='string'||value.length>2048)throw Error('Invalid link.');
+      let url;try{url=new URL(value);}catch{throw Error('Invalid link.');}
+      if(url.protocol!=='https:'||url.username||url.password)throw Error('Only HTTPS links can be opened.');
+      await shell.openExternal(url.href);
+    });
 
     ipcMain.handle('forge:coach-conversation',(event,payload)=>{
       checkSender(event);

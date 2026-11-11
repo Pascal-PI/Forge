@@ -27,6 +27,8 @@ contextBridge.exposeInMainWorld('forgeDesktop', {
   runnerCancel:()=>ipcRenderer.invoke('forge:runner-cancel'),
   runnerPrivacy:()=>ipcRenderer.invoke('forge:runner-privacy'),
   exportLessonPptx:payload=>ipcRenderer.invoke('forge:lesson-export-pptx',payload),
-  coachOpenSource:url=>ipcRenderer.invoke('forge:coach-source',url)
+  coachOpenSource:url=>ipcRenderer.invoke('forge:coach-source',url),
+  copyText:text=>ipcRenderer.invoke('forge:copy-text',text),
+  openLearningLink:url=>ipcRenderer.invoke('forge:open-learning-link',url)
 });
 ipcRenderer.on('forge:request-export', () => window.dispatchEvent(new Event('forge-export')));
