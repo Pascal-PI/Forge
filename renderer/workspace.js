@@ -11,8 +11,8 @@
   let renderedSession = null;
   const current = () => state.workspace.sessions.find(item => item.id === state.workspace.selected);
   const touch = session => { session.updatedAt = Date.now(); save(); };
-  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line', coding: 'Coding challenge' };
-  const activityActions = { 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line', coding: 'coding-challenge' };
+  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line', coding: 'Coding challenge', 'equation-balance': 'Equation balance' };
+  const activityActions = { 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line', coding: 'coding-challenge', 'equation-balance': 'equation-balance' };
   function archiveActivity(session) {
     if (!session.activity) return true;
     session.activities ||= [];
@@ -25,6 +25,16 @@
   function activityMarkup(session) {
     const activity = session?.activity;
     if (!activity) return '';
+    if (activity.type === 'equation-balance') {
+      const result = WorkspaceCore.balanceState(activity);
+      const left = result.constant === 0 ? 'x' : `x ${result.constant < 0 ? '−' : '+'} ${Math.abs(result.constant)}`;
+      const hint = Math.abs(result.constant) <= 10 ? `Add ${-result.constant} to both sides to remove the constant.` : 'Move the constant toward zero in steps of at most 10.';
+      const choices = Array.from({ length: 21 }, (_, index) => index - 10).filter(value => value !== 0).map(value => `<option value="${value}" ${value === -1 ? 'selected' : ''}>${value > 0 ? '+' : ''}${value}</option>`).join('');
+      return `<aside class="workspace-activity" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Equation balance</h2><button data-action="close-activity" aria-label="Close activity">×</button></div>
+        <p>Isolate x by adding the same number to both sides. Each step keeps the equation balanced.</p><div class="workspace-equation" aria-label="${esc(left)} equals ${result.right}"><span>${esc(left)}</span><span>=</span><span>${result.right}</span></div>
+        <p role="status">${result.finished ? `Solved. x = ${result.right}.` : `The equation is balanced after ${activity.moves.length} ${activity.moves.length === 1 ? 'step' : 'steps'}.`}</p>
+        ${result.finished || activity.moves.length >= 30 ? '<button data-action="equation-balance">Try another equation</button>' : `<label for="balanceDelta">Add to both sides</label><select id="balanceDelta">${choices}</select><button data-action="balance-apply">Apply</button><button data-action="balance-hint" aria-expanded="${activity.hint}">Hint</button>${activity.hint ? `<p>${esc(hint)}</p>` : ''}`}</aside>`;
+    }
     if (activity.type === 'coding') {
       const challenge = WorkspaceCore.codingChallenge;
       const running = codeBusy === activity;
@@ -112,7 +122,7 @@
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
       <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map(message => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong><p>${esc(message.text)}</p>${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : '<p>Choose a session length to get started.</p>'}${busy ? '<p role="status">FORGE is thinking…</p>' : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
       ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…">${esc(session.draft || '')}</textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${session.messages.at(-1)?.role === 'user' && !busy ? '<button type="button" data-action="retry">Retry last message</button>' : ''}${session.messages.length === 0 ? `<button type="button" data-action="suggest" ${busy ? 'disabled' : ''}>Suggest a starting point</button>` : ''}</div><p class="workspace-privacy">Sending shares recent messages, your learning goal, and short School and activity summaries with OpenAI. API usage is billed to your key. Drafts stay on this device until sent.</p></form>`}
-      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
+      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button><button data-go="coding">Open coding</button><button data-go="lessons">Explore lessons</button><button data-go="school">School Edition</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
       </div>${activityMarkup(session)}</div>`;
     sidebar.replaceChildren(root.querySelector('.workspace-sessions'));
     const activityHeader = root.querySelector('.workspace-activity-header');
@@ -167,6 +177,10 @@
       if (activity?.type === 'number-line' && messages.at(-1)?.role === 'user') {
         const result = WorkspaceCore.lineState(activity);
         messages.at(-1).text = (messages.at(-1).text + `\n\nNumber line practice: target ${activity.target}, ${result.attempts} attempts, ${result.finished ? 'completed' : 'in progress'}.`).slice(0, 4000);
+      }
+      if (activity?.type === 'equation-balance' && messages.at(-1)?.role === 'user') {
+        const result = WorkspaceCore.balanceState(activity);
+        messages.at(-1).text = (messages.at(-1).text + `\n\nEquation balance practice: ${activity.moves.length} equal operations on both sides; ${result.finished ? `solved with x = ${result.right}` : `remaining equation x + (${result.constant}) = ${result.right}`}.`).slice(0, 4000);
       }
       if (activity?.type === 'coding' && activity.attempts.length && messages.at(-1)?.role === 'user') {
         const tests = activity.attempts.at(-1).tests;
@@ -244,6 +258,21 @@
     const session = current();
     if (button.dataset.action === 'new') { state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
     if (!session) return;
+    if (button.dataset.action === 'equation-balance') {
+      const previous = session.activity?.type === 'equation-balance' ? session.activity.problem : -1;
+      if (!archiveActivity(session)) return;
+      session.activity = { type: 'equation-balance', problem: (previous + 1) % WorkspaceCore.balanceProblems.length, moves: [], hint: false };
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
+    if (button.dataset.action === 'balance-hint' && session.activity?.type === 'equation-balance') { session.activity.hint = true; touch(session); render(); return; }
+    if (button.dataset.action === 'balance-apply' && session.activity?.type === 'equation-balance') {
+      const activity = session.activity;
+      const move = Number(document.getElementById('balanceDelta')?.value);
+      if (WorkspaceCore.balanceState(activity).finished || activity.moves.length >= 30 || !Number.isInteger(move) || move < -10 || move > 10 || move === 0) return;
+      activity.moves.push(move);
+      if (WorkspaceCore.balanceState(activity).finished) addActivity('math');
+      touch(session); render(); document.getElementById('workspaceActivityHeading')?.focus(); return;
+    }
     if (button.dataset.action === 'expand-activity' && session.activity) { session.expanded = !session.expanded; touch(session); render(); document.querySelector('[data-action="expand-activity"]')?.focus(); return; }
     if (button.dataset.action === 'suggest' && !busy && session.messages.length === 0) {
       session.messages.push({ role: 'user', text: 'Suggest a learning objective and a first step based on my goals and practice.' });

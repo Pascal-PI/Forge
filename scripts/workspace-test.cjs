@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 require('../renderer/school-core.js');
-const { normalize, searchState, searchValues, sortingState, sortingSets, lineState, codingChallenge } = require('../renderer/workspace-core.js');
+const { normalize, searchState, searchValues, sortingState, sortingSets, lineState, balanceState, balanceProblems, codingChallenge } = require('../renderer/workspace-core.js');
 
 assert.deepEqual(normalize(undefined), { sessions: [], selected: null });
 const saved = { sessions: [{ id: 'session-1', title: 'Binary search', minutes: 25, createdAt: 1, updatedAt: 2, pinned: true, messages: [{ role: 'user', text: 'How does it work?' }, { role: 'assistant', text: 'Start in the middle.' }], activity: {type:'school-question',questionId:globalThis.SchoolCore.QUESTIONS[0].id,answer:1,hint:true}, activities: [], draft:'unfinished thought', expanded:false }], selected: 'session-1' };
@@ -38,6 +38,15 @@ assert.equal(sortingState({type:'sorting',set:0,moves:['keep']}).mistakes, 1);
 assert.equal(lineState({type:'number-line',target:-7,position:-7,attempts:[0,-7]}).finished, true);
 assert.throws(() => lineState({type:'number-line',target:-7,position:0,attempts:[-7,0]}));
 assert.throws(() => lineState({type:'number-line',target:100,position:0,attempts:[]}));
+for (let problem = 0; problem < balanceProblems.length; problem++) {
+  const initial = balanceProblems[problem];
+  const activity = {type:'equation-balance',problem,moves:[-initial.constant],hint:true};
+  assert.deepEqual(balanceState(activity), {constant:0,right:initial.right-initial.constant,finished:true});
+  assert.equal(normalize({...saved,sessions:[{...saved.sessions[0],activity}]}).sessions[0].activity.problem, problem);
+  assert.throws(() => balanceState({...activity,moves:[...activity.moves,1]}));
+}
+assert.deepEqual(balanceState({type:'equation-balance',problem:0,moves:[1,-4],hint:false}),{constant:0,right:7,finished:true});
+assert.throws(() => balanceState({type:'equation-balance',problem:0,moves:[11],hint:false}));
 const coding = {type:'coding',challengeId:codingChallenge.id,code:'print(7)',attempts:[{code:'print(7)',createdAt:3,tests:[{status:'Accepted',output:'7\n'}]}]};
 assert.deepEqual(normalize({...saved,sessions:[{...saved.sessions[0],activity:coding}]}).sessions[0].activity,coding);
 assert.throws(() => normalize({...saved,sessions:[{...saved.sessions[0],activity:{...coding,challengeId:'unknown'}}]}));

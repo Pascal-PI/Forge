@@ -5,6 +5,7 @@
   const searchTargets = [3, 19, 35, 56, 68, 72];
   const sortingSets = [[7, 2, 5, 1], [4, 6, 1, 3], [5, 5, 2, 4]];
   const lineTargets = [-7, -3, 4, 8];
+  const balanceProblems = [{ constant: 3, right: 10 }, { constant: -4, right: 2 }, { constant: 8, right: 3 }];
   const codingChallenge = Object.freeze({
     id: 'sum-two-integers',
     title: 'Add two integers',
@@ -34,6 +35,17 @@
         !Array.isArray(activity.attempts) || activity.attempts.length > 50 || !activity.attempts.every(value => Number.isInteger(value) && value >= -10 && value <= 10) ||
         activity.attempts.slice(0, -1).includes(activity.target)) throw Error('Invalid number line activity');
     return { finished: activity.attempts.at(-1) === activity.target, attempts: activity.attempts.length };
+  }
+
+  function balanceState(activity) {
+    if (!Number.isInteger(activity.problem) || !balanceProblems[activity.problem] || !Array.isArray(activity.moves) || activity.moves.length > 30 || !activity.moves.every(value => Number.isInteger(value) && value >= -10 && value <= 10 && value !== 0) || typeof activity.hint !== 'boolean') throw Error('Invalid equation activity');
+    let { constant, right } = balanceProblems[activity.problem];
+    for (const move of activity.moves) {
+      if (constant === 0) throw Error('Invalid equation activity');
+      constant += move;
+      right += move;
+    }
+    return { constant, right, finished: constant === 0 };
   }
 
   function searchState(activity) {
@@ -68,6 +80,10 @@
       lineState(item);
       return { type: item.type, target: item.target, position: item.position, attempts: [...item.attempts] };
     }
+    if (item.type === 'equation-balance') {
+      balanceState(item);
+      return { type: item.type, problem: item.problem, moves: [...item.moves], hint: item.hint };
+    }
     if (item.type === 'coding') {
       if (item.challengeId !== codingChallenge.id || typeof item.code !== 'string' || item.code.length > 8000 || !Array.isArray(item.attempts) || item.attempts.length > 10) throw Error('Invalid coding activity');
       const attempts = item.attempts.map(attempt => {
@@ -98,7 +114,7 @@
           typeof session.pinned !== 'boolean') throw Error('Invalid learning session');
       const messages = session.messages.map(message => {
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
-        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line', 'coding'].includes(message.activity))) throw Error('Invalid suggested activity');
+        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line', 'coding', 'equation-balance'].includes(message.activity))) throw Error('Invalid suggested activity');
         return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}) };
       });
       let activity = null;
@@ -115,6 +131,6 @@
     return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null };
   }
 
-  root.WorkspaceCore = { normalize, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, codingChallenge };
+  root.WorkspaceCore = { normalize, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge };
   if (typeof module !== 'undefined') module.exports = root.WorkspaceCore;
 })(typeof window !== 'undefined' ? window : globalThis);
