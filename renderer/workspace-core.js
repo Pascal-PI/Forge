@@ -14,7 +14,16 @@
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
         return { role: message.role, text: message.text };
       });
-      return { id: session.id, title: session.title, minutes: session.minutes, createdAt: session.createdAt, updatedAt: session.updatedAt, pinned: session.pinned, messages };
+      let activity = null;
+      if (session.activity != null) {
+        const item = session.activity;
+        if (!item || item.type !== 'school-question' || typeof item.questionId !== 'string' ||
+            !root.SchoolCore?.byId.has(item.questionId) ||
+            !(item.answer === null || Number.isInteger(item.answer) && item.answer >= 0 && item.answer <= 3) ||
+            typeof item.hint !== 'boolean') throw Error('Invalid learning activity');
+        activity = { type: item.type, questionId: item.questionId, answer: item.answer, hint: item.hint };
+      }
+      return { id: session.id, title: session.title, minutes: session.minutes, createdAt: session.createdAt, updatedAt: session.updatedAt, pinned: session.pinned, messages, activity };
     });
     if (new Set(sessions.map(session => session.id)).size !== sessions.length) throw Error('Duplicate learning session');
     return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null };

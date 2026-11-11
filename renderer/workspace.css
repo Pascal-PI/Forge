@@ -20,4 +20,14 @@
 .workspace-chat textarea { resize:vertical; min-height:90px; }
 .workspace-chat form button,.workspace-durations button { margin:8px 8px 0 0; border:0; border-radius:9px; background:#8067e8; color:white; padding:11px 18px; cursor:pointer; }
 .workspace-error { color:#f69f9f; }
+.workspace-layout:has(.workspace-activity) { grid-template-columns: 190px minmax(0,1fr) minmax(260px,340px); }
+.workspace-activity { border-left:1px solid #30364b; padding-left:20px; }
+.workspace-activity-header { display:flex; justify-content:space-between; align-items:center; }
+.workspace-activity-header button,.workspace-activity>button,.workspace-tools button,.workspace-answers button { border:1px solid #55516d; background:#20263b; color:inherit; border-radius:9px; padding:10px; cursor:pointer; }
+.workspace-answers { display:grid; gap:8px; margin:16px 0; }
+.workspace-answers button { text-align:left; }
+.workspace-answers button:disabled { opacity:.7; cursor:default; }
+.workspace-tools { display:flex; flex-wrap:wrap; gap:8px; }
+@media(max-width:1100px) { .workspace-layout:has(.workspace-activity) { grid-template-columns:190px minmax(0,1fr); } .workspace-activity { grid-column:2; border-left:0; border-top:1px solid #30364b; padding:20px 0; } }
 @media(max-width:800px) { .workspace-layout { grid-template-columns:1fr; } .workspace-sessions { border-right:0; border-bottom:1px solid #30364b; padding:0 0 12px; } .workspace-list { max-height:140px; overflow:auto; } .workspace-links { display:flex; flex-wrap:wrap; } }
+@media(max-width:800px) { .workspace-layout:has(.workspace-activity) { grid-template-columns:1fr; } .workspace-activity { grid-column:1; } }
