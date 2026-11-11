@@ -39,11 +39,14 @@ function normalizeBackup(obj){
 }
 
 let state;
+let recoveryRaw=null;
 let codeforcesSchedule=null,codeforcesLoading=false,codeforcesLoadError='';
 let selectedTimelineMonth='',timelineExamNames=new Map();
 let modalReturnTarget=null,modalAfterClose=null;
-try{const saved=localStorage.getItem(STORAGE_KEY);state=saved?normalizeBackup(JSON.parse(saved)):seed();if(state.focus.active?.running){state.focus=FocusCore.recover(state.focus);localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}}catch{state=seed();}
-function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{toast('Could not save progress; export a backup.');}}
+let savedStateText=null;
+try{savedStateText=localStorage.getItem(STORAGE_KEY);state=savedStateText!==null?normalizeBackup(JSON.parse(savedStateText)):seed();if(state.focus.active?.running){state.focus=FocusCore.recover(state.focus);localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}}catch{state=seed();recoveryRaw=savedStateText;}
+window.forgeRecoveryRequired=()=>recoveryRaw!==null;
+function save(){if(recoveryRaw!==null){toast('Resolve the saved-data recovery prompt first.');return false;}try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));return true;}catch{toast('Could not save progress; export a backup.');return false;}}
 function applyTheme(){
   const mode=['system','dark','light'].includes(state.settings?.theme)?state.settings.theme:'system';
   const light=mode==='light'||(mode==='system'&&window.matchMedia?.('(prefers-color-scheme: light)').matches);
@@ -528,8 +531,16 @@ byId('exportData').onclick=async()=>{
 };
 window.addEventListener('forge-export',()=>byId('exportData').click());
 byId('importData').onclick=()=>byId('importFile').click();
-byId('importFile').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>5*1024*1024)throw Error('Backup is larger than 5 MB');const obj=normalizeBackup(JSON.parse(await f.text()));if(!confirm('Replace your current local data with this backup?'))return;stopFocusTicker();state=obj;if(state.focus.active?.running)state.focus=FocusCore.recover(state.focus);state.codeDone||={};state.codeNotes||={};state.activity||={};state.mocks||=[];focusPauseReason='Restored focus session is paused';save();renderAll();toast('Backup imported successfully.')}catch(err){toast('Could not import: '+err.message)}finally{e.target.value=''}};
-byId('resetData').onclick=()=>{if(confirm('Reset all FORGE data on this device? This cannot be undone without a backup.')){stopFocusTicker();focusPauseReason='';state=seed();save();renderAll();toast('Workspace reset.')}};
+async function importBackup(event){const file=event.target.files?.[0];if(!file)return;try{if(file.size>5*1024*1024)throw Error('Backup is larger than 5 MB');const next=normalizeBackup(JSON.parse(await file.text()));if(!confirm('Replace your current local data with this backup?'))return;if(next.focus.active?.running)next.focus=FocusCore.recover(next.focus);localStorage.setItem(STORAGE_KEY,JSON.stringify(next));stopFocusTicker();state=next;recoveryRaw=null;if(byId('recoveryDialog').open)byId('recoveryDialog').close();focusPauseReason='Restored focus session is paused';renderAll();window.WorkspaceUI?.refresh();toast('Backup imported successfully.')}catch(err){const message='Could not import: '+err.message;if(recoveryRaw!==null)byId('recoveryStatus').textContent=message;else toast(message);}finally{event.target.value=''}}
+byId('importFile').onchange=importBackup;
+byId('recoveryImportFile').onchange=importBackup;
+function resetData(){if(!confirm('Reset all FORGE data on this device? This cannot be undone without a backup.'))return;try{const next=seed();localStorage.setItem(STORAGE_KEY,JSON.stringify(next));stopFocusTicker();focusPauseReason='';state=next;recoveryRaw=null;if(byId('recoveryDialog').open)byId('recoveryDialog').close();renderAll();window.WorkspaceUI?.refresh();toast('Workspace reset.');}catch{if(recoveryRaw!==null)byId('recoveryStatus').textContent='Could not save the new profile. Your existing data was kept.';else toast('Could not reset the workspace.');}}
+byId('resetData').onclick=resetData;
+byId('recoveryReset').onclick=resetData;
+byId('recoveryImport').onclick=()=>byId('recoveryImportFile').click();
+byId('recoveryExport').onclick=async()=>{try{const saved=await window.forgeDesktop.exportRecovery(recoveryRaw);byId('recoveryStatus').textContent=saved?'Recovery copy saved.':'Recovery copy was not saved.';}catch{byId('recoveryStatus').textContent='Could not save a recovery copy. Try another location.';}};
+byId('recoveryDialog').addEventListener('cancel',event=>event.preventDefault());
+if(recoveryRaw!==null)byId('recoveryDialog').showModal();
 renderAll();renderLanguageGuide();
 window.forgeDesktop.getAmcCatalog().then(catalog=>{timelineExamNames=new Map(catalog.map(exam=>[exam.id,exam.title]));renderTimelineEvidence()}).catch(()=>{});
 

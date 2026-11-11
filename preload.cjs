@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('forgeDesktop', {
   runtimeInfo: Object.freeze({qaProfile:Boolean(process.env.FORGE_QA_PROFILE),forceOnboarding:process.env.FORGE_QA_ONBOARDING==='1'}),
   exportBackup: data => ipcRenderer.invoke('forge:export-backup', data),
+  exportRecovery: data => ipcRenderer.invoke('forge:export-recovery', data),
   getAmcCatalog: () => ipcRenderer.invoke('forge:amc-catalog'),
   getAmcPdf: (id,kind) => ipcRenderer.invoke('forge:amc-pdf',id,kind),
   openAmcSource: (id,kind) => ipcRenderer.invoke('forge:amc-source',id,kind),

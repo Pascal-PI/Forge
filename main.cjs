@@ -180,6 +180,19 @@ else {
       return true;
     });
 
+    ipcMain.handle('forge:export-recovery', async (event, data) => {
+      checkSender(event);
+      if (typeof data !== 'string' || Buffer.byteLength(data, 'utf8') > 20 * 1024 * 1024) throw new Error('Recovery data is too large');
+      const result = await dialog.showSaveDialog(mainWindow, {
+        title: 'Save FORGE recovery data',
+        defaultPath: path.join(app.getPath('documents'), 'forge-recovery.txt'),
+        filters: [{ name: 'Text file', extensions: ['txt'] }]
+      });
+      if (result.canceled || !result.filePath) return false;
+      await fs.writeFile(result.filePath, data, 'utf8');
+      return true;
+    });
+
     mainWindow = new BrowserWindow({
       width: 1380,
       height: 940,
