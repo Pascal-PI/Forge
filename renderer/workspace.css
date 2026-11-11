@@ -28,6 +28,16 @@
 .workspace-answers button { text-align:left; }
 .workspace-answers button:disabled { opacity:.7; cursor:default; }
 .workspace-tools { display:flex; flex-wrap:wrap; gap:8px; }
+.workspace-history summary { cursor:pointer; }
+.workspace-history div { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.workspace-history button { border:1px solid #55516d; background:#20263b; color:inherit; border-radius:9px; padding:8px; cursor:pointer; }
+.workspace-search-array { display:flex; flex-wrap:wrap; gap:4px; list-style:none; margin:16px 0; padding:0; }
+.workspace-search-array li { display:grid; min-width:39px; text-align:center; padding:5px; border:1px solid #515876; border-radius:7px; }
+.workspace-search-array li span { font-size:.7rem; opacity:.8; }
+.workspace-search-array li.middle { border-color:#80d8ee; background:#243e50; }
+.workspace-search-array li.ruled-out { opacity:.4; }
+.workspace-search-controls { display:flex; flex-wrap:wrap; gap:6px; }
+.workspace-search-controls button { border:1px solid #55516d; background:#20263b; color:inherit; border-radius:9px; padding:10px; cursor:pointer; }
 @media(max-width:1100px) { .workspace-layout:has(.workspace-activity) { grid-template-columns:190px minmax(0,1fr); } .workspace-activity { grid-column:2; border-left:0; border-top:1px solid #30364b; padding:20px 0; } }
 @media(max-width:800px) { .workspace-layout { grid-template-columns:1fr; } .workspace-sessions { border-right:0; border-bottom:1px solid #30364b; padding:0 0 12px; } .workspace-list { max-height:140px; overflow:auto; } .workspace-links { display:flex; flex-wrap:wrap; } }
 @media(max-width:800px) { .workspace-layout:has(.workspace-activity) { grid-template-columns:1fr; } .workspace-activity { grid-column:1; } }
