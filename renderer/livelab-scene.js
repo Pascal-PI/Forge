@@ -22,9 +22,9 @@
         continue;
       }
       if(b.type==='diagram'){
-        if(!text(b.label,200) || !b.label.trim() || !Array.isArray(b.shapes) || b.shapes.length>100) throw Error('Invalid diagram');
-        for(const s of b.shapes){
-          if(!s || typeof s!=='object' || !color(s.color)) throw Error('Invalid diagram shape');
+        if(!text(b.label,200) || !b.label.trim() || !Array.isArray(b.shapes) || b.shapes.length>100) throw Error('Invalid diagram: provide a label and at most 100 shapes');
+        for(const [index,s] of b.shapes.entries()){
+          if(!s || typeof s!=='object' || !color(s.color)) throw Error(`Invalid diagram shape ${index}: color must be a six-digit hex value`);
           if(s.draggable!==undefined && typeof s.draggable!=='boolean')throw Error('Invalid draggable shape');
           if(s.draggable){
             if(!['circle','rect'].includes(s.type) || !id(s.id) || ids.has(s.id) || !text(s.label,120) || !s.label.trim() || !finite(s.x) || !finite(s.y) || s.x<0 || s.x>1000 || s.y<0 || s.y>1000)throw Error('Invalid draggable shape');
@@ -34,8 +34,9 @@
           if(s.type==='rect' && [s.x,s.y,s.width,s.height].every(finite) && s.width>0 && s.width<=1000 && s.height>0 && s.height<=1000) continue;
           if(s.type==='line' && [s.x1,s.y1,s.x2,s.y2,s.width].every(finite) && s.width>0 && s.width<=30) continue;
           if((s.type==='polyline'||s.type==='polygon') && Array.isArray(s.points) && s.points.length>=(s.type==='polygon'?3:2) && s.points.length<=200 && s.points.every(point=>Array.isArray(point)&&point.length===2&&point.every(finite)) && (s.type==='polygon'||finite(s.width)&&s.width>0&&s.width<=30))continue;
-          if(s.type==='label' && [s.x,s.y,s.size].every(finite) && s.size>=8 && s.size<=80 && text(s.text,120)) continue;
-          throw Error('Invalid diagram shape');
+          if(s.type==='label' && [s.x,s.y,s.size].every(finite) && s.size>=8 && s.size<=80 && text(s.text,120) && (s.anchor===undefined || ['start','middle','end'].includes(s.anchor))) continue;
+          const guidance={circle:'finite x and y; radius greater than zero and at most 1000',rect:'finite x and y; width and height greater than zero and at most 1000',line:'finite coordinates; width greater than zero and at most 30',polyline:'2 to 200 finite coordinate pairs and width greater than zero and at most 30',polygon:'3 to 200 finite coordinate pairs',label:'finite x and y, size 8 to 80, text up to 120 characters and valid anchor'};
+          throw Error(`Invalid diagram shape ${index}: ${Object.hasOwn(guidance,s.type)?guidance[s.type]:'unknown shape type'}`);
         }
         continue;
       }

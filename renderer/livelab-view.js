@@ -6,6 +6,7 @@
     // Reuse the same schema as the host. Text is always inserted as text nodes.
     root.LiveLabScene.validate({state:{},scene});
     const fragment=document.createDocumentFragment();
+    const labels=[];
     const title=document.createElement('h2');title.textContent=scene.title;fragment.append(title);
     // Put the visual first while keeping source-order among visuals and controls.
     const blocks=[...scene.blocks.filter(block=>block.type==='diagram'),...scene.blocks.filter(block=>block.type!=='diagram')];
@@ -41,14 +42,19 @@
         step.type='button';step.textContent='Step';step.addEventListener('click',()=>onEvent({type:'tick',id:block.id,dt:block.intervalMs}));
         group.append(label,play,step);fragment.append(group);continue;
       }
-      const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 1000 1000');svg.setAttribute('role',block.shapes.some(shape=>shape.draggable)?'group':'img');svg.setAttribute('aria-label',block.label);
-      for(const shape of block.shapes){
+      const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 1000 1000');svg.setAttribute('role',block.shapes.some(shape=>shape.draggable)?'group':'img');svg.setAttribute('aria-label',block.label);svg.setAttribute('data-livelab-diagram-index',String(scene.blocks.indexOf(block)));
+      for(const [shapeIndex,shape] of block.shapes.entries()){
         const tag=shape.type==='label'?'text':shape.type,el=document.createElementNS(ns,tag);
+        el.setAttribute('data-livelab-shape-index',String(shapeIndex));
         const fields=shape.type==='circle'?['x','y','r']:shape.type==='rect'?['x','y','width','height']:shape.type==='line'?['x1','y1','x2','y2','width']:shape.type==='label'?['x','y','size']:[];
         for(const field of fields){const attr=shape.type==='circle'&&field==='x'?'cx':shape.type==='circle'&&field==='y'?'cy':shape.type==='line'&&field==='width'?'stroke-width':field==='size'?'font-size':field;el.setAttribute(attr,String(shape[field]));}
         if(shape.type==='polyline'||shape.type==='polygon')el.setAttribute('points',shape.points.map(point=>point.join(',')).join(' '));
         if(shape.type==='line'||shape.type==='polyline'){el.setAttribute('stroke',shape.color);if(shape.type==='polyline'){el.setAttribute('stroke-width',String(shape.width));el.setAttribute('fill','none');el.setAttribute('stroke-linejoin','round');el.setAttribute('stroke-linecap','round');}}else el.setAttribute('fill',shape.color);
-        if(shape.type==='label')el.textContent=shape.text;
+        if(shape.type==='label'){
+          const insideCircle=shape.text.length<=12 && block.shapes.some(other=>other.type==='circle' && Math.abs(other.x-shape.x)<1 && Math.abs(other.y-shape.y)<other.r*0.5);
+          const anchor=shape.anchor || (insideCircle?'middle':'start');
+          el.textContent=shape.text;el.setAttribute('text-anchor',anchor);labels.push({element:el,x:shape.x,y:shape.y,anchor});
+        }
         if(shape.draggable){
           el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('data-livelab-id',shape.id);el.setAttribute('aria-label',`${shape.label}. Drag or use arrow keys to move.`);
           el.style.cursor='grab';el.style.touchAction='none';
@@ -66,6 +72,39 @@
       fragment.append(svg);
     }
     container.replaceChildren(fragment);
+    // Generated labels use start anchoring. Keep the complete label inside the
+    // 1000-unit canvas even when its author placed a long caption near an edge.
+    for(const {element,x,y,anchor} of labels){
+      const measured=element.getComputedTextLength();
+      if(!Number.isFinite(measured)||measured<=0)continue;
+      const width=Math.min(measured,960);
+      if(measured>960){element.setAttribute('textLength','960');element.setAttribute('lengthAdjust','spacingAndGlyphs');}
+      const offset=anchor==='middle'?width/2:anchor==='end'?width:0;
+      const left=Math.max(20,Math.min(x-offset,980-width));
+      element.setAttribute('x',String(left+offset));
+      const bounds=element.getBBox();
+      if(bounds.y<10)element.setAttribute('y',String(y+10-bounds.y));
+      else if(bounds.y+bounds.height>990)element.setAttribute('y',String(y+990-bounds.y-bounds.height));
+    }
   }
-  root.LiveLabView={render};
+  function animateTransition(container,before,after,duration){
+    if(!(container instanceof Element)||!Number.isFinite(duration)||duration<1||duration>2000)return;
+    for(const svg of container.querySelectorAll('[data-livelab-diagram-index]')){
+      const i=Number(svg.getAttribute('data-livelab-diagram-index'));
+      const oldBlock=before?.blocks?.[i],newBlock=after?.blocks?.[i];
+      if(oldBlock?.type!=='diagram'||newBlock?.type!=='diagram'||oldBlock.label!==newBlock.label)continue;
+      for(const el of svg.querySelectorAll('[data-livelab-shape-index]')){
+        const index=Number(el.getAttribute('data-livelab-shape-index')),old=oldBlock.shapes[index],next=newBlock.shapes[index];
+        if(!old||!next||old.type!==next.type||!['circle','rect','label'].includes(next.type)||old.id!==next.id||old.color!==next.color)continue;
+        if(next.type==='circle' && old.r!==next.r || next.type==='rect' && (old.width!==next.width||old.height!==next.height))continue;
+        if(next.type==='label' && (old.text!==next.text || old.size!==next.size || old.anchor!==next.anchor || next.text.length>12 || old.x<100 || old.x>900 || next.x<100 || next.x>900))continue;
+        const dx=old.x-next.x,dy=old.y-next.y;
+        if(!Number.isFinite(dx)||!Number.isFinite(dy)||(!dx&&!dy)||Math.abs(dx)>1000||Math.abs(dy)>1000)continue;
+        const animation=document.createElementNS(ns,'animateTransform');
+        animation.setAttribute('attributeName','transform');animation.setAttribute('type','translate');animation.setAttribute('from',`${dx} ${dy}`);animation.setAttribute('to','0 0');animation.setAttribute('dur',`${duration}ms`);animation.setAttribute('fill','remove');animation.setAttribute('begin','indefinite');
+        el.append(animation);animation.beginElement();
+      }
+    }
+  }
+  root.LiveLabView={render,animateTransition};
 })(window);

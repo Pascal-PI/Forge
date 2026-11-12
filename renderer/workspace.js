@@ -37,6 +37,7 @@
     const target=current()===session ? root.querySelector('[data-livelab-view]') : null;
     const restoreFocus=event.type==='drag' && target?.contains(document.activeElement) && document.activeElement?.getAttribute('data-livelab-id')===event.id;
     if(target){target.setAttribute('aria-busy','true');target.querySelectorAll(event.type==='tick'?'button,input':'button,input,textarea').forEach(el=>el.disabled=true);}
+    let transition=null;
     window.forgeDesktop.liveLabStep({source:activity.source,snapshot:activity.snapshot,event}).then(snapshot=>{
       if(!state.workspace.sessions.includes(session)||session.activity!==activity)return;
       LiveLabScene.validate(snapshot);
@@ -44,9 +45,10 @@
       activity.snapshot=snapshot;
       if(event.type!=='tick')activity.lastInteraction=JSON.stringify({...event,...(typeof event.value==='string'?{value:event.value.slice(0,500)}:{})}).slice(0,700);
       if(!touch(session)){activity.snapshot=previousSnapshot;session.updatedAt=previousUpdatedAt;if(previousInteraction===undefined)delete activity.lastInteraction;else activity.lastInteraction=previousInteraction;throw Error('The LiveLab change could not be saved. The previous state was kept.');}
+      if(event.type==='tick' && liveLabAnimation?.activity===activity && !reducedMotion.matches)transition={before:previousSnapshot.scene,after:snapshot.scene,duration:event.dt};
       if(event.type==='submit')liveLabDrafts.get(activity)?.delete(event.id);
     }).catch(failure=>{stopLiveLabAnimation();if(current()===session)error=String(failure.message||failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/,'');})
-      .finally(()=>{liveLabStepBusy=false;render();if(restoreFocus && current()===session && session.activity===activity)Array.from(root.querySelectorAll('[data-livelab-id]')).find(el=>el.getAttribute('data-livelab-id')===event.id)?.focus();if(liveLabAnimation?.activity===activity)scheduleLiveLabAnimation(session,activity);});
+      .finally(()=>{liveLabStepBusy=false;render();if(transition && liveLabAnimation?.activity===activity && current()===session && session.activity===activity){const view=root.querySelector('[data-livelab-view]');if(view)LiveLabView.animateTransition(view,transition.before,transition.after,transition.duration);}if(restoreFocus && current()===session && session.activity===activity)Array.from(root.querySelectorAll('[data-livelab-id]')).find(el=>el.getAttribute('data-livelab-id')===event.id)?.focus();if(liveLabAnimation?.activity===activity)scheduleLiveLabAnimation(session,activity);});
   }
   document.addEventListener('visibilitychange',()=>{if(document.hidden && liveLabAnimation){stopLiveLabAnimation();render();}});
   reducedMotion.addEventListener('change',()=>{if(reducedMotion.matches)stopLiveLabAnimation();render();});
