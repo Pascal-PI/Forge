@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld('forgeDesktop', {
   coachCheck:()=>ipcRenderer.invoke('forge:coach-check'),
   coachTopics:()=>ipcRenderer.invoke('forge:coach-topics'),
   coachRequest:payload=>ipcRenderer.invoke('forge:coach-request',payload),
+  liveLab:payload=>ipcRenderer.invoke('forge:livelab',payload),
+  liveLabStep:payload=>ipcRenderer.invoke('forge:livelab-step',payload),
   coachConversation:payload=>ipcRenderer.invoke('forge:coach-conversation',payload),
   onCoachStream:callback=>{
     if(typeof callback!=='function')throw Error('A stream callback is required.');

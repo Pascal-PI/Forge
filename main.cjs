@@ -4,6 +4,7 @@ const { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, protocol, session,
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { createCoach } = require('./coach.cjs');
+const { createLiveLabSession } = require('./livelab-session.cjs');
 const { createCodeforces } = require('./codeforces.cjs');
 const { createRunner } = require('./runner.cjs');
 const { normalizeLessonExport, createLessonPresentation, lessonFilename } = require('./lesson-pptx.cjs');
@@ -15,6 +16,9 @@ const files = new Map([
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/workspace-core.js', ['workspace-core.js', 'text/javascript; charset=utf-8']],
+  ['/livelab-core.js', ['livelab-core.js', 'text/javascript; charset=utf-8']],
+  ['/livelab-scene.js', ['livelab-scene.js', 'text/javascript; charset=utf-8']],
+  ['/livelab-view.js', ['livelab-view.js', 'text/javascript; charset=utf-8']],
   ['/workspace.js', ['workspace.js', 'text/javascript; charset=utf-8']],
   ['/workspace.css', ['workspace.css', 'text/css; charset=utf-8']],
   ['/workspace-markup.js', ['workspace-markup.js', 'text/javascript; charset=utf-8']],
@@ -57,6 +61,7 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'forge', privileges: { standard:
 
 let mainWindow;
 const coach=createCoach({app,dialog,getWindow:()=>mainWindow});
+let liveLabStepBusy=false;
 const codeforces=createCodeforces();
 function checkSender(event){
   if(!mainWindow||event.sender!==mainWindow.webContents||event.senderFrame!==event.sender.mainFrame||event.senderFrame.url!==APP_URL)throw Error('Invalid sender');
@@ -123,6 +128,15 @@ else {
       'forge:coach-check':()=>coach.check(),
       'forge:coach-topics':()=>coach.topics(),
       'forge:coach-request':payload=>coach.request(payload),
+      'forge:livelab':payload=>coach.liveLab(payload),
+      'forge:livelab-step':async payload=>{
+        if(liveLabStepBusy)throw Error('The LiveLab is already updating.');
+        if(!payload || typeof payload.source!=='string' || Buffer.byteLength(payload.source,'utf8')>32768)throw Error('Invalid LiveLab.');
+        const lab=createLiveLabSession(payload.source,payload.snapshot);
+        liveLabStepBusy=true;
+        try {await lab.step(payload.event);return lab.snapshot();}
+        finally {liveLabStepBusy=false;lab.close();}
+      },
       'forge:coach-cancel':()=>{coach.cancel();return true;},
       'forge:codeforces-contests':()=>codeforces.getUpcoming(),
       'forge:runner-status':()=>runner.status(),

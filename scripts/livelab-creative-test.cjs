@@ -1,0 +1,23 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {createCreativeLab,verify,preserveControls}=require('../livelab-creative.cjs');
+const {createLiveLabSession}=require('../livelab-session.cjs');
+const candidate={source:`function update(state,event){const n=state?state.n+(event.type==='click'?1:0):0;return {state:{n},scene:{title:'Timeline',blocks:[{type:'text',text:'Step '+n},{type:'button',id:'next',label:'Next'}]}}}`,description:'Explore steps',assumptions:'Illustrative sequence',question:'What happens next?'};
+const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n'],expected:1,reason:'One click advances one step.'}]}];
+(async()=>{
+  assert.equal(await verify(candidate.source,checks),1);
+  await assert.rejects(verify(candidate.source,[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]),/Independent check failed/);
+  await assert.rejects(verify(candidate.source,[{events:[],assertions:[{...checks[0].assertions[0],expected:0}]}]),/did not test an interaction/);
+  let n=0,feedback='';
+  const result=await createCreativeLab({request:'Create a timeline',ask:async(_instructions,input)=>{n++;if(n===1)return candidate;if(n===2)return {verdict:'pass',findings:'Checked.',checks:[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]};if(n===3){feedback=input.feedback;return candidate;}return {verdict:'pass',findings:'Checked.',checks};}});
+  assert.match(feedback,/Independent check failed/);assert.equal(result.snapshot.state.n,0);assert.match(result.review,/1 independently proposed assertion passed/);
+  const sliderSource=`function update(s,e){const n=e.type==='change'?e.value:(s?s.n:1);return {state:{n},scene:{title:'Growth',blocks:[{type:'slider',id:'rate',label:'Rate',min:0,max:5,step:1,value:n}]}}}`;
+  const original=createLiveLabSession(sliderSource);await original.step({type:'init'});await original.step({type:'change',id:'rate',value:4});
+  const replacement=createLiveLabSession(sliderSource);await replacement.step({type:'init'});
+  const preserved=await preserveControls(sliderSource,replacement.snapshot(),{snapshot:original.snapshot()});
+  assert.equal(preserved.state.n,4);original.close();replacement.close();
+  const motion=`function update(s,e){s=s||{x:100,t:0};if(e.type==='drag')s.x=e.x;if(e.type==='tick')s.t+=e.dt;return {state:s,scene:{title:'Motion',blocks:[{type:'animation',id:'clock',label:'Clock',intervalMs:500},{type:'diagram',label:'Point',shapes:[{type:'circle',id:'point',label:'Point',draggable:true,x:s.x,y:200,r:20,color:'#ffaa00'}]}]}}}`;
+  const motionChecks=[{events:[{type:'drag',id:'point',x:300,y:200},{type:'tick',id:'clock',dt:500}],assertions:[{path:['state','x'],expected:300,reason:'Dragging sets the position.'},{path:['state','t'],expected:500,reason:'One step advances half a second.'}]}];
+  assert.equal(await verify(motion,motionChecks),2);
+  console.log('Creative LiveLab generation, independent checks and repair passed');
+})().catch(error=>{console.error(error);process.exitCode=1;});

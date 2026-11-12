@@ -3,18 +3,49 @@
   const root = document.getElementById('workspaceRoot');
   const sidebar = document.getElementById('workspaceSidebar');
   let busy = false;
+  let liveLabBusy = false;
+  let liveLabSession = null;
+  let liveLabStepBusy = false;
+  let liveLabAnimation = null;
   let pendingStream = null;
   let codeBusy = null;
   let codeError = null;
   let codeCancelRequested = false;
+  let projectilePythonOpen = false;
   let error = '';
   let filter = '';
   let workspacePage = 'learn';
   let renderedSession = null;
   const current = () => state.workspace.sessions.find(item => item.id === state.workspace.selected);
   const touch = session => { session.updatedAt = Date.now(); save(); };
-  const activityNames = { 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line', coding: 'Coding challenge', 'equation-balance': 'Equation balance', projectile: 'Projectile playground' };
-  const activityActions = { 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line', coding: 'coding-challenge', 'equation-balance': 'equation-balance', projectile: 'projectile' };
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  function stopLiveLabAnimation(){if(liveLabAnimation){clearTimeout(liveLabAnimation.timer);liveLabAnimation=null;}}
+  function scheduleLiveLabAnimation(session,activity){
+    const animation=liveLabAnimation;
+    if(!animation || animation.session!==session || animation.activity!==activity)return;
+    if(current()!==session || session.activity!==activity || workspacePage!=='learn' || document.hidden || reducedMotion.matches || animation.ticks>=120){stopLiveLabAnimation();render();return;}
+    const block=activity.snapshot.scene.blocks.find(b=>b.type==='animation' && b.id===animation.id);
+    if(!block){stopLiveLabAnimation();render();return;}
+    clearTimeout(animation.timer);
+    animation.timer=setTimeout(()=>{if(liveLabAnimation!==animation)return;animation.ticks++;performLiveLabEvent(session,activity,{type:'tick',id:block.id,dt:block.intervalMs});},block.intervalMs);
+  }
+  function performLiveLabEvent(session,activity,event){
+    if(liveLabStepBusy)return;
+    if(liveLabAnimation?.activity===activity)clearTimeout(liveLabAnimation.timer);
+    liveLabStepBusy=true;
+    const target=current()===session ? root.querySelector('[data-livelab-view]') : null;
+    const restoreFocus=event.type==='drag' && target?.contains(document.activeElement) && document.activeElement?.getAttribute('data-livelab-id')===event.id;
+    if(target){target.setAttribute('aria-busy','true');target.querySelectorAll('button,input').forEach(el=>el.disabled=true);}
+    window.forgeDesktop.liveLabStep({source:activity.source,snapshot:activity.snapshot,event}).then(snapshot=>{
+      if(!state.workspace.sessions.includes(session)||session.activity!==activity)return;
+      LiveLabScene.validate(snapshot);activity.snapshot=snapshot;touch(session);
+    }).catch(failure=>{stopLiveLabAnimation();if(current()===session)error=String(failure.message||failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/,'');})
+      .finally(()=>{liveLabStepBusy=false;render();if(restoreFocus && current()===session && session.activity===activity)Array.from(root.querySelectorAll('[data-livelab-id]')).find(el=>el.getAttribute('data-livelab-id')===event.id)?.focus();if(liveLabAnimation?.activity===activity)scheduleLiveLabAnimation(session,activity);});
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.hidden && liveLabAnimation){stopLiveLabAnimation();render();}});
+  reducedMotion.addEventListener('change',()=>{if(reducedMotion.matches)stopLiveLabAnimation();render();});
+  const activityNames = { livelab: 'LiveLab', 'livelab-creative':'LiveLab', 'binary-search': 'Binary search lab', 'school-question': 'Practice question', sorting: 'Sorting lab', 'number-line': 'Number line', coding: 'Coding challenge', 'equation-balance': 'Equation balance', projectile: 'Projectile playground' };
+  const activityActions = { livelab:'livelab', 'binary-search': 'binary', 'school-question': 'practice', sorting: 'sorting', 'number-line': 'number-line', coding: 'coding-challenge', 'equation-balance': 'equation-balance', projectile: 'projectile' };
   function archiveActivity(session) {
     if (!session.activity) return true;
     session.activities ||= [];
@@ -27,6 +58,17 @@
   function activityMarkup(session) {
     const activity = session?.activity;
     if (!activity) return '';
+    if (activity.type === 'livelab-creative') return `<aside class="workspace-activity workspace-livelab-creative" aria-label="LiveLab"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">LiveLab</h2><button data-action="close-activity" aria-label="Close LiveLab">×</button></div><p>${esc(activity.description)}</p><div data-livelab-view></div><h3>Try a prediction</h3><p>${esc(activity.question)}</p><details><summary>Assumptions and checks</summary><p>${esc(activity.assumptions)}</p><p>AI review: ${esc(activity.review)} These checks do not guarantee accuracy.</p></details></aside>`;
+    if (activity.type === 'livelab') {
+      const lab=activity.lab, vars=Object.create(null); lab.controls.forEach(c=>vars[c.id]=c.value);
+      let graph='';
+      try {
+        const sets=lab.curves.map(curve=>Array.from({length:81},(_,i)=>{vars.x=lab.xMin+(lab.xMax-lab.xMin)*i/80;return LiveLabCore.evaluate(curve.expression,vars);}));
+        const all=sets.flat(), low=Math.min(...all), high=Math.max(...all), span=high-low||1;
+        graph=`<svg viewBox="0 0 400 220" role="img" aria-label="${esc(lab.yLabel)} plotted against ${esc(lab.xLabel)}"><path d="M20 10V200H390" fill="none" stroke="currentColor" opacity=".35"/>${sets.map((values,index)=>`<polyline points="${values.map((y,i)=>`${20+i*4.5},${195-(y-low)/span*180}`).join(' ')}" fill="none" stroke="${['#ed7958','#68a8e3','#55b98e'][index]}" stroke-width="3"/>`).join('')}</svg><p>${esc(lab.xLabel)}: ${lab.xMin}–${lab.xMax} · ${esc(lab.yLabel)}: ${low.toPrecision(4)}–${high.toPrecision(4)}</p><p>${lab.curves.map((c,i)=>`${['●','●','●'][i]} ${esc(c.label)}`).join(' · ')}</p>`;
+      } catch { graph='<p role="alert">The model cannot calculate these settings. Change a control to continue.</p>'; }
+      return `<aside class="workspace-activity workspace-livelab" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">${esc(lab.title)}</h2><button data-action="close-activity" aria-label="Close LiveLab">×</button></div><p>${esc(lab.description)}</p><div class="livelab-graph">${graph}</div>${lab.controls.map((c,i)=>`<label>${esc(c.label)}: <strong>${c.value}</strong><input type="range" data-livelab-control="${i}" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.value}"></label>`).join('')}<h3>Try a prediction</h3><p>${esc(lab.question)}</p><details><summary>Model assumptions and checks</summary><p>${esc(lab.assumptions)}</p><p>AI review: ${esc(activity.review)} Model checks do not guarantee accuracy.</p></details></aside>`;
+    }
     if (activity.type === 'projectile') {
       if (activity.stage === 'practice') {
         const choices = ['The range doubles', 'The range becomes four times larger', 'The range stays the same'];
@@ -38,7 +80,11 @@
         const peak = result === null ? 0 : 105 * (result / 4) / (900 / (4 * 9.81));
         const trajectory = `M 20 160 Q ${((20 + endX) / 2).toFixed(2)} ${(160 - 2 * peak).toFixed(2)} ${endX.toFixed(2)} 160`;
         const graph = result === null ? '<div class="projectile-ready">Run the simulation to see the launch.</div>' : `<svg class="projectile-simulation" viewBox="0 0 400 180" role="img" aria-label="Launch at ${activity.result} meters per second, predicted range ${result.toFixed(1)} meters"><path d="M 20 160 H 385" stroke="currentColor" opacity=".3"/><path d="${trajectory}" fill="none" stroke="#df7756" stroke-width="3"/><circle r="6" fill="#df7756" class="projectile-flight" style="offset-path:path('${trajectory}')"/><circle cx="${endX.toFixed(2)}" cy="160" r="3" fill="#47755b"/></svg>`;
-        return `<aside class="workspace-activity workspace-projectile" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Build a launch simulation</h2><button data-action="close-activity" aria-label="Close activity">×</button></div><p>Choose a launch speed and run the model. This simulation uses a 45° angle, Earth gravity and level ground.</p><label for="projectileSpeed">Launch speed: <strong>${activity.speed} m/s</strong></label><input id="projectileSpeed" type="range" min="5" max="30" value="${activity.speed}"><pre class="projectile-code"><code>speed = ${activity.speed}\ngravity = 9.81\nrange_m = speed ** 2 / gravity\nprint(range_m)</code></pre><button data-action="projectile-run">Run simulation</button>${graph}${result === null ? '' : `<p role="status"><strong>${result.toFixed(1)} m</strong> predicted range at ${activity.result} m/s.${activity.result !== activity.speed ? ' Change the speed and run again to update the result.' : ''}</p>`}<p>The result is calculated locally in FORGE. The Python shown expresses the same calculation.</p><button data-action="projectile-explore">Return to the lab</button></aside>`;
+        const python = activity.python ?? WorkspaceCore.projectileStarter, last = activity.lastPythonRun, running = codeBusy === activity;
+        const numeric = last && /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(last.output.trim()) ? Number(last.output.trim()) : NaN;
+        const match = last && last.status === 'Accepted' && Number.isFinite(numeric) && Math.abs(numeric - last.speed ** 2 / 9.81) <= .051;
+        const pythonPanel = `<details class="projectile-python" ${projectilePythonOpen || running || last || codeError?.activity === activity ? 'open' : ''}><summary>Edit and test the Python project</summary><p>Read a launch speed from input and print its range to one decimal place. The test uses the slider’s speed. Your code does not control the local diagram.</p><label for="projectilePython">Python code</label><textarea id="projectilePython" maxlength="8000" spellcheck="false" ${running ? 'disabled' : ''}>${esc(python)}</textarea><p>Your draft and last result are saved on this device and included in backups.</p><label class="workspace-run-consent"><input id="projectileConsent" type="checkbox" ${running ? 'disabled' : ''}> I agree to send this code and the speed to Judge0 Community Edition. Judge0 stores submissions. Do not include secrets or personal information.</label><button data-action="projectile-test-python" ${codeBusy ? 'disabled' : ''}>${running ? 'Running…' : 'Run Python test'}</button>${running ? '<button data-action="stop-code">Stop waiting</button><p role="status">Running Python test…</p>' : codeError?.activity === activity ? `<p role="alert">${esc(codeError.message)}</p>` : ''}${last ? `<div class="projectile-python-result"><h3>Last Python test</h3><p class="projectile-run-stale" ${last.code !== python || last.speed !== activity.speed ? '' : 'hidden'}>This result is from an earlier draft or speed.</p><p>${match ? 'Matches the model.' : 'Does not match the model.'} Expected ${(last.speed ** 2 / 9.81).toFixed(1)} m for ${last.speed} m/s.</p><p>Status: ${esc(last.status)}</p><pre>${esc(last.output || '(no output)')}</pre></div>` : ''}</details>`;
+        return `<aside class="workspace-activity workspace-projectile" aria-labelledby="workspaceActivityHeading"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">Build a launch simulation</h2><button data-action="close-activity" aria-label="Close activity">×</button></div><p>Choose a launch speed and run the model. This simulation uses a 45° angle, Earth gravity and level ground.</p><label for="projectileSpeed">Launch speed: <strong>${activity.speed} m/s</strong></label><input id="projectileSpeed" type="range" min="5" max="30" value="${activity.speed}"><pre class="projectile-code"><code>speed = ${activity.speed}\ngravity = 9.81\nrange_m = speed ** 2 / gravity\nprint(range_m)</code></pre><button data-action="projectile-run">Run simulation</button>${graph}${result === null ? '' : `<p role="status"><strong>${result.toFixed(1)} m</strong> predicted range at ${activity.result} m/s.${activity.result !== activity.speed ? ' Change the speed and run again to update the result.' : ''}</p>`}<p>The diagram above is calculated locally in FORGE.</p>${pythonPanel}<button data-action="projectile-explore">Return to the lab</button></aside>`;
       }
       const angle = activity.angle * Math.PI / 180;
       const range = 324 * Math.sin(2 * angle) / 9.81;
@@ -118,11 +164,12 @@
 
   function render() {
     const session = current();
+    if(liveLabAnimation && (liveLabAnimation.session!==session || session?.activity!==liveLabAnimation.activity || workspacePage!=='learn'))stopLiveLabAnimation();
     const oldMessages = document.getElementById('workspaceMessages');
     const sameSession = renderedSession === (session?.id || null);
     const scrollTop = oldMessages?.scrollTop || 0;
     const followLatest = !sameSession || !oldMessages || oldMessages.scrollHeight - oldMessages.scrollTop - oldMessages.clientHeight < 32;
-    const focused = sameSession && ['workspaceInput', 'workspaceCode', 'workspaceSearch', 'workspaceLearningGoal'].includes(document.activeElement?.id) ? document.activeElement.id : null;
+    const focused = sameSession && ['workspaceInput', 'workspaceCode', 'workspaceSearch', 'workspaceLearningGoal', 'projectilePython'].includes(document.activeElement?.id) ? document.activeElement.id : null;
     const selectionStart = focused ? document.activeElement.selectionStart : null;
     const selectionEnd = focused ? document.activeElement.selectionEnd : null;
     const sessions = [...state.workspace.sessions].sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt)
@@ -142,11 +189,22 @@
       <div class="workspace-list">${sessionGroups.filter(([, items]) => items.length).map(([label, items]) => `<section aria-label="${label}"><h3>${label}</h3>${items.map(item => `<button data-session="${esc(item.id)}" ${item.id === session?.id ? 'aria-current="true"' : ''}>${esc(item.title)}<small>${new Date(item.updatedAt).toLocaleDateString()}</small></button>`).join('')}</section>`).join('')}</div>
       <div class="workspace-links"><button data-action="workspace-learn">Learning workspace</button><button data-action="workspace-progress">Progress</button><button data-action="workspace-settings">Settings and backups</button></div></aside>
       <div class="workspace-chat"><header><div><span class="workspace-kicker">FORGE LEARNING</span><h1>${esc(session?.title || 'What would you like to learn?')}</h1>${session ? `<span>${session.minutes} minute plan</span>` : ''}</div>${session ? '<div class="workspace-actions"><button data-action="pin">'+(session.pinned?'Unpin':'Pin')+'</button><button data-action="rename">Rename</button><button data-action="delete">Delete</button></div>' : ''}</header>
-      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map((message, messageIndex) => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong>${message.role === 'assistant' ? `<div class="workspace-rich-text">${WorkspaceMarkup.render(message.text)}</div>` : `<p>${esc(message.text)}</p>`}${message.plan ? `<section class="workspace-tutor-plan" id="workspace-plan-${messageIndex}" tabindex="-1" aria-label="Suggested learning path"><h3>Your suggested path</h3><ol>${message.plan.map((step, stepIndex) => `<li><label><input type="checkbox" data-plan-message="${messageIndex}" data-plan-step="${stepIndex}" ${step.done ? 'checked' : ''}><span>${esc(step.text)}</span></label></li>`).join('')}</ol><small>Mark steps yourself as you work. Saved in this session.</small></section>` : ''}${message.activity ? `<button data-action="${activityActions[message.activity]}">Open ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : welcome}${pendingStream && pendingStream.session === session ? `<article class="workspace-message streaming"><strong>FORGE</strong><p id="workspaceStream" aria-live="off">${esc(pendingStream.text)}</p></article><p role="status">FORGE is responding…</p>` : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
+      <div class="workspace-messages" id="workspaceMessages" aria-live="polite">${session ? session.messages.map((message, messageIndex) => `<article class="workspace-message ${message.role}"><strong>${message.role === 'user' ? 'You' : 'FORGE'}</strong>${message.role === 'assistant' ? `<div class="workspace-rich-text">${WorkspaceMarkup.render(message.text)}</div>` : `<p>${esc(message.text)}</p>`}${message.plan ? `<section class="workspace-tutor-plan" id="workspace-plan-${messageIndex}" tabindex="-1" aria-label="Suggested learning path"><h3>Your suggested path</h3><ol>${message.plan.map((step, stepIndex) => `<li><label><input type="checkbox" data-plan-message="${messageIndex}" data-plan-step="${stepIndex}" ${step.done ? 'checked' : ''}><span>${esc(step.text)}</span></label></li>`).join('')}</ol><small>Mark steps yourself as you work. Saved in this session.</small></section>` : ''}${message.activity ? `<button data-action="${activityActions[message.activity]}" ${message.activity === 'livelab' ? `data-livelab-message="${messageIndex}"` : ''}>${message.activity === 'livelab' ? 'Create' : 'Open'} ${activityNames[message.activity]}</button>` : ''}</article>`).join('') : welcome}${pendingStream && pendingStream.session === session ? `<article class="workspace-message streaming"><strong>FORGE</strong><p id="workspaceStream" aria-live="off">${esc(pendingStream.text)}</p></article><p role="status">FORGE is responding…</p>` : ''}${liveLabBusy && liveLabSession === session ? '<p role="status">Building and checking your LiveLab…</p>' : ''}${error ? `<p class="workspace-error" role="alert">${esc(error)}</p>` : ''}</div>
       ${!session ? '<div class="workspace-durations"><button data-minutes="15">15 minutes</button><button data-minutes="25">25 minutes</button><button data-minutes="40">40 minutes</button></div>' : `<form id="workspaceForm"><label for="workspaceInput">Your message</label><textarea id="workspaceInput" maxlength="4000" required placeholder="Ask a question or describe what you want to learn…">${esc(session.draft || '')}</textarea><div><button type="submit" ${busy ? 'disabled' : ''}>Send</button>${pendingStream?.session === session ? '<button type="button" data-action="stop-tutor">Stop response</button>' : ''}${session.messages.at(-1)?.role === 'user' && !busy ? '<button type="button" data-action="retry">Retry last message</button>' : ''}${session.messages.length === 0 ? `<button type="button" data-action="suggest" ${busy ? 'disabled' : ''}>Suggest a starting point</button>` : ''}</div><p class="workspace-privacy">Sending shares recent messages, your learning goal, and short School, activity and checklist summaries with OpenAI. API usage is billed to your key. Drafts stay on this device until sent.</p></form>`}
-      ${session ? `<div class="workspace-tools"><button data-action="practice">Practice a question</button><button data-action="projectile">Projectile playground</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
+      ${session ? `<div class="workspace-tools"><button data-action="livelab" ${busy ? 'disabled' : ''}>${busy ? 'Working…' : 'Create or revise LiveLab'}</button>${liveLabBusy ? '<button data-action="stop-livelab">Cancel LiveLab</button>' : ''}<button data-action="practice">Practice a question</button><button data-action="projectile">Projectile playground</button><button data-action="binary">Binary search lab</button><button data-action="sorting">Sorting lab</button><button data-action="number-line">Number line</button><button data-action="equation-balance">Equation balance</button><button data-action="coding-challenge">Coding challenge</button></div>${session.activities?.length ? `<details class="workspace-history"><summary>Saved activities (${session.activities.length})</summary><div>${session.activities.map((item, index) => `<button data-activity-index="${index}">${esc(activityNames[item.type])}${item.type === 'school-question' ? ' · ' + esc(SchoolCore.byId.get(item.questionId).topic) : item.target !== undefined ? ' · target ' + item.target : ''}</button>`).join('')}</div></details>` : ''}` : ''}
       </div>${activityMarkup(session)}</div>`;
     sidebar.replaceChildren(root.querySelector('.workspace-sessions'));
+    if(session?.activity?.type==='livelab-creative') {
+      const activity=session.activity, target=root.querySelector('[data-livelab-view]');
+      if(target)LiveLabView.render(target,activity.snapshot.scene,event=>{
+        if(event.type==='toggle-animation'){
+          if(liveLabStepBusy || reducedMotion.matches)return;
+          if(liveLabAnimation?.activity===activity && liveLabAnimation.id===event.id){stopLiveLabAnimation();render();return;}
+          stopLiveLabAnimation();liveLabAnimation={session,activity,id:event.id,ticks:0,timer:null};render();scheduleLiveLabAnimation(session,activity);return;
+        }
+        performLiveLabEvent(session,activity,event);
+      },{playingId:liveLabAnimation?.activity===activity?liveLabAnimation.id:null,reducedMotion:reducedMotion.matches});
+    }
     if (session) {
       const historyIndex = session.activities?.findLastIndex(item => item.type === 'projectile') ?? -1;
       const active = session.activity?.type === 'projectile';
@@ -222,10 +280,22 @@
   }
 
   async function respond(session) {
+    let createLabAt=null;
     busy = true; error = ''; pendingStream = { requestId: crypto.randomUUID(), session, text: '' }; render();
     try {
       const messages = session.messages.slice(-12).map(message => ({ role: message.role, text: message.text.slice(0, 4000) }));
       const activity = session.activity;
+      if (activity?.type === 'livelab' && messages.at(-1)?.role === 'user') {
+        const lab=activity.lab;
+        const controls=lab.controls.map(c=>`${c.label}: ${c.value}`).join('; ');
+        const summary=`Active LiveLab (model data, not evidence of learner understanding): ${lab.title}. ${lab.description} Graph: ${lab.yLabel} vs ${lab.xLabel}. Controls: ${controls}. Assumptions: ${lab.assumptions}`;
+        messages.at(-1).text=(messages.at(-1).text+'\n\n'+summary).slice(0,4000);
+      }
+      if (activity?.type === 'livelab-creative' && messages.at(-1)?.role === 'user') {
+        const scene=activity.snapshot.scene;
+        const controls=scene.blocks.filter(b=>b.type==='slider').map(b=>`${b.label}: ${b.value}`).join('; ');
+        messages.at(-1).text=(messages.at(-1).text+`\n\nActive LiveLab (model data, not evidence of learner understanding): ${scene.title}. ${activity.description} Controls: ${controls || 'buttons'}. Assumptions: ${activity.assumptions}`).slice(0,4000);
+      }
       const latestPlan = [...session.messages].reverse().find(message => message.role === 'assistant' && message.plan?.length)?.plan;
       if (latestPlan && messages.at(-1)?.role === 'user') {
         const summary = latestPlan.map(step => `${step.done ? 'self-marked done' : 'not marked done'}: ${step.text.slice(0, 100)}`).join('; ');
@@ -268,9 +338,44 @@
       const schoolTopics = SchoolCore.weakTopics(state.school).filter(item => item.answered > 0).slice(0, 6).map(({ subject, topic, answered, correct }) => ({ subject, topic, answered, correct }));
       const response = await window.forgeDesktop.coachConversation({ requestId: pendingStream.requestId, minutes: session.minutes, goal: state.coach.profile?.goal || '', schoolTopics, messages });
       if (!response || typeof response.reply !== 'string' || !response.reply.trim() || response.reply.length > 8000 || response.activity !== 'none' && !Object.hasOwn(activityActions, response.activity) || response.steps != null && (!Array.isArray(response.steps) || response.steps.length === 1 || response.steps.length > 5 || !response.steps.every(step => typeof step === 'string' && step.trim() && step.length <= 500))) throw Error('The tutor returned an invalid response. Please retry.');
-      if (state.workspace.sessions.includes(session)) { session.messages.push({ role: 'assistant', text: response.reply, ...(response.activity !== 'none' ? { activity: response.activity } : {}), ...(response.steps?.length ? { plan: response.steps.map(text => ({text,done:false})) } : {}) }); touch(session); }
+      if (state.workspace.sessions.includes(session)) { session.messages.push({ role: 'assistant', text: response.reply, ...(response.activity !== 'none' ? { activity: response.activity } : {}), ...(response.steps?.length ? { plan: response.steps.map(text => ({text,done:false})) } : {}) }); if(response.activity==='livelab')createLabAt=session.messages.length-1; touch(session); }
     } catch (failure) { if (current() === session) error = String(failure.message || failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/, ''); }
     finally { busy = false; pendingStream = null; render(); }
+    if(createLabAt!==null && state.workspace.sessions.includes(session)) startLiveLab(session,createLabAt);
+  }
+
+  function startLiveLab(session,sourceIndex){
+    if(busy || !Number.isInteger(sourceIndex) || sourceIndex<0 || sourceIndex>=session.messages.length)return;
+    if(session.activity && (session.activities?.length||0)>=100){if(current()===session)error='This session has 100 saved activities. Start another session to continue.';render();return;}
+    const prior=session.messages.slice(0,sourceIndex+1);
+    const request=[...prior].reverse().find(m=>m.role==='user')?.text;
+    if (!request) { if(current()===session)error='Send a message about what you want to explore first.'; render(); return; }
+    const contextual=prior.at(-1)?.role==='assistant' && prior.at(-1)?.activity==='livelab' ? prior.slice(0,-1) : prior;
+    const context=contextual.slice(-8).map(({role,text})=>({role,text:text.slice(0,1000)}));
+    const original=session.activity, previous=sourceIndex===session.messages.length-1 && original?.type==='livelab-creative' ? {source:original.source,snapshot:original.snapshot} : null;
+    busy=true; liveLabBusy=true; liveLabSession=session; error=''; render();
+    Promise.resolve().then(async()=>{
+      let reuseCandidates=[];
+      if(!previous){
+        try{
+          const bytes=new TextEncoder().encode(JSON.stringify({version:1,request,context}));
+          const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
+          const activities=[...state.workspace.sessions].sort((a,b)=>b.updatedAt-a.updatedAt).flatMap(item=>[...(item.activity?[item.activity]:[]),...(item.activities||[]).slice().reverse()]);
+          reuseCandidates=activities.filter(item=>item.type==='livelab-creative'&&item.reuse?.fingerprint===hash).slice(0,8).map(found=>({fingerprint:hash,seal:found.reuse.seal,artifact:{kind:'creative',source:found.source,description:found.description,assumptions:found.assumptions,question:found.question,review:found.review,snapshot:found.reuse.snapshot}}));
+        }catch{ /* A cache miss must not prevent a new generation. */ }
+      }
+      return window.forgeDesktop.liveLab({request,context,previous,kind:'creative',reuseCandidates});
+    }).then(result=>{
+      if (!state.workspace.sessions.includes(session) || session.activity !== original) return;
+      if(result?.kind!=='creative' || typeof result.source!=='string' || !result.source.trim() || new TextEncoder().encode(result.source).length>32768 || !['description','assumptions','question','review'].every(k=>typeof result[k]==='string' && result[k].length<=1500))throw Error('The LiveLab response was invalid.');
+      LiveLabScene.validate(result.snapshot);
+      if(result.reuse!=null){if(typeof result.reuse.fingerprint!=='string'||typeof result.reuse.seal!=='string'||!/^[a-f0-9]{64}$/.test(result.reuse.fingerprint)||!/^[a-f0-9]{64}$/.test(result.reuse.seal))throw Error('Invalid LiveLab reuse record.');LiveLabScene.validate(result.reuse.snapshot);}
+      if (!archiveActivity(session)) return;
+      session.activity={type:'livelab-creative',source:result.source,description:result.description,assumptions:result.assumptions,question:result.question,review:result.review,snapshot:result.snapshot,...(result.reuse?{reuse:result.reuse}:{})};
+      if(session.messages[sourceIndex]?.activity==='livelab')delete session.messages[sourceIndex].activity;
+      if(session.messages.length<300) session.messages.push({role:'assistant',text:'Your LiveLab is ready. Explore the controls and consider the prediction question. Its assumptions are shown in the lab.'});
+      touch(session);
+    }).catch(failure=>{if(current()===session)error=String(failure.message||failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/,'');}).finally(()=>{busy=false;liveLabBusy=false;liveLabSession=null;render();});
   }
 
   async function runCode(session, activity) {
@@ -298,6 +403,19 @@
       codeBusy = null;
       render();
     }
+  }
+  async function runProjectilePython(session, activity) {
+    const source = activity.python ?? WorkspaceCore.projectileStarter, speed = activity.speed;
+    codeBusy = activity; codeError = null; codeCancelRequested = false; projectilePythonOpen = true; render();
+    try {
+      const result = await window.forgeDesktop.runnerRun({ language:'Python', sourceCode:source, stdin:`${speed}\n`, remoteConsent:true });
+      if (codeCancelRequested) throw Error('Stopped waiting. Judge0 may finish a submitted test.');
+      if (!state.workspace.sessions.includes(session)) return;
+      activity.lastPythonRun = { code:source, speed, status:String(result.status || 'Unknown').slice(0,100), output:String(result.stdout || result.stderr || result.compileOutput || result.message || '').slice(0,1000) };
+      touch(session);
+    } catch (failure) {
+      codeError = { activity, message:String(failure.message || failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/, '') };
+    } finally { codeBusy = null; render(); }
   }
 
   async function importNotes(file, session) {
@@ -374,6 +492,23 @@
   });
 
   root.addEventListener('input', event => {
+    if (event.target.dataset.livelabControl !== undefined && current()?.activity?.type === 'livelab') {
+      const session=current(), control=session.activity.lab.controls[Number(event.target.dataset.livelabControl)], value=Number(event.target.value);
+      if (!control || !Number.isFinite(value) || value<control.min || value>control.max) return;
+      control.value=value; touch(session);
+      const panel=root.querySelector('.workspace-livelab'), template=document.createElement('template');
+      template.innerHTML=activityMarkup(session);
+      const updated=template.content.querySelector('.workspace-livelab');
+      panel.querySelector('.livelab-graph').replaceWith(updated.querySelector('.livelab-graph'));
+      event.target.parentElement.querySelector('strong').textContent=String(value); return;
+    }
+    if (event.target.id === 'projectilePython' && current()?.activity?.type === 'projectile') {
+      const session = current(), activity = session.activity;
+      activity.python = event.target.value.slice(0, 8000);
+      const stale = root.querySelector('.projectile-run-stale');
+      if (stale && activity.lastPythonRun) stale.hidden = activity.lastPythonRun.code === activity.python && activity.lastPythonRun.speed === activity.speed;
+      touch(session); return;
+    }
     if (event.target.id === 'workspaceLearningGoal' && current()) {
       current().learningGoal = event.target.value.slice(0, 300);
       touch(current());
@@ -388,6 +523,8 @@
       const panel = root.querySelector('.workspace-projectile');
       panel.querySelector('label strong').textContent = `${speed} m/s`;
       panel.querySelector('.projectile-code code').textContent = `speed = ${speed}\ngravity = 9.81\nrange_m = speed ** 2 / gravity\nprint(range_m)`;
+      const stale = panel.querySelector('.projectile-run-stale');
+      if (stale && activity.lastPythonRun) stale.hidden = activity.lastPythonRun.code === (activity.python ?? WorkspaceCore.projectileStarter) && activity.lastPythonRun.speed === speed;
       const status = panel.querySelector('[role="status"]');
       if (status && activity.result !== speed) status.textContent = `Previous run: ${(activity.result ** 2 / 9.81).toFixed(1)} m at ${activity.result} m/s. Run again to update.`;
       return;
@@ -458,6 +595,13 @@
     const session = current();
     if (button.dataset.action === 'new') { workspacePage = 'learn'; state.workspace.selected = null; error = ''; save(); render(); document.body.classList.remove('workspace-sessions-open'); document.getElementById('workspaceSidebarToggle').setAttribute('aria-expanded','false'); }
     if (!session) return;
+    if (button.dataset.action === 'livelab') {
+      const rawIndex=button.dataset.livelabMessage;
+      const sourceIndex=rawIndex === undefined ? session.messages.length-1 : Number(rawIndex);
+      startLiveLab(session,sourceIndex);
+      return;
+    }
+    if (button.dataset.action === 'stop-livelab' && liveLabBusy) { window.forgeDesktop.coachCancel(); return; }
     if (button.dataset.action === 'prepare-learning-path') {
       const goal = (session.learningGoal || '').trim();
       if (!goal) { error = 'Enter a learning goal first.'; render(); document.getElementById('workspaceLearningGoal')?.focus(); return; }
@@ -474,6 +618,13 @@
     }
     if (session.activity?.type === 'projectile') {
       const activity = session.activity;
+      if (button.dataset.action === 'projectile-test-python' && activity.stage === 'build') {
+        if (codeBusy) return;
+        projectilePythonOpen = true;
+        if (!document.getElementById('projectileConsent')?.checked) { codeError = {activity,message:'Agree to the Judge0 notice before running Python.'}; render(); return; }
+        if (!(activity.python ?? WorkspaceCore.projectileStarter).trim()) { codeError = {activity,message:'Write a Python program before running it.'}; render(); return; }
+        runProjectilePython(session, activity); return;
+      }
       if (button.dataset.action === 'projectile-resume') { document.getElementById('workspaceActivityHeading')?.focus(); document.getElementById('workspaceActivityHeading')?.scrollIntoView({ block: 'nearest' }); return; }
       if (button.dataset.projectileAnswer !== undefined && activity.stage === 'practice') {
         const answer = Number(button.dataset.projectileAnswer);

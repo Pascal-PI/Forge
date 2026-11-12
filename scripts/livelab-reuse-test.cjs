@@ -1,0 +1,40 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
+const {createReuse,fingerprint}=require('../livelab-reuse.cjs');
+const {createCoach}=require('../coach.cjs');
+const candidate={source:`function update(s,e){const n=s?s.n+(e.type==='click'?1:0):0;return {state:{n},scene:{title:'Timeline',blocks:[{type:'text',text:'Step '+n},{type:'button',id:'next',label:'Next'}]}}}`,description:'Explore steps',assumptions:'Illustrative sequence',question:'What happens next?'};
+const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n'],expected:1,reason:'One click advances one step.'}]}];
+(async()=>{
+  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'forge-reuse-test-')),other=await fs.mkdtemp(path.join(os.tmpdir(),'forge-reuse-other-'));
+  try {
+    const keyFile=path.join(dir,'key.txt');await fs.writeFile(keyFile,'sk-abcdefghijklmnopqrstuv');await fs.writeFile(path.join(dir,'ai-settings.json'),JSON.stringify({keyFile}));
+    const answers=[candidate,{verdict:'pass',findings:'Checked.',checks}];let calls=0;
+    const coach=createCoach({app:{getPath:()=>dir},dialog:{},getWindow:()=>null,fetchImpl:async()=>{calls++;return {ok:true,json:async()=>({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(answers.shift())}]}]})}}});
+    const request='Create a timeline',context=[{role:'user',text:request}];
+    const result=await coach.liveLab({kind:'creative',request,context});
+    assert(result.reuse);assert.equal(calls,2);
+    const {reuse,...artifact}=result;
+    const reusable={fingerprint:reuse.fingerprint,seal:reuse.seal,artifact};
+    const workspace=require('../renderer/workspace-core.js');
+    const saved={sessions:[{id:'1',title:'Learning',minutes:25,createdAt:1,updatedAt:1,pinned:false,messages:[],activity:{type:'livelab-creative',source:artifact.source,description:artifact.description,assumptions:artifact.assumptions,question:artifact.question,review:artifact.review,snapshot:artifact.snapshot,reuse},activities:[],draft:'',expanded:false}],selected:'1'};
+    assert.deepEqual(workspace.normalize(saved),saved);
+    assert.throws(()=>workspace.normalize({...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,reuse:{...reuse,seal:'invalid'}}}]}),/Invalid LiveLab reuse record/);
+    const browserHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({version:1,request,context})))).toString('hex');
+    assert.equal(browserHash,fingerprint(request,context));
+    const store=createReuse(dir);
+    assert.deepEqual(await store.lookup(request,context,reusable),artifact);
+    assert.equal(await store.lookup('A different request',context,reusable),null);
+    assert.equal(await store.lookup(request,[{role:'user',text:'Other notes'}],reusable),null);
+    assert.equal(await store.lookup(request,context,{...reusable,artifact:{...artifact,source:artifact.source+' '}}),null);
+    assert.equal(await store.lookup(request,context,{...reusable,artifact:{...artifact,snapshot:{...artifact.snapshot,state:{n:99}}}}),null);
+    assert.equal(await createReuse(other).lookup(request,context,reusable),null);
+    await fs.writeFile(path.join(dir,'ai-settings.json'),JSON.stringify({disabled:true}));
+    const reused=await coach.liveLab({kind:'creative',request,context,reuseCandidate:reusable});
+    assert.equal(reused.source,result.source);assert.equal(calls,2);
+    const recovered=await coach.liveLab({kind:'creative',request,context,reuseCandidates:[{...reusable,seal:'0'.repeat(64)},reusable]});
+    assert.equal(recovered.source,result.source);assert.equal(calls,2);
+    assert.equal(JSON.parse(await fs.readFile(path.join(dir,'ai-usage.json'),'utf8')).total,1);
+    await assert.rejects(coach.liveLab({kind:'creative',request:'Different',context,reuseCandidate:reusable}),/Connect your OpenAI key/);
+    console.log('Private exact reuse, integrity, context, profile isolation and no extra AI request passed');
+  }finally{await fs.rm(dir,{recursive:true,force:true});await fs.rm(other,{recursive:true,force:true});}
+})().catch(error=>{console.error(error);process.exitCode=1;});

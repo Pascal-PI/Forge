@@ -33,6 +33,11 @@
       "main.cjs",
       "preload.cjs",
       "coach.cjs",
+      "livelab-creative.cjs",
+      "livelab-reuse.cjs",
+      "livelab-session.cjs",
+      "livelab-vm.cjs",
+      "livelab-vm-worker.cjs",
       "codeforces.cjs",
       "runner.cjs",
       "lesson-pptx.cjs",
@@ -72,6 +77,7 @@
     }
   },
   "dependencies": {
-    "pptxgenjs": "4.0.1"
+    "pptxgenjs": "4.0.1",
+    "quickjs-emscripten": "0.32.0"
   }
 }

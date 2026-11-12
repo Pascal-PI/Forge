@@ -51,6 +51,13 @@
 .workspace-activity { min-width:0; border:1px solid var(--border); border-radius:16px; background:var(--panel); padding:22px; }
 .workspace-activity h2 { font-size:1.25rem; line-height:1.25; }
 .workspace-activity p { line-height:1.6; }
+.workspace-livelab-creative [data-livelab-view] { display:grid; gap:12px; margin:18px 0; }
+.workspace-livelab-creative [data-livelab-view] svg { display:block; width:100%; max-height:380px; background:var(--panel2); border:1px solid var(--border); border-radius:12px; }
+.workspace-livelab-creative [data-livelab-view] label { display:grid; grid-template-columns:1fr auto; gap:8px; }
+.workspace-livelab-creative [data-livelab-view] label input { grid-column:1 / -1; width:100%; }
+.workspace-livelab-creative [data-livelab-view] button { justify-self:start; border:1px solid var(--border); background:var(--panel2); color:var(--text); border-radius:9px; padding:10px 14px; cursor:pointer; }
+.workspace-livelab-creative .livelab-animation { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.workspace-livelab-creative [data-livelab-view] [role=button]:focus { outline:4px solid #cf7658; outline-offset:3px; }
 .workspace-activity-header { display:flex; justify-content:space-between; align-items:center; }
 .workspace-activity-header h2 { margin-right:auto; }
 .workspace-activity-header button { margin-left:8px; }
@@ -97,6 +104,11 @@
 .projectile-metrics p { flex:1 1 100px; }
 .projectile-metrics strong { display:block; font-size:1.25rem; }
 .projectile-code { overflow:auto; padding:16px; border-radius:10px; background:#202b27; color:#e9f3e7; font: .9rem/1.6 Consolas,monospace; }
+.projectile-python { margin:18px 0; padding:14px; border:1px solid var(--border); border-radius:10px; background:var(--panel2); }
+.projectile-python summary { cursor:pointer; font-weight:700; }
+.projectile-python textarea { display:block; box-sizing:border-box; width:100%; min-height:160px; resize:vertical; padding:12px; border:1px solid var(--border); border-radius:8px; background:#202b27; color:#eef4ea; font:.9rem/1.6 Consolas,monospace; }
+.projectile-python button { margin:0 8px 8px 0; padding:9px 12px; color:var(--text); background:var(--panel); border:1px solid var(--border); border-radius:8px; }
+.projectile-python-result pre { overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
 .projectile-ready { margin:12px 0; padding:18px; border-radius:10px; background:var(--panel2); color:var(--muted); }
 .projectile-simulation .projectile-flight { offset-rotate:0deg; offset-distance:100%; animation:projectile-launch 2.2s ease-in-out both; }
 @keyframes projectile-launch { from { offset-distance:0%; } to { offset-distance:100%; } }

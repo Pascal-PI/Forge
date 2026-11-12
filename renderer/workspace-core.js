@@ -6,6 +6,7 @@
   const sortingSets = [[7, 2, 5, 1], [4, 6, 1, 3], [5, 5, 2, 4]];
   const lineTargets = [-7, -3, 4, 8];
   const balanceProblems = [{ constant: 3, right: 10 }, { constant: -4, right: 2 }, { constant: 8, right: 3 }];
+  const projectileStarter = 'speed = float(input())\ngravity = 9.81\nrange_m = speed ** 2 / gravity\nprint(f"{range_m:.1f}")\n';
   const codingChallenge = Object.freeze({
     id: 'sum-two-integers',
     title: 'Add two integers',
@@ -68,11 +69,30 @@
 
   function normalizeActivity(item) {
     if (!item || typeof item !== 'object') throw Error('Invalid learning activity');
+    if (item.type === 'livelab-creative') {
+      const scene=root.LiveLabScene || (typeof require==='function' ? require('./livelab-scene.js') : null);
+      if(typeof item.source!=='string' || !item.source.trim() || new TextEncoder().encode(item.source).length>32768 || !['description','assumptions','question','review'].every(k=>typeof item[k]==='string' && item[k].length<=1500)) throw Error('Invalid LiveLab');
+      scene.validate(item.snapshot);
+      if(item.reuse!=null){
+        if(!item.reuse || typeof item.reuse!=='object' || typeof item.reuse.fingerprint!=='string' || typeof item.reuse.seal!=='string' || !/^[a-f0-9]{64}$/.test(item.reuse.fingerprint) || !/^[a-f0-9]{64}$/.test(item.reuse.seal))throw Error('Invalid LiveLab reuse record');
+        scene.validate(item.reuse.snapshot);
+      }
+      return {type:item.type,source:item.source,description:item.description,assumptions:item.assumptions,question:item.question,review:item.review,snapshot:JSON.parse(JSON.stringify(item.snapshot)),...(item.reuse?{reuse:JSON.parse(JSON.stringify(item.reuse))}:{})};
+    }
+    if (item.type === 'livelab') {
+      const core=root.LiveLabCore || (typeof require==='function' ? require('./livelab-core.js') : null);
+      core.validate(item.lab);
+      if (typeof item.review !== 'string' || item.review.length>1500) throw Error('Invalid LiveLab review');
+      return {type:'livelab',lab:JSON.parse(JSON.stringify(item.lab)),review:item.review};
+    }
     if (item.type === 'projectile') {
       if (!Number.isInteger(item.angle) || item.angle < 10 || item.angle > 80) throw Error('Invalid projectile activity');
       const stage = item.stage ?? 'explore', answer = item.answer ?? null, speed = item.speed ?? 18, result = item.result ?? null, explored = item.explored ?? false;
       if (!['explore', 'practice', 'build'].includes(stage) || ![null, 0, 1, 2].includes(answer) || !Number.isInteger(speed) || speed < 5 || speed > 30 || !(result === null || Number.isInteger(result) && result >= 5 && result <= 30) || typeof explored !== 'boolean') throw Error('Invalid projectile activity');
-      return { type: item.type, angle: item.angle, stage, answer, speed, result, explored };
+      if (item.python != null && (typeof item.python !== 'string' || item.python.length > 8000)) throw Error('Invalid projectile code');
+      const run = item.lastPythonRun;
+      if (run != null && (typeof run !== 'object' || typeof run.code !== 'string' || run.code.length > 8000 || !Number.isInteger(run.speed) || run.speed < 5 || run.speed > 30 || typeof run.status !== 'string' || run.status.length > 100 || typeof run.output !== 'string' || run.output.length > 1000)) throw Error('Invalid projectile code result');
+      return { type: item.type, angle: item.angle, stage, answer, speed, result, explored, ...(item.python != null ? {python:item.python} : {}), ...(run != null ? {lastPythonRun:{code:run.code,speed:run.speed,status:run.status,output:run.output}} : {}) };
     }
     if (item.type === 'binary-search') {
       searchState(item);
@@ -120,7 +140,7 @@
           typeof session.pinned !== 'boolean') throw Error('Invalid learning session');
       const messages = session.messages.map(message => {
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
-        if (message.activity != null && (message.role !== 'assistant' || !['binary-search', 'school-question', 'sorting', 'number-line', 'coding', 'equation-balance', 'projectile'].includes(message.activity))) throw Error('Invalid suggested activity');
+        if (message.activity != null && (message.role !== 'assistant' || !['livelab', 'binary-search', 'school-question', 'sorting', 'number-line', 'coding', 'equation-balance', 'projectile'].includes(message.activity))) throw Error('Invalid suggested activity');
         if (message.plan != null && (message.role !== 'assistant' || !Array.isArray(message.plan) || message.plan.length < 2 || message.plan.length > 5 || !message.plan.every(step => step && typeof step.text === 'string' && step.text.trim() && step.text.length <= 500 && typeof step.done === 'boolean'))) throw Error('Invalid saved learning path');
         return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}), ...(message.plan ? { plan: message.plan.map(step => ({text:step.text,done:step.done})) } : {}) };
       });
@@ -150,6 +170,6 @@
     tutorPlans.sort((a,b) => b.updatedAt - a.updatedAt || b.messageIndex - a.messageIndex);
     return { sessions: sessions.length, paths: paths.length, checks: paths.filter(item => item.activity.answer === 1).length, simulations: paths.filter(item => Number.isInteger(item.activity.result)).length, pathsByRecency: paths, tutorPlans, selfMarkedSteps:tutorPlans.reduce((sum,plan) => sum + plan.steps.filter(step => step.done).length,0) };
   }
-  root.WorkspaceCore = { normalize, learningProgress, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge };
+  root.WorkspaceCore = { normalize, learningProgress, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge, projectileStarter };
   if (typeof module !== 'undefined') module.exports = root.WorkspaceCore;
 })(typeof window !== 'undefined' ? window : globalThis);
