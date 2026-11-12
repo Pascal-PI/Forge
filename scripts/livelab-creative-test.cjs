@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict');
-const {createCreativeLab,verify,preserveControls}=require('../livelab-creative.cjs');
+const {createCreativeLab,verify,preserveControls,smokeControls}=require('../livelab-creative.cjs');
 const {createLiveLabSession}=require('../livelab-session.cjs');
 const candidate={source:`function update(state,event){const n=state?state.n+(event.type==='click'?1:0):0;return {state:{n},scene:{title:'Timeline',blocks:[{type:'text',text:'Step '+n},{type:'button',id:'next',label:'Next'}]}}}`,description:'Explore steps',assumptions:'Illustrative sequence',question:'What happens next?'};
 const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n'],expected:1,reason:'One click advances one step.'},{path:['scene','blocks',0,'text'],expected:'Step 1',reason:'The next step is visible.'}]}];
@@ -22,5 +22,9 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
   assert.equal(await verify(motion,motionChecks),3);
   const input=`function update(s,e){const answer=e.type==='submit'?e.value:'';return {state:{answer},scene:{title:'Question',blocks:[{type:'input',id:'answer',label:'Answer',value:answer,maxLength:20},{type:'text',text:answer}]}}}`;
   assert.equal(await verify(input,[{events:[{type:'submit',id:'answer',value:'hello'}],assertions:[{path:['state','answer'],expected:'hello',reason:'The submitted answer is retained.'},{path:['scene','blocks',1,'text'],expected:'hello',reason:'The result is shown.'}]}]),2);
+  const defective=`function update(s,e){if(e.id==='bad')throw Error('broken');return {state:{},scene:{title:'Test',blocks:[{type:'button',id:'good',label:'Good'},{type:'button',id:'bad',label:'Bad'}]}}}`;
+  const brokenSession=createLiveLabSession(defective);await brokenSession.step({type:'init'});
+  await assert.rejects(smokeControls(defective,brokenSession.snapshot()),/Control bad failed/);brokenSession.close();
+  const slider=createLiveLabSession(sliderSource);await slider.step({type:'init'});assert.equal(await smokeControls(sliderSource,slider.snapshot()),2);slider.close();
   console.log('Creative LiveLab generation, independent checks and repair passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

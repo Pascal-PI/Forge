@@ -33,6 +33,30 @@ async function verify(source,checks){
   return assertions;
 }
 
+async function smokeControls(source,initial,signal){
+  Scene.validate(initial);
+  const events=[];
+  for(const block of initial.scene.blocks){
+    if(block.type==='button')events.push({type:'click',id:block.id});
+    if(block.type==='slider'){
+      events.push({type:'change',id:block.id,value:block.min});
+      const max=Math.min(block.max,block.min+Math.floor((block.max-block.min)/block.step+1e-9)*block.step);
+      if(max!==block.min)events.push({type:'change',id:block.id,value:max});
+    }
+    if(block.type==='input')events.push({type:'submit',id:block.id,value:block.value});
+    if(block.type==='animation')events.push({type:'tick',id:block.id,dt:block.intervalMs});
+    if(block.type==='diagram')for(const shape of block.shapes)if(shape.draggable)events.push({type:'drag',id:shape.id,x:Math.max(0,Math.min(1000,shape.x+10)),y:shape.y});
+  }
+  const deadline=Date.now()+20000;
+  for(const event of events){
+    if(signal?.aborted)throw Error('LiveLab was canceled.');
+    if(Date.now()>deadline)throw Error('The activity has too many controls to validate in time.');
+    const session=createLiveLabSession(source,initial);
+    try{await session.step(event);}catch(error){throw Error(`Control ${event.id} failed its ${event.type} check: ${String(error.message).slice(0,200)}`);}finally{session.close();}
+  }
+  return events.length;
+}
+
 async function preserveControls(source,initial,previous){
   if(!previous?.snapshot)return initial;
   const session=createLiveLabSession(source,initial);
@@ -60,6 +84,7 @@ async function createCreativeLab({request,context=[],previous=null,ask,signal}){
       const scene=await session.step({type:'init'});initial=session.snapshot();
       if(!scene.blocks.some(b=>['button','slider','animation','input'].includes(b.type)||(b.type==='diagram' && b.shapes.some(shape=>shape.draggable))))throw Error('The activity needs an interactive control.');
       Scene.validate(initial);
+      await smokeControls(candidate.source,initial,signal);
     }catch(error){feedback='Execution check failed: '+String(error.message).slice(0,500);continue;}finally{session.close();}
     const review=await ask(CHECKER,{request,context,previous,candidate,initial:initial.scene});
     const findingsText=typeof review?.findings==='string'?review.findings:Array.isArray(review?.findings) && review.findings.length<=5 && review.findings.every(x=>typeof x==='string')?review.findings.join(' '):'';
@@ -75,4 +100,4 @@ async function createCreativeLab({request,context=[],previous=null,ask,signal}){
   }
   throw Error('LiveLab could not create an activity that passed its checks. '+(feedback?`Last check: ${feedback.slice(0,300)}`:'Try a more specific request.'));
 }
-module.exports={createCreativeLab,verify,preserveControls};
+module.exports={createCreativeLab,verify,preserveControls,smokeControls};

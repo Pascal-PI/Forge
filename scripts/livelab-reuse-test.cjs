@@ -22,7 +22,7 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
     assert.deepEqual(workspace.normalize(observed),observed);
     assert.throws(()=>workspace.normalize({...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,lastInteraction:'x'.repeat(701)}}]}),/Invalid LiveLab interaction/);
     assert.throws(()=>workspace.normalize({...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,reuse:{...reuse,seal:'invalid'}}}]}),/Invalid LiveLab reuse record/);
-    const browserHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({version:2,request,context})))).toString('hex');
+    const browserHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({version:3,request,context})))).toString('hex');
     assert.equal(browserHash,fingerprint(request,context));
     const store=createReuse(dir);
     assert.deepEqual(await store.lookup(request,context,reusable),artifact);
