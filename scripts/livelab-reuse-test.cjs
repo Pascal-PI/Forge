@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=req
 const {createReuse,fingerprint}=require('../livelab-reuse.cjs');
 const {createCoach}=require('../coach.cjs');
 const candidate={source:`function update(s,e){const n=s?s.n+(e.type==='click'?1:0):0;return {state:{n},scene:{title:'Timeline',blocks:[{type:'text',text:'Step '+n},{type:'button',id:'next',label:'Next'}]}}}`,description:'Explore steps',assumptions:'Illustrative sequence',question:'What happens next?'};
-const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n'],expected:1,reason:'One click advances one step.'}]}];
+const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n'],expected:1,reason:'One click advances one step.'},{path:['scene','blocks',0,'text'],expected:'Step 1',reason:'The next step is visible.'}]}];
 (async()=>{
   const dir=await fs.mkdtemp(path.join(os.tmpdir(),'forge-reuse-test-')),other=await fs.mkdtemp(path.join(os.tmpdir(),'forge-reuse-other-'));
   try {
@@ -22,7 +22,7 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
     assert.deepEqual(workspace.normalize(observed),observed);
     assert.throws(()=>workspace.normalize({...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,lastInteraction:'x'.repeat(701)}}]}),/Invalid LiveLab interaction/);
     assert.throws(()=>workspace.normalize({...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,reuse:{...reuse,seal:'invalid'}}}]}),/Invalid LiveLab reuse record/);
-    const browserHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({version:1,request,context})))).toString('hex');
+    const browserHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({version:2,request,context})))).toString('hex');
     assert.equal(browserHash,fingerprint(request,context));
     const store=createReuse(dir);
     assert.deepEqual(await store.lookup(request,context,reusable),artifact);

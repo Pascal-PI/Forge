@@ -5,7 +5,7 @@ const path=require('node:path');
 const Scene=require('./renderer/livelab-scene.js');
 
 // Private, exact-match reuse. Bump this version when validation semantics change.
-const VERSION=1;
+const VERSION=2;
 function fingerprint(request,context){return crypto.createHash('sha256').update(JSON.stringify({version:VERSION,request,context})).digest('hex');}
 function artifact(value){
   if(!value || value.kind!=='creative' || typeof value.source!=='string' || !value.source.trim() || Buffer.byteLength(value.source,'utf8')>32768 || !['description','assumptions','question','review'].every(k=>typeof value[k]==='string'&&value[k].length<=1500))throw Error('Invalid reusable activity');

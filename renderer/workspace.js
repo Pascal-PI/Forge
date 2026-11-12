@@ -370,7 +370,7 @@
       let reuseCandidates=[];
       if(!previous){
         try{
-          const bytes=new TextEncoder().encode(JSON.stringify({version:1,request,context}));
+          const bytes=new TextEncoder().encode(JSON.stringify({version:2,request,context}));
           const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
           const activities=[...state.workspace.sessions].sort((a,b)=>b.updatedAt-a.updatedAt).flatMap(item=>[...(item.activity?[item.activity]:[]),...(item.activities||[]).slice().reverse()]);
           reuseCandidates=activities.filter(item=>item.type==='livelab-creative'&&item.reuse?.fingerprint===hash).slice(0,8).map(found=>({fingerprint:hash,seal:found.reuse.seal,artifact:{kind:'creative',source:found.source,description:found.description,assumptions:found.assumptions,question:found.question,review:found.review,snapshot:found.reuse.snapshot}}));
