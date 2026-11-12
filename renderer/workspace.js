@@ -17,7 +17,7 @@
   let workspacePage = 'learn';
   let renderedSession = null;
   const current = () => state.workspace.sessions.find(item => item.id === state.workspace.selected);
-  const touch = session => { session.updatedAt = Date.now(); save(); };
+  const touch = session => { session.updatedAt = Date.now(); return save(); };
   const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
   function stopLiveLabAnimation(){if(liveLabAnimation){clearTimeout(liveLabAnimation.timer);liveLabAnimation=null;}}
   function scheduleLiveLabAnimation(session,activity){
@@ -38,7 +38,10 @@
     if(target){target.setAttribute('aria-busy','true');target.querySelectorAll('button,input').forEach(el=>el.disabled=true);}
     window.forgeDesktop.liveLabStep({source:activity.source,snapshot:activity.snapshot,event}).then(snapshot=>{
       if(!state.workspace.sessions.includes(session)||session.activity!==activity)return;
-      LiveLabScene.validate(snapshot);activity.snapshot=snapshot;touch(session);
+      LiveLabScene.validate(snapshot);
+      const previousSnapshot=activity.snapshot,previousUpdatedAt=session.updatedAt;
+      activity.snapshot=snapshot;
+      if(!touch(session)){activity.snapshot=previousSnapshot;session.updatedAt=previousUpdatedAt;throw Error('The LiveLab change could not be saved. The previous state was kept.');}
     }).catch(failure=>{stopLiveLabAnimation();if(current()===session)error=String(failure.message||failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/,'');})
       .finally(()=>{liveLabStepBusy=false;render();if(restoreFocus && current()===session && session.activity===activity)Array.from(root.querySelectorAll('[data-livelab-id]')).find(el=>el.getAttribute('data-livelab-id')===event.id)?.focus();if(liveLabAnimation?.activity===activity)scheduleLiveLabAnimation(session,activity);});
   }
@@ -370,11 +373,18 @@
       if(result?.kind!=='creative' || typeof result.source!=='string' || !result.source.trim() || new TextEncoder().encode(result.source).length>32768 || !['description','assumptions','question','review'].every(k=>typeof result[k]==='string' && result[k].length<=1500))throw Error('The LiveLab response was invalid.');
       LiveLabScene.validate(result.snapshot);
       if(result.reuse!=null){if(typeof result.reuse.fingerprint!=='string'||typeof result.reuse.seal!=='string'||!/^[a-f0-9]{64}$/.test(result.reuse.fingerprint)||!/^[a-f0-9]{64}$/.test(result.reuse.seal))throw Error('Invalid LiveLab reuse record.');LiveLabScene.validate(result.reuse.snapshot);}
+      const priorActivities=session.activities?.slice(), priorMessages=session.messages.length, priorUpdatedAt=session.updatedAt;
+      const trigger=session.messages[sourceIndex], priorSuggestion=trigger?.activity;
       if (!archiveActivity(session)) return;
       session.activity={type:'livelab-creative',source:result.source,description:result.description,assumptions:result.assumptions,question:result.question,review:result.review,snapshot:result.snapshot,...(result.reuse?{reuse:result.reuse}:{})};
-      if(session.messages[sourceIndex]?.activity==='livelab')delete session.messages[sourceIndex].activity;
+      if(trigger?.activity==='livelab')delete trigger.activity;
       if(session.messages.length<300) session.messages.push({role:'assistant',text:'Your LiveLab is ready. Explore the controls and consider the prediction question. Its assumptions are shown in the lab.'});
-      touch(session);
+      if(!touch(session)){
+        session.activity=original;session.updatedAt=priorUpdatedAt;session.messages.length=priorMessages;
+        if(priorActivities)session.activities=priorActivities;else delete session.activities;
+        if(priorSuggestion)trigger.activity=priorSuggestion;
+        throw Error('The LiveLab could not be saved. Your previous activity is still available. Free local storage or export a backup, then retry.');
+      }
     }).catch(failure=>{if(current()===session)error=String(failure.message||failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/,'');}).finally(()=>{busy=false;liveLabBusy=false;liveLabSession=null;render();});
   }
 
