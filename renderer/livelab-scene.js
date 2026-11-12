@@ -13,11 +13,12 @@
     for(const b of scene.blocks){
       if(!b || typeof b!=='object' || Array.isArray(b)) throw Error('Invalid activity block');
       if(b.type==='text' || b.type==='heading') { if(!text(b.text,1200)) throw Error('Invalid text block'); continue; }
-      if(b.type==='button' || b.type==='slider' || b.type==='animation'){
+      if(b.type==='button' || b.type==='slider' || b.type==='animation' || b.type==='input'){
         if(!id(b.id) || ids.has(b.id) || !text(b.label,120) || !b.label.trim()) throw Error('Invalid activity control');
         ids.add(b.id);
         if(b.type==='slider' && (![b.min,b.max,b.step,b.value].every(finite) || b.min>=b.max || b.step<=0 || b.step>b.max-b.min || (b.max-b.min)/b.step>10000 || b.value<b.min || b.value>b.max)) throw Error('Invalid slider');
         if(b.type==='animation' && (!Number.isInteger(b.intervalMs) || b.intervalMs<500 || b.intervalMs>2000))throw Error('Invalid animation interval');
+        if(b.type==='input' && (!Number.isInteger(b.maxLength) || b.maxLength<1 || b.maxLength>2000 || !text(b.value,b.maxLength)))throw Error('Invalid text input');
         continue;
       }
       if(b.type==='diagram'){
@@ -49,8 +50,10 @@
     if(event.type==='click' && b?.type==='button' && Object.keys(event).length===2)return event;
     if(event.type==='change' && b?.type==='slider' && Object.keys(event).length===3 && finite(event.value) && event.value>=b.min && event.value<=b.max && Math.abs((event.value-b.min)/b.step-Math.round((event.value-b.min)/b.step))<1e-6)return event;
     if(event.type==='tick' && b?.type==='animation' && Object.keys(event).length===3 && event.dt===b.intervalMs)return event;
+    if(event.type==='submit' && b?.type==='input' && Object.keys(event).length===3 && text(event.value,b.maxLength))return event;
     if(event.type==='drag' && Object.keys(event).length===4 && finite(event.x) && finite(event.y) && event.x>=0 && event.x<=1000 && event.y>=0 && event.y<=1000 && scene.blocks.some(block=>block.type==='diagram' && block.shapes.some(shape=>shape.draggable===true && shape.id===event.id)))return event;
-    throw Error('Invalid activity event');
+    const kind=typeof event.type==='string' && /^[a-z-]{1,30}$/.test(event.type)?event.type:'unknown';
+    throw Error(`Invalid activity event: ${kind} for ${event.id}`);
   }
   root.LiveLabScene={validate,validateEvent};
   if(typeof module!=='undefined')module.exports=root.LiveLabScene;

@@ -55,6 +55,7 @@
 .workspace-livelab-creative [data-livelab-view] svg { display:block; width:100%; max-height:380px; background:var(--panel2); border:1px solid var(--border); border-radius:12px; }
 .workspace-livelab-creative [data-livelab-view] label { display:grid; grid-template-columns:1fr auto; gap:8px; }
 .workspace-livelab-creative [data-livelab-view] label input { grid-column:1 / -1; width:100%; }
+.workspace-livelab-creative [data-livelab-view] label textarea { grid-column:1 / -1; width:100%; min-width:0; resize:vertical; background:var(--panel2); color:var(--text); border:1px solid var(--border); border-radius:9px; padding:10px; }
 .workspace-livelab-creative [data-livelab-view] button { justify-self:start; border:1px solid var(--border); background:var(--panel2); color:var(--text); border-radius:9px; padding:10px 14px; cursor:pointer; }
 .workspace-livelab-creative .livelab-animation { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .workspace-livelab-creative [data-livelab-view] [role=button]:focus { outline:4px solid #cf7658; outline-offset:3px; }

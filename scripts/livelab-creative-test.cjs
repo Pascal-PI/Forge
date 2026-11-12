@@ -19,5 +19,7 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
   const motion=`function update(s,e){s=s||{x:100,t:0};if(e.type==='drag')s.x=e.x;if(e.type==='tick')s.t+=e.dt;return {state:s,scene:{title:'Motion',blocks:[{type:'animation',id:'clock',label:'Clock',intervalMs:500},{type:'diagram',label:'Point',shapes:[{type:'circle',id:'point',label:'Point',draggable:true,x:s.x,y:200,r:20,color:'#ffaa00'}]}]}}}`;
   const motionChecks=[{events:[{type:'drag',id:'point',x:300,y:200},{type:'tick',id:'clock',dt:500}],assertions:[{path:['state','x'],expected:300,reason:'Dragging sets the position.'},{path:['state','t'],expected:500,reason:'One step advances half a second.'}]}];
   assert.equal(await verify(motion,motionChecks),2);
+  const input=`function update(s,e){const answer=e.type==='submit'?e.value:'';return {state:{answer},scene:{title:'Question',blocks:[{type:'input',id:'answer',label:'Answer',value:answer,maxLength:20},{type:'text',text:answer}]}}}`;
+  assert.equal(await verify(input,[{events:[{type:'submit',id:'answer',value:'hello'}],assertions:[{path:['state','answer'],expected:'hello',reason:'The submitted answer is retained.'}]}]),1);
   console.log('Creative LiveLab generation, independent checks and repair passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

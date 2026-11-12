@@ -23,6 +23,13 @@
         input.addEventListener('change',()=>onEvent({type:'change',id:block.id,value:Number(input.value)}));
         label.append(name,input,output);fragment.append(label);continue;
       }
+      if(block.type==='input'){
+        const label=document.createElement('label'),name=document.createElement('span'),input=document.createElement('textarea'),submit=document.createElement('button');
+        name.textContent=block.label;input.maxLength=block.maxLength;input.value=options.drafts?.get(block.id) ?? block.value;input.rows=4;input.spellcheck=false;input.setAttribute('data-livelab-input',block.id);
+        input.addEventListener('input',()=>options.drafts?.set(block.id,input.value));
+        submit.type='button';submit.textContent='Submit response';submit.addEventListener('click',()=>onEvent({type:'submit',id:block.id,value:input.value}));
+        label.append(name,input);fragment.append(label,submit);continue;
+      }
       if(block.type==='animation'){
         const group=document.createElement('div'),label=document.createElement('span'),play=document.createElement('button'),step=document.createElement('button');
         group.className='livelab-animation';label.textContent=block.label;

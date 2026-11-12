@@ -6,6 +6,7 @@
   let liveLabBusy = false;
   let liveLabSession = null;
   let liveLabStepBusy = false;
+  const liveLabDrafts = new WeakMap();
   let liveLabAnimation = null;
   let pendingStream = null;
   let codeBusy = null;
@@ -35,13 +36,14 @@
     liveLabStepBusy=true;
     const target=current()===session ? root.querySelector('[data-livelab-view]') : null;
     const restoreFocus=event.type==='drag' && target?.contains(document.activeElement) && document.activeElement?.getAttribute('data-livelab-id')===event.id;
-    if(target){target.setAttribute('aria-busy','true');target.querySelectorAll('button,input').forEach(el=>el.disabled=true);}
+    if(target){target.setAttribute('aria-busy','true');target.querySelectorAll(event.type==='tick'?'button,input':'button,input,textarea').forEach(el=>el.disabled=true);}
     window.forgeDesktop.liveLabStep({source:activity.source,snapshot:activity.snapshot,event}).then(snapshot=>{
       if(!state.workspace.sessions.includes(session)||session.activity!==activity)return;
       LiveLabScene.validate(snapshot);
       const previousSnapshot=activity.snapshot,previousUpdatedAt=session.updatedAt;
       activity.snapshot=snapshot;
       if(!touch(session)){activity.snapshot=previousSnapshot;session.updatedAt=previousUpdatedAt;throw Error('The LiveLab change could not be saved. The previous state was kept.');}
+      if(event.type==='submit')liveLabDrafts.get(activity)?.delete(event.id);
     }).catch(failure=>{stopLiveLabAnimation();if(current()===session)error=String(failure.message||failure).replace(/^Error invoking remote method '[^']+': (?:Error: )?/,'');})
       .finally(()=>{liveLabStepBusy=false;render();if(restoreFocus && current()===session && session.activity===activity)Array.from(root.querySelectorAll('[data-livelab-id]')).find(el=>el.getAttribute('data-livelab-id')===event.id)?.focus();if(liveLabAnimation?.activity===activity)scheduleLiveLabAnimation(session,activity);});
   }
@@ -170,6 +172,8 @@
     if(liveLabAnimation && (liveLabAnimation.session!==session || session?.activity!==liveLabAnimation.activity || workspacePage!=='learn'))stopLiveLabAnimation();
     const oldMessages = document.getElementById('workspaceMessages');
     const sameSession = renderedSession === (session?.id || null);
+    const focusedLabInput=sameSession && session?.activity?.type==='livelab-creative' ? document.activeElement?.getAttribute('data-livelab-input') : null;
+    const labSelection=focusedLabInput ? [document.activeElement.selectionStart,document.activeElement.selectionEnd] : null;
     const scrollTop = oldMessages?.scrollTop || 0;
     const followLatest = !sameSession || !oldMessages || oldMessages.scrollHeight - oldMessages.scrollTop - oldMessages.clientHeight < 32;
     const focused = sameSession && ['workspaceInput', 'workspaceCode', 'workspaceSearch', 'workspaceLearningGoal', 'projectilePython'].includes(document.activeElement?.id) ? document.activeElement.id : null;
@@ -199,6 +203,7 @@
     sidebar.replaceChildren(root.querySelector('.workspace-sessions'));
     if(session?.activity?.type==='livelab-creative') {
       const activity=session.activity, target=root.querySelector('[data-livelab-view]');
+      if(!liveLabDrafts.has(activity))liveLabDrafts.set(activity,new Map());
       if(target)LiveLabView.render(target,activity.snapshot.scene,event=>{
         if(event.type==='toggle-animation'){
           if(liveLabStepBusy || reducedMotion.matches)return;
@@ -206,7 +211,7 @@
           stopLiveLabAnimation();liveLabAnimation={session,activity,id:event.id,ticks:0,timer:null};render();scheduleLiveLabAnimation(session,activity);return;
         }
         performLiveLabEvent(session,activity,event);
-      },{playingId:liveLabAnimation?.activity===activity?liveLabAnimation.id:null,reducedMotion:reducedMotion.matches});
+      },{playingId:liveLabAnimation?.activity===activity?liveLabAnimation.id:null,reducedMotion:reducedMotion.matches,drafts:liveLabDrafts.get(activity)});
     }
     if (session) {
       const historyIndex = session.activities?.findLastIndex(item => item.type === 'projectile') ?? -1;
@@ -280,6 +285,7 @@
     renderedSession = session?.id || null;
     const target = focused && document.getElementById(focused);
     if (target && !target.disabled) { target.focus({ preventScroll: true }); if (typeof target.setSelectionRange === 'function') target.setSelectionRange(selectionStart, selectionEnd); }
+    if(focusedLabInput){const input=Array.from(root.querySelectorAll('[data-livelab-input]')).find(el=>el.getAttribute('data-livelab-input')===focusedLabInput);if(input&&!input.disabled){input.focus({preventScroll:true});input.setSelectionRange(...labSelection);}}
   }
 
   async function respond(session) {
