@@ -18,6 +18,9 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
     const workspace=require('../renderer/workspace-core.js');
     const saved={sessions:[{id:'1',title:'Learning',minutes:25,createdAt:1,updatedAt:1,pinned:false,messages:[],activity:{type:'livelab-creative',source:artifact.source,description:artifact.description,assumptions:artifact.assumptions,question:artifact.question,review:artifact.review,snapshot:artifact.snapshot,reuse},activities:[],draft:'',expanded:false}],selected:'1'};
     assert.deepEqual(workspace.normalize(saved),saved);
+    const observed={...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,lastInteraction:'{"type":"submit","id":"answer","value":"hello"}'}}]};
+    assert.deepEqual(workspace.normalize(observed),observed);
+    assert.throws(()=>workspace.normalize({...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,lastInteraction:'x'.repeat(701)}}]}),/Invalid LiveLab interaction/);
     assert.throws(()=>workspace.normalize({...saved,sessions:[{...saved.sessions[0],activity:{...saved.sessions[0].activity,reuse:{...reuse,seal:'invalid'}}}]}),/Invalid LiveLab reuse record/);
     const browserHash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({version:1,request,context})))).toString('hex');
     assert.equal(browserHash,fingerprint(request,context));

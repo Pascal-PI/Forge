@@ -73,11 +73,12 @@
       const scene=root.LiveLabScene || (typeof require==='function' ? require('./livelab-scene.js') : null);
       if(typeof item.source!=='string' || !item.source.trim() || new TextEncoder().encode(item.source).length>32768 || !['description','assumptions','question','review'].every(k=>typeof item[k]==='string' && item[k].length<=1500)) throw Error('Invalid LiveLab');
       scene.validate(item.snapshot);
+      if(item.lastInteraction!=null && (typeof item.lastInteraction!=='string'||item.lastInteraction.length>700))throw Error('Invalid LiveLab interaction');
       if(item.reuse!=null){
         if(!item.reuse || typeof item.reuse!=='object' || typeof item.reuse.fingerprint!=='string' || typeof item.reuse.seal!=='string' || !/^[a-f0-9]{64}$/.test(item.reuse.fingerprint) || !/^[a-f0-9]{64}$/.test(item.reuse.seal))throw Error('Invalid LiveLab reuse record');
         scene.validate(item.reuse.snapshot);
       }
-      return {type:item.type,source:item.source,description:item.description,assumptions:item.assumptions,question:item.question,review:item.review,snapshot:JSON.parse(JSON.stringify(item.snapshot)),...(item.reuse?{reuse:JSON.parse(JSON.stringify(item.reuse))}:{})};
+      return {type:item.type,source:item.source,description:item.description,assumptions:item.assumptions,question:item.question,review:item.review,snapshot:JSON.parse(JSON.stringify(item.snapshot)),...(item.lastInteraction!=null?{lastInteraction:item.lastInteraction}:{}),...(item.reuse?{reuse:JSON.parse(JSON.stringify(item.reuse))}:{})};
     }
     if (item.type === 'livelab') {
       const core=root.LiveLabCore || (typeof require==='function' ? require('./livelab-core.js') : null);
