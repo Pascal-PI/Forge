@@ -41,7 +41,7 @@
         step.type='button';step.textContent='Step';step.addEventListener('click',()=>onEvent({type:'tick',id:block.id,dt:block.intervalMs}));
         group.append(label,play,step);fragment.append(group);continue;
       }
-      const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 1000 1000');svg.setAttribute('role','img');svg.setAttribute('aria-label',block.label);
+      const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 1000 1000');svg.setAttribute('role',block.shapes.some(shape=>shape.draggable)?'group':'img');svg.setAttribute('aria-label',block.label);
       for(const shape of block.shapes){
         const tag=shape.type==='label'?'text':shape.type,el=document.createElementNS(ns,tag);
         const fields=shape.type==='circle'?['x','y','r']:shape.type==='rect'?['x','y','width','height']:shape.type==='line'?['x1','y1','x2','y2','width']:shape.type==='label'?['x','y','size']:[];

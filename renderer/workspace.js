@@ -64,7 +64,7 @@
   function activityMarkup(session) {
     const activity = session?.activity;
     if (!activity) return '';
-    if (activity.type === 'livelab-creative') return `<aside class="workspace-activity workspace-livelab-creative" aria-label="LiveLab"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">LiveLab</h2><button data-action="close-activity" aria-label="Close LiveLab">×</button></div><p>${esc(activity.description)}</p><div data-livelab-view></div><h3>Try a prediction</h3><p>${esc(activity.question)}</p><details><summary>Assumptions and checks</summary><p>${esc(activity.assumptions)}</p><p>AI review: ${esc(activity.review)} These checks do not guarantee accuracy.</p></details></aside>`;
+    if (activity.type === 'livelab-creative') return `<aside class="workspace-activity workspace-livelab-creative" aria-label="LiveLab"><div class="workspace-activity-header"><h2 id="workspaceActivityHeading" tabindex="-1">LiveLab</h2><button data-action="close-activity" aria-label="Close LiveLab">×</button></div><div data-livelab-view></div><h3>Try a prediction</h3><p>${esc(activity.question)}</p><details><summary>About, assumptions and checks</summary><p>${esc(activity.description)}</p><p>${esc(activity.assumptions)}</p><p>AI review: ${esc(activity.review)} These checks do not guarantee accuracy.</p></details></aside>`;
     if (activity.type === 'livelab') {
       const lab=activity.lab, vars=Object.create(null); lab.controls.forEach(c=>vars[c.id]=c.value);
       let graph='';
