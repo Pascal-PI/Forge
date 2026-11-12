@@ -51,8 +51,9 @@
 .workspace-activity { min-width:0; border:1px solid var(--border); border-radius:16px; background:var(--panel); padding:22px; }
 .workspace-activity h2 { font-size:1.25rem; line-height:1.25; }
 .workspace-activity p { line-height:1.6; }
-.workspace-livelab-creative [data-livelab-view] { display:grid; gap:12px; margin:18px 0; }
-.workspace-livelab-creative [data-livelab-view] svg { display:block; width:100%; max-height:380px; background:var(--panel2); border:1px solid var(--border); border-radius:12px; }
+.workspace-livelab-creative [data-livelab-view] { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:18px 0; }
+.workspace-livelab-creative [data-livelab-view]>h2,.workspace-livelab-creative [data-livelab-view]>h3,.workspace-livelab-creative [data-livelab-view]>p,.workspace-livelab-creative [data-livelab-view]>label,.workspace-livelab-creative [data-livelab-view]>.livelab-animation { flex:0 0 100%; }
+.workspace-livelab-creative [data-livelab-view] svg { display:block; width:100%; max-height:380px; background:#f1f5eb; border:1px solid var(--border); border-radius:12px; }
 .workspace-livelab-creative [data-livelab-view] label { display:grid; grid-template-columns:1fr auto; gap:8px; }
 .workspace-livelab-creative [data-livelab-view] label input { grid-column:1 / -1; width:100%; }
 .workspace-livelab-creative [data-livelab-view] label textarea { grid-column:1 / -1; width:100%; min-width:0; resize:vertical; background:var(--panel2); color:var(--text); border:1px solid var(--border); border-radius:9px; padding:10px; }

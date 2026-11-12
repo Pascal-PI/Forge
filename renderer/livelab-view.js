@@ -7,7 +7,9 @@
     root.LiveLabScene.validate({state:{},scene});
     const fragment=document.createDocumentFragment();
     const title=document.createElement('h2');title.textContent=scene.title;fragment.append(title);
-    for(const block of scene.blocks){
+    // Put the visual first while keeping source-order among visuals and controls.
+    const blocks=[...scene.blocks.filter(block=>block.type==='diagram'),...scene.blocks.filter(block=>block.type!=='diagram')];
+    for(const block of blocks){
       if(block.type==='heading' || block.type==='text'){
         const el=document.createElement(block.type==='heading'?'h3':'p');el.textContent=block.text;fragment.append(el);continue;
       }
@@ -42,9 +44,10 @@
       const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 1000 1000');svg.setAttribute('role','img');svg.setAttribute('aria-label',block.label);
       for(const shape of block.shapes){
         const tag=shape.type==='label'?'text':shape.type,el=document.createElementNS(ns,tag);
-        const fields=shape.type==='circle'?['x','y','r']:shape.type==='rect'?['x','y','width','height']:shape.type==='line'?['x1','y1','x2','y2','width']:['x','y','size'];
+        const fields=shape.type==='circle'?['x','y','r']:shape.type==='rect'?['x','y','width','height']:shape.type==='line'?['x1','y1','x2','y2','width']:shape.type==='label'?['x','y','size']:[];
         for(const field of fields){const attr=shape.type==='circle'&&field==='x'?'cx':shape.type==='circle'&&field==='y'?'cy':shape.type==='line'&&field==='width'?'stroke-width':field==='size'?'font-size':field;el.setAttribute(attr,String(shape[field]));}
-        if(shape.type==='line')el.setAttribute('stroke',shape.color);else el.setAttribute('fill',shape.color);
+        if(shape.type==='polyline'||shape.type==='polygon')el.setAttribute('points',shape.points.map(point=>point.join(',')).join(' '));
+        if(shape.type==='line'||shape.type==='polyline'){el.setAttribute('stroke',shape.color);if(shape.type==='polyline'){el.setAttribute('stroke-width',String(shape.width));el.setAttribute('fill','none');el.setAttribute('stroke-linejoin','round');el.setAttribute('stroke-linecap','round');}}else el.setAttribute('fill',shape.color);
         if(shape.type==='label')el.textContent=shape.text;
         if(shape.draggable){
           el.setAttribute('tabindex','0');el.setAttribute('role','button');el.setAttribute('data-livelab-id',shape.id);el.setAttribute('aria-label',`${shape.label}. Drag or use arrow keys to move.`);

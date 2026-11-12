@@ -33,6 +33,7 @@
           if(s.type==='circle' && [s.x,s.y,s.r].every(finite) && s.r>0 && s.r<=1000) continue;
           if(s.type==='rect' && [s.x,s.y,s.width,s.height].every(finite) && s.width>0 && s.width<=1000 && s.height>0 && s.height<=1000) continue;
           if(s.type==='line' && [s.x1,s.y1,s.x2,s.y2,s.width].every(finite) && s.width>0 && s.width<=30) continue;
+          if((s.type==='polyline'||s.type==='polygon') && Array.isArray(s.points) && s.points.length>=(s.type==='polygon'?3:2) && s.points.length<=200 && s.points.every(point=>Array.isArray(point)&&point.length===2&&point.every(finite)) && (s.type==='polygon'||finite(s.width)&&s.width>0&&s.width<=30))continue;
           if(s.type==='label' && [s.x,s.y,s.size].every(finite) && s.size>=8 && s.size<=80 && text(s.text,120)) continue;
           throw Error('Invalid diagram shape');
         }

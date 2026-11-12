@@ -2,16 +2,19 @@
 const assert=require('node:assert/strict');
 const {createCreativeLab,verify,preserveControls,smokeControls}=require('../livelab-creative.cjs');
 const {createLiveLabSession}=require('../livelab-session.cjs');
-const candidate={source:`function update(state,event){const n=state?state.n+(event.type==='click'?1:0):0;return {state:{n},scene:{title:'Timeline',blocks:[{type:'text',text:'Step '+n},{type:'button',id:'next',label:'Next'}]}}}`,description:'Explore steps',assumptions:'Illustrative sequence',question:'What happens next?'};
-const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n'],expected:1,reason:'One click advances one step.'},{path:['scene','blocks',0,'text'],expected:'Step 1',reason:'The next step is visible.'}]}];
+const candidate={source:`function update(state,event){const n=state?state.n+(event.type==='click'?1:0):0;return {state:{n},scene:{title:'Timeline',blocks:[{type:'text',text:'Step '+n},{type:'button',id:'next',label:'Next'},{type:'diagram',label:'Timeline',shapes:[{type:'line',x1:50,y1:500,x2:900,y2:500,width:8,color:'#334455'},{type:'circle',x:100+n*100,y:500,r:30,color:'#ef7744'}]}]}}}`,description:'Explore steps',assumptions:'Illustrative sequence',question:'What happens next?'};
+const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n'],expected:1,reason:'One click advances one step.'},{path:['scene','blocks',0,'text'],expected:'Step 1',reason:'The next step is visible.'},{path:['scene','blocks',2,'shapes',1,'x'],expected:200,reason:'The marker moves to the next step.'}]}];
 (async()=>{
-  assert.equal(await verify(candidate.source,checks),2);
+  assert.equal(await verify(candidate.source,checks),3);
+  await assert.rejects(verify(candidate.source,[{events:checks[0].events,assertions:[checks[0].assertions[1]]}],undefined,true),/graphic changes/);
+  const plain={...candidate,source:`function update(s,e){const n=s?s.n+1:0;return {state:{n},scene:{title:'Plain',blocks:[{type:'button',id:'next',label:'Next'},{type:'text',text:'Step '+n}]}}}`};
+  await assert.rejects(createCreativeLab({request:'Draw a timeline',ask:async()=>plain}),/substantive diagram/);
   await assert.rejects(verify(candidate.source,[{events:checks[0].events,assertions:[checks[0].assertions[0]]}]),/visible result/);
   await assert.rejects(verify(candidate.source,[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]),/Independent check failed/);
   await assert.rejects(verify(candidate.source,[{events:[],assertions:[{...checks[0].assertions[0],expected:0}]}]),/did not test an interaction/);
   let n=0,feedback='';
   const result=await createCreativeLab({request:'Create a timeline',ask:async(_instructions,input)=>{n++;if(n===1)return candidate;if(n===2)return {verdict:'pass',findings:'Checked.',checks:[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]};if(n===3){feedback=input.feedback;return candidate;}return {verdict:'pass',findings:'Checked.',checks};}});
-  assert.match(feedback,/Independent check failed/);assert.equal(result.snapshot.state.n,0);assert.match(result.review,/2 independently proposed assertions passed/);
+  assert.match(feedback,/Independent check failed/);assert.equal(result.snapshot.state.n,0);assert.match(result.review,/3 independently proposed assertions passed/);
   const sliderSource=`function update(s,e){const n=e.type==='change'?e.value:(s?s.n:1);return {state:{n},scene:{title:'Growth',blocks:[{type:'slider',id:'rate',label:'Rate',min:0,max:5,step:1,value:n}]}}}`;
   const original=createLiveLabSession(sliderSource);await original.step({type:'init'});await original.step({type:'change',id:'rate',value:4});
   const replacement=createLiveLabSession(sliderSource);await replacement.step({type:'init'});
@@ -26,5 +29,9 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
   const brokenSession=createLiveLabSession(defective);await brokenSession.step({type:'init'});
   await assert.rejects(smokeControls(defective,brokenSession.snapshot()),/Control bad failed/);brokenSession.close();
   const slider=createLiveLabSession(sliderSource);await slider.step({type:'init'});assert.equal(await smokeControls(sliderSource,slider.snapshot()),2);slider.close();
+  const hidden=`function update(s,e){if(e.id==='later')throw Error('broken');const n=e.id==='next'?1:(s?s.n:0);return {state:{n},scene:{title:'Branch',blocks:[{type:'text',text:'Step '+n},...(n?[{type:'button',id:'later',label:'Later'}]:[{type:'button',id:'next',label:'Next'}])]}}}`;
+  const branchChecks=[{events:[{type:'click',id:'next'}],assertions:[{path:['scene','blocks',0,'text'],expected:'Step 1',reason:'Next reveals the second step.'}]}];
+  await assert.rejects(verify(hidden,branchChecks),/Control later failed/);
+  assert.equal(await verify(hidden.replace("if(e.id==='later')throw Error('broken');",''),branchChecks),1);
   console.log('Creative LiveLab generation, independent checks and repair passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});
