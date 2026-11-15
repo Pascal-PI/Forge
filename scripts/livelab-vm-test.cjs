@@ -4,6 +4,10 @@ const {runLiveLabCode}=require('../livelab-vm.cjs');
 (async()=>{
   const source='function update(state,event){return {count:state.count+event.delta, labels:["growth", "time"]}}';
   assert.deepEqual(await runLiveLabCode({source,state:{count:2},event:{delta:3}}),{count:5,labels:['growth','time']});
+  const typescript='type State = {count:number}; function update(state: State, event: {delta:number}): State { return {count:state.count + event.delta}; }';
+  assert.deepEqual(await runLiveLabCode({source:typescript,state:{count:2},event:{delta:4}}),{count:6});
+  const tsCapabilities=await runLiveLabCode({source:'function update(): object { return {process:typeof process,require:typeof require,fetch:typeof fetch,document:typeof document}; }'});
+  assert.deepEqual(tsCapabilities,{process:'undefined',require:'undefined',fetch:'undefined',document:'undefined'});
   const capabilities=await runLiveLabCode({source:'function update(){return {process:typeof process,require:typeof require,fetch:typeof fetch,document:typeof document,websocket:typeof WebSocket}}'});
   assert.deepEqual(capabilities,{process:'undefined',require:'undefined',fetch:'undefined',document:'undefined',websocket:'undefined'});
   await assert.rejects(runLiveLabCode({source:'function update(){while(true){}}',timeoutMs:100}),/failed|limit/);

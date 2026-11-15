@@ -12,9 +12,25 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
   await assert.rejects(verify(candidate.source,[{events:checks[0].events,assertions:[checks[0].assertions[0]]}]),/visible result/);
   await assert.rejects(verify(candidate.source,[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]),/Independent check failed/);
   await assert.rejects(verify(candidate.source,[{events:[],assertions:[{...checks[0].assertions[0],expected:0}]}]),/did not test an interaction/);
-  let n=0,feedback='';
-  const result=await createCreativeLab({request:'Create a timeline',ask:async(_instructions,input)=>{n++;if(n===1)return candidate;if(n===2)return {verdict:'pass',findings:'Checked.',checks:[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]};if(n===3){feedback=input.feedback;return candidate;}return {verdict:'pass',findings:'Checked.',checks};}});
-  assert.match(feedback,/Independent check failed/);assert.equal(result.snapshot.state.n,0);assert.match(result.review,/3 independently proposed assertions passed/);
+  let n=0,feedback='',counterexample;
+  const result=await createCreativeLab({request:'Create a timeline',ask:async(_instructions,input)=>{n++;if(n===1)return candidate;if(n===2)return {verdict:'pass',findings:'Checked.',checks:[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]};if(n===3){counterexample=input.checkFailure;return {verdict:'pass',findings:'I rechecked the arithmetic.',checks};}throw Error('Unexpected extra model call');}});
+  assert.equal(n,3);assert.equal(counterexample.expected,2);assert.equal(counterexample.actual,1);assert.deepEqual(counterexample.events,checks[0].events);assert.equal(result.snapshot.state.n,0);assert.match(result.review,/3 independently proposed assertions passed/);
+  let repairCalls=0;
+  await assert.rejects(createCreativeLab({request:'Create a timeline',ask:async(instructions,input)=>{if(instructions.includes('LiveLab Architect')){repairCalls++;if(repairCalls>1)feedback=input.feedback;return candidate;}return {verdict:'pass',findings:'Still incorrect.',checks:[{...checks[0],assertions:[{...checks[0].assertions[0],expected:2}]}]};}}),/Independent check failed/);
+  assert.equal(repairCalls,3);assert.match(feedback,/Counterexample/);assert.match(feedback,/"actual":1/);
+  let rejected=0;
+  await assert.rejects(createCreativeLab({request:'Create a timeline',ask:async(instructions)=>{if(instructions.includes('LiveLab Architect'))return candidate;rejected++;return {verdict:'revise',findings:'The concept is wrong.',checks:[]};}}),/concept is wrong/);assert.equal(rejected,3);
+  const broadContext=[{role:'user',text:'Make a learning path with a practice task and project about polarity.'},{role:'assistant',text:'Explore how molecular shape affects bond dipoles.',activity:'livelab'}];
+  let scopedCalls=0;
+  const scoped=await createCreativeLab({request:broadContext[0].text,context:broadContext,ask:async(instructions,input)=>{
+    scopedCalls++;
+    assert.deepEqual(input.context,broadContext);
+    if(scopedCalls===1){assert.match(instructions,/one interactive activity, not an entire lesson or learning path/);return candidate;}
+    assert.match(instructions,/do not require those in the activity/);
+    assert.match(instructions,/reject actual scientific errors/);
+    return {verdict:'pass',findings:'Activity checked.',checks};
+  }});
+  assert.equal(scoped.kind,'creative');assert.equal(scopedCalls,2);
   const sliderSource=`function update(s,e){const n=e.type==='change'?e.value:(s?s.n:1);return {state:{n},scene:{title:'Growth',blocks:[{type:'slider',id:'rate',label:'Rate',min:0,max:5,step:1,value:n}]}}}`;
   const original=createLiveLabSession(sliderSource);await original.step({type:'init'});await original.step({type:'change',id:'rate',value:4});
   const replacement=createLiveLabSession(sliderSource);await replacement.step({type:'init'});
@@ -28,7 +44,13 @@ const checks=[{events:[{type:'click',id:'next'}],assertions:[{path:['state','n']
   const defective=`function update(s,e){if(e.id==='bad')throw Error('broken');return {state:{},scene:{title:'Test',blocks:[{type:'button',id:'good',label:'Good'},{type:'button',id:'bad',label:'Bad'}]}}}`;
   const brokenSession=createLiveLabSession(defective);await brokenSession.step({type:'init'});
   await assert.rejects(smokeControls(defective,brokenSession.snapshot()),/Control bad failed/);brokenSession.close();
-  const slider=createLiveLabSession(sliderSource);await slider.step({type:'init'});assert.equal(await smokeControls(sliderSource,slider.snapshot()),2);slider.close();
+  const slider=createLiveLabSession(sliderSource);await slider.step({type:'init'});assert.equal(await smokeControls(sliderSource,slider.snapshot()),3);slider.close();
+  const brokenMiddle=sliderSource.replace("const n=e.type==='change'?e.value:(s?s.n:1);", "if(e.type==='change' && e.value===2)throw Error('middle is broken');const n=e.type==='change'?e.value:(s?s.n:1);");
+  const middleSession=createLiveLabSession(brokenMiddle);await middleSession.step({type:'init'});
+  await assert.rejects(smokeControls(brokenMiddle,middleSession.snapshot()),/Control rate failed/);middleSession.close();
+  const dynamic=`function update(s,e){s=s||{wide:false,n:0};if(e.id==='expand')s.wide=true;if(e.type==='change'&&e.value===10)throw Error('new endpoint fails');return {state:s,scene:{title:'Range',blocks:[{type:'button',id:'expand',label:'Expand'},{type:'slider',id:'rate',label:'Rate',min:0,max:s.wide?10:4,step:1,value:s.n}]}}}`;
+  const dynamicSession=createLiveLabSession(dynamic),seen=new Set();await dynamicSession.step({type:'init'});await smokeControls(dynamic,dynamicSession.snapshot(),undefined,seen);await dynamicSession.step({type:'click',id:'expand'});
+  await assert.rejects(smokeControls(dynamic,dynamicSession.snapshot(),undefined,seen),/Control rate failed/);dynamicSession.close();
   const hidden=`function update(s,e){if(e.id==='later')throw Error('broken');const n=e.id==='next'?1:(s?s.n:0);return {state:{n},scene:{title:'Branch',blocks:[{type:'text',text:'Step '+n},...(n?[{type:'button',id:'later',label:'Later'}]:[{type:'button',id:'next',label:'Next'}])]}}}`;
   const branchChecks=[{events:[{type:'click',id:'next'}],assertions:[{path:['scene','blocks',0,'text'],expected:'Step 1',reason:'Next reveals the second step.'}]}];
   await assert.rejects(verify(hidden,branchChecks),/Control later failed/);

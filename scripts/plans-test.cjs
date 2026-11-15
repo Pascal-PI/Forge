@@ -1,0 +1,1 @@
+const assert=require('node:assert/strict');const {plans,price}=require('../renderer/plans-core.js');assert.deepEqual(plans.map(p=>p.id),['free','pro','max','ultra']);assert.deepEqual(plans.map(price),['$0','$9.99','$29.99','$119.99']);assert(Object.isFrozen(plans));assert.throws(()=>price({monthlyCents:'9.99'}));console.log('Proposed subscription plan catalogue passed');

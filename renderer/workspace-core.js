@@ -73,12 +73,13 @@
       const scene=root.LiveLabScene || (typeof require==='function' ? require('./livelab-scene.js') : null);
       if(typeof item.source!=='string' || !item.source.trim() || new TextEncoder().encode(item.source).length>32768 || !['description','assumptions','question','review'].every(k=>typeof item[k]==='string' && item[k].length<=1500)) throw Error('Invalid LiveLab');
       scene.validate(item.snapshot);
+      if(item.initialSnapshot != null) scene.validate(item.initialSnapshot);
       if(item.lastInteraction!=null && (typeof item.lastInteraction!=='string'||item.lastInteraction.length>700))throw Error('Invalid LiveLab interaction');
       if(item.reuse!=null){
         if(!item.reuse || typeof item.reuse!=='object' || typeof item.reuse.fingerprint!=='string' || typeof item.reuse.seal!=='string' || !/^[a-f0-9]{64}$/.test(item.reuse.fingerprint) || !/^[a-f0-9]{64}$/.test(item.reuse.seal))throw Error('Invalid LiveLab reuse record');
         scene.validate(item.reuse.snapshot);
       }
-      return {type:item.type,source:item.source,description:item.description,assumptions:item.assumptions,question:item.question,review:item.review,snapshot:JSON.parse(JSON.stringify(item.snapshot)),...(item.lastInteraction!=null?{lastInteraction:item.lastInteraction}:{}),...(item.reuse?{reuse:JSON.parse(JSON.stringify(item.reuse))}:{})};
+      return {type:item.type,source:item.source,description:item.description,assumptions:item.assumptions,question:item.question,review:item.review,snapshot:JSON.parse(JSON.stringify(item.snapshot)),...(item.initialSnapshot?{initialSnapshot:JSON.parse(JSON.stringify(item.initialSnapshot))}:{}),...(item.lastInteraction!=null?{lastInteraction:item.lastInteraction}:{}),...(item.reuse?{reuse:JSON.parse(JSON.stringify(item.reuse))}:{})};
     }
     if (item.type === 'livelab') {
       const core=root.LiveLabCore || (typeof require==='function' ? require('./livelab-core.js') : null);
@@ -111,6 +112,17 @@
       balanceState(item);
       return { type: item.type, problem: item.problem, moves: [...item.moves], hint: item.hint };
     }
+    if (item.type === 'coding-workspace') {
+      if(typeof item.code!=='string'||item.code.length>8000||typeof item.stdin!=='string'||item.stdin.length>4000||typeof item.output!=='string'||item.output.length>4000||typeof item.runError!=='string'||item.runError.length>500||!Array.isArray(item.results)||item.results.length>3)throw Error('Invalid coding workspace');
+      const language=item.language ?? 'JavaScript',assignmentTopic=item.assignmentTopic ?? '';
+      if(!['JavaScript','TypeScript','Python','C++','Java'].includes(language)||typeof assignmentTopic!=='string'||assignmentTopic.length>500)throw Error('Invalid coding language');
+      const exercise=item.exercise;
+      if(exercise!==null && (!exercise||typeof exercise.title!=='string'||!exercise.title.trim()||exercise.title.length>120||typeof exercise.prompt!=='string'||!exercise.prompt.trim()||exercise.prompt.length>1200||!Array.isArray(exercise.tests)||exercise.tests.length<2||exercise.tests.length>3||!exercise.tests.every(t=>t&&typeof t.input==='string'&&t.input.length<=1000&&typeof t.expected==='string'&&t.expected.length<=1000)))throw Error('Invalid coding exercise');
+      if(item.results.length && (!exercise || item.results.length>exercise.tests.length))throw Error('Invalid coding results');
+      if(!item.results.every(r=>r&&typeof r.output==='string'&&r.output.length<=1000&&typeof r.error==='string'&&r.error.length<=500&&typeof r.passed==='boolean'))throw Error('Invalid coding results');
+      if(exercise?.language!=null&&!['JavaScript','TypeScript','Python','C++','Java'].includes(exercise.language))throw Error('Invalid exercise language');
+      return {type:item.type,language,assignmentTopic,code:item.code,stdin:item.stdin,output:item.output,runError:item.runError,results:item.results.map(r=>({...r})),exercise:exercise?{title:exercise.title,prompt:exercise.prompt,language:exercise.language??'JavaScript',tests:exercise.tests.map(t=>({...t}))}:null};
+    }
     if (item.type === 'coding') {
       if (item.challengeId !== codingChallenge.id || typeof item.code !== 'string' || item.code.length > 8000 || !Array.isArray(item.attempts) || item.attempts.length > 10) throw Error('Invalid coding activity');
       const attempts = item.attempts.map(attempt => {
@@ -130,6 +142,20 @@
     return { type: item.type, questionId: item.questionId, answer: item.answer, hint: item.hint };
   }
 
+  function normalizePathLesson(lesson) {
+    const valid=(v,max)=>typeof v==='string' && v.trim().length>0 && v.length<=max;
+    if(!lesson||!valid(lesson.title,120)||!Array.isArray(lesson.screens)||lesson.screens.length!==2||!lesson.screens.every(x=>x&&valid(x.heading,120)&&valid(x.body,1600))||!valid(lesson.question,1000)||!Array.isArray(lesson.choices)||lesson.choices.length!==4||!lesson.choices.every(x=>valid(x,350))||new Set(lesson.choices.map(x=>x.trim().toLowerCase())).size!==4||!Number.isInteger(lesson.correctIndex)||lesson.correctIndex<0||lesson.correctIndex>3||!Array.isArray(lesson.explanations)||lesson.explanations.length!==4||!lesson.explanations.every(x=>valid(x,800))||!Number.isInteger(lesson.screen)||lesson.screen<0||lesson.screen>3||!(lesson.selected===null || Number.isInteger(lesson.selected)&&lesson.selected>=0&&lesson.selected<4)||typeof lesson.passed!=='boolean')throw Error('Invalid interactive lesson');
+    if(lesson.attempts != null && (!Array.isArray(lesson.attempts) || lesson.attempts.length>100 || !lesson.attempts.every(x=>Number.isInteger(x)&&x>=0&&x<4))) throw Error('Invalid quiz attempts');
+    if(lesson.historyComplete != null && typeof lesson.historyComplete !== 'boolean') throw Error('Invalid quiz history');
+    const lab=lesson.lab==null ? null : normalizeActivity(lesson.lab);
+    if(lab && lab.type!=='livelab-creative')throw Error('Invalid lesson LiveLab');
+    const mastery=root.MasteryCore || (typeof require==='function' ? require('./mastery-core.js') : null);
+    const quizV2=lesson.quizV2 == null ? null : mastery.normalizeQuiz(lesson.quizV2);
+    const showCore=root.StudyShowCore || (typeof require==='function' ? require('./studyshow-core.js') : null);
+    const studyShow=lesson.studyShow == null ? null : showCore.normalize(lesson.studyShow);
+    return {title:lesson.title,screens:lesson.screens.map(x=>({heading:x.heading,body:x.body})),question:lesson.question,choices:[...lesson.choices],correctIndex:lesson.correctIndex,explanations:[...lesson.explanations],screen:lesson.screen,selected:lesson.selected,passed:lesson.passed,lab,...(lesson.attempts != null ? {attempts:[...lesson.attempts]} : {}),...(lesson.historyComplete != null ? {historyComplete:lesson.historyComplete} : {}),...(quizV2?{quizV2}:{}),...(studyShow?{studyShow}:{})};
+  }
+
   function normalize(value) {
     if (value == null) return { sessions: [], selected: null };
     if (!value || !Array.isArray(value.sessions) || value.sessions.length > 100) throw Error('Invalid learning sessions');
@@ -142,8 +168,8 @@
       const messages = session.messages.map(message => {
         if (!message || !['user', 'assistant'].includes(message.role) || typeof message.text !== 'string' || message.text.length > 8000) throw Error('Invalid session message');
         if (message.activity != null && (message.role !== 'assistant' || !['livelab', 'binary-search', 'school-question', 'sorting', 'number-line', 'coding', 'equation-balance', 'projectile'].includes(message.activity))) throw Error('Invalid suggested activity');
-        if (message.plan != null && (message.role !== 'assistant' || !Array.isArray(message.plan) || message.plan.length < 2 || message.plan.length > 5 || !message.plan.every(step => step && typeof step.text === 'string' && step.text.trim() && step.text.length <= 500 && typeof step.done === 'boolean'))) throw Error('Invalid saved learning path');
-        return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}), ...(message.plan ? { plan: message.plan.map(step => ({text:step.text,done:step.done})) } : {}) };
+        if (message.plan != null && (message.role !== 'assistant' || !Array.isArray(message.plan) || message.plan.length < 2 || message.plan.length > 5 || !message.plan.every(step => step && typeof step.text === 'string' && step.text.trim() && step.text.length <= 500 && typeof step.done === 'boolean' && (step.completedBy == null || step.completedBy === 'ai' && step.done)))) throw Error('Invalid saved learning path');
+        return { role: message.role, text: message.text, ...(message.activity ? { activity: message.activity } : {}), ...(message.plan ? { plan: message.plan.map(step => ({text:step.text,done:step.done,...(step.completedBy ? {completedBy:step.completedBy} : {}),...(step.lesson ? {lesson:normalizePathLesson(step.lesson)} : {})})) } : {}) };
       });
       let activity = null;
       if (session.activity != null) {
@@ -154,10 +180,25 @@
       if (session.draft != null && (typeof session.draft !== 'string' || session.draft.length > 4000)) throw Error('Invalid message draft');
       if (session.learningGoal != null && (typeof session.learningGoal !== 'string' || session.learningGoal.length > 300)) throw Error('Invalid learning goal');
       if (session.expanded != null && typeof session.expanded !== 'boolean') throw Error('Invalid workspace state');
-      return { id: session.id, title: session.title, minutes: session.minutes, createdAt: session.createdAt, updatedAt: session.updatedAt, pinned: session.pinned, messages, activity, activities, draft: session.draft || '', expanded: Boolean(session.expanded && activity), ...(session.learningGoal != null ? { learningGoal: session.learningGoal } : {}) };
+      if (session.titleEdited != null && typeof session.titleEdited !== 'boolean') throw Error('Invalid session title');
+      return { id: session.id, title: session.title, minutes: session.minutes, createdAt: session.createdAt, updatedAt: session.updatedAt, pinned: session.pinned, messages, activity, activities, draft: session.draft || '', expanded: Boolean(session.expanded && activity), ...(session.learningGoal != null ? { learningGoal: session.learningGoal } : {}), ...(session.titleEdited != null ? {titleEdited:session.titleEdited} : {}) };
     });
     if (new Set(sessions.map(session => session.id)).size !== sessions.length) throw Error('Duplicate learning session');
-    return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null };
+    if (value.memory != null && (!value.memory || typeof value.memory.enabled !== 'boolean' || typeof value.memory.notes !== 'string' || value.memory.notes.length > 2000)) throw Error('Invalid chat memory');
+    return { sessions, selected: sessions.some(session => session.id === value.selected) ? value.selected : null, ...(value.memory ? {memory:{enabled:value.memory.enabled,notes:value.memory.notes}} : {}) };
+  }
+
+  function quizStats(workspace) {
+    const quizzes=(workspace?.sessions || []).flatMap(session=>(session.messages || []).flatMap(message=>(message.plan || []).flatMap(step=>step.lesson ? [{title:step.lesson.title,lesson:step.lesson}] : [])));
+    const recorded=quizzes.filter(item=>Array.isArray(item.lesson.attempts)&&item.lesson.attempts.length>0);
+    const attempts=recorded.reduce((sum,item)=>sum+item.lesson.attempts.length,0);
+    const correct=recorded.reduce((sum,item)=>sum+item.lesson.attempts.filter(choice=>choice===item.lesson.correctIndex).length,0);
+    const eligible=recorded.filter(item=>item.lesson.historyComplete!==false);
+    const firstTry=eligible.filter(item=>item.lesson.attempts[0]===item.lesson.correctIndex).length;
+    const modern=quizzes.filter(item=>item.lesson.quizV2).flatMap(item=>item.lesson.quizV2.questions.map(q=>({q,attempts:item.lesson.quizV2.attempts.filter(a=>a.questionId===q.id)}))).filter(item=>item.attempts.length);
+    const modernAttempts=modern.reduce((sum,item)=>sum+item.attempts.length,0),modernCorrect=modern.reduce((sum,item)=>sum+item.attempts.filter(a=>a.correct).length,0),modernFirst=modern.filter(item=>item.attempts[0].correct).length;
+    const totalAttempts=attempts+modernAttempts,totalCorrect=correct+modernCorrect,totalEligible=eligible.length+modern.length,totalFirst=firstTry+modernFirst;
+    return {quizzes:recorded.length+modern.length,attempts:totalAttempts,correct:totalCorrect,firstTry:totalFirst,firstTryEligible:totalEligible,firstTryPercent:totalEligible?Math.round(100*totalFirst/totalEligible):null,attemptPercent:totalAttempts?Math.round(100*totalCorrect/totalAttempts):null,legacy:quizzes.filter(item=>item.lesson.passed && !item.lesson.attempts?.length && !item.lesson.quizV2 || item.lesson.historyComplete===false).length};
   }
 
   function learningProgress(workspace) {
@@ -169,8 +210,8 @@
     paths.sort((a, b) => b.updatedAt - a.updatedAt || (b.index ?? Infinity) - (a.index ?? Infinity));
     const tutorPlans = sessions.flatMap(session => (session.messages || []).flatMap((message, messageIndex) => message.role === 'assistant' && message.plan?.length ? [{sessionId:session.id,title:session.title,updatedAt:session.updatedAt,messageIndex,steps:message.plan}] : []));
     tutorPlans.sort((a,b) => b.updatedAt - a.updatedAt || b.messageIndex - a.messageIndex);
-    return { sessions: sessions.length, paths: paths.length, checks: paths.filter(item => item.activity.answer === 1).length, simulations: paths.filter(item => Number.isInteger(item.activity.result)).length, pathsByRecency: paths, tutorPlans, selfMarkedSteps:tutorPlans.reduce((sum,plan) => sum + plan.steps.filter(step => step.done).length,0) };
+    return { sessions: sessions.length, paths: paths.length, checks: paths.filter(item => item.activity.answer === 1).length, simulations: paths.filter(item => Number.isInteger(item.activity.result)).length, pathsByRecency: paths, tutorPlans, selfMarkedSteps:tutorPlans.reduce((sum,plan) => sum + plan.steps.filter(step => step.done && !step.completedBy).length,0), aiCompletedSteps:tutorPlans.reduce((sum,plan) => sum + plan.steps.filter(step => step.done && step.completedBy === 'ai').length,0) };
   }
-  root.WorkspaceCore = { normalize, learningProgress, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge, projectileStarter };
+  root.WorkspaceCore = { normalize, normalizePathLesson, quizStats, learningProgress, searchState, searchValues, searchTargets, sortingState, sortingSets, lineState, lineTargets, balanceState, balanceProblems, codingChallenge, projectileStarter };
   if (typeof module !== 'undefined') module.exports = root.WorkspaceCore;
 })(typeof window !== 'undefined' ? window : globalThis);

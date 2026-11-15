@@ -19,7 +19,8 @@
     "electron-builder": "26.18.0",
     "katex": "^0.19.1",
     "markdown-it": "^15.0.3",
-    "pdfjs-dist": "6.4.299"
+    "pdfjs-dist": "6.4.299",
+    "stripe": "^23.1.0"
   },
   "build": {
     "appId": "local.forge.commandcenter",
@@ -38,8 +39,10 @@
       "livelab-session.cjs",
       "livelab-vm.cjs",
       "livelab-vm-worker.cjs",
+      "narration.cjs",
       "codeforces.cjs",
       "runner.cjs",
+      "coding-platform.cjs",
       "lesson-pptx.cjs",
       "third-party/PPTXGENJS-LICENSE.txt",
       "amc-topics.json",
@@ -78,6 +81,7 @@
   },
   "dependencies": {
     "pptxgenjs": "4.0.1",
-    "quickjs-emscripten": "0.32.0"
+    "quickjs-emscripten": "0.32.0",
+    "typescript": "^5.9.3"
   }
 }

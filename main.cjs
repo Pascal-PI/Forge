@@ -4,6 +4,7 @@ const { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, protocol, session,
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { createCoach } = require('./coach.cjs');
+const { narrate } = require('./narration.cjs');
 const { createLiveLabSession } = require('./livelab-session.cjs');
 const { createCodeforces } = require('./codeforces.cjs');
 const { createRunner } = require('./runner.cjs');
@@ -11,13 +12,17 @@ const { normalizeLessonExport, createLessonPresentation, lessonFilename } = requ
 
 const APP_URL = 'forge://app/index.html';
 const exams = require('./amc-catalog.json');
-const CSP = "default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' blob:; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+const CSP = "default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' blob:; img-src 'self' data: blob:; media-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 const files = new Map([
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/workspace-core.js', ['workspace-core.js', 'text/javascript; charset=utf-8']],
   ['/livelab-core.js', ['livelab-core.js', 'text/javascript; charset=utf-8']],
   ['/livelab-scene.js', ['livelab-scene.js', 'text/javascript; charset=utf-8']],
+  ['/livelab-html.js', ['livelab-html.js', 'text/javascript; charset=utf-8']],
+  ['/mastery-core.js', ['mastery-core.js', 'text/javascript; charset=utf-8']],
+  ['/studyshow-core.js', ['studyshow-core.js', 'text/javascript; charset=utf-8']],
+  ['/plans-core.js', ['plans-core.js', 'text/javascript; charset=utf-8']],
   ['/livelab-view.js', ['livelab-view.js', 'text/javascript; charset=utf-8']],
   ['/workspace.js', ['workspace.js', 'text/javascript; charset=utf-8']],
   ['/workspace.css', ['workspace.css', 'text/css; charset=utf-8']],
@@ -60,8 +65,9 @@ const runner=createRunner({dataDir:app.getPath('userData')});
 protocol.registerSchemesAsPrivileged([{ scheme: 'forge', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
 
 let mainWindow;
-const coach=createCoach({app,dialog,getWindow:()=>mainWindow});
+const coach=createCoach({app,dialog,getWindow:()=>mainWindow,runner});
 let liveLabStepBusy=false;
+let narrationInFlight=null;
 const codeforces=createCodeforces();
 function checkSender(event){
   if(!mainWindow||event.sender!==mainWindow.webContents||event.senderFrame!==event.sender.mainFrame||event.senderFrame.url!==APP_URL)throw Error('Invalid sender');
@@ -128,6 +134,11 @@ else {
       'forge:coach-check':()=>coach.check(),
       'forge:coach-topics':()=>coach.topics(),
       'forge:coach-request':payload=>coach.request(payload),
+      'forge:path-lesson':payload=>coach.pathLesson(payload),
+      'forge:coding-assignment':payload=>coach.codingAssignment(payload),
+      'forge:coding-run':payload=>require('./coding-platform.cjs').runCoding(payload),
+      'forge:studyshow':payload=>coach.studyShow(payload),
+      'forge:study-narration':async text=>{if(narrationInFlight){if(narrationInFlight.text===text)return narrationInFlight.promise;throw Error('Local narration is already preparing.');}const promise=narrate(text);narrationInFlight={text,promise};try{return await promise;}finally{if(narrationInFlight?.promise===promise)narrationInFlight=null;}},
       'forge:livelab':payload=>coach.liveLab(payload),
       'forge:livelab-step':async payload=>{
         if(liveLabStepBusy)throw Error('The LiveLab is already updating.');

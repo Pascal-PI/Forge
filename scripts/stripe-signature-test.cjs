@@ -1,0 +1,5 @@
+'use strict';const assert=require('node:assert/strict'),Stripe=require('stripe'),{createStripeBilling}=require('../billing/stripe-service.cjs');
+const stripe=new Stripe('sk_test_'+ '0'.repeat(24)),secret='whsec_'+ '0'.repeat(24),body=JSON.stringify({id:'evt_test',object:'event',type:'customer.subscription.updated',livemode:false,data:{object:{id:'sub_test'}}}),signature=stripe.webhooks.generateTestHeaderString({payload:body,secret});
+const store={withAccountLock:async(_id,fn)=>fn(),getCustomer:async()=>null,setCustomer:async()=>{},getPendingCheckout:async()=>null,setPendingCheckout:async()=>{}};
+const billing=createStripeBilling({stripe,store,priceId:'price_test123',successUrl:'https://forge.example/success',cancelUrl:'https://forge.example/cancel',portalReturnUrl:'https://forge.example/account',webhookSecret:secret});
+assert.deepEqual(billing.webhook(Buffer.from(body),signature),{received:true});assert.throws(()=>billing.webhook(Buffer.from(body+' '),signature),/signature/);assert.throws(()=>billing.webhook(Buffer.from(body),signature.replace(/v1=[a-f0-9]+/,'v1=bad')),/signature/);console.log('Actual Stripe SDK webhook signature verification passed');

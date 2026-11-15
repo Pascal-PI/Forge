@@ -1,0 +1,11 @@
+'use strict';
+const assert=require('node:assert/strict');
+const html=require('../renderer/livelab-html.js');
+const Scene=require('../renderer/livelab-scene.js');
+const markup='<section class="card"><h3>Observation</h3><p class="note">The temperature rises.</p></section>';
+const css='.card { background-color: #eff7ed; padding: 12px; border-radius: 8px; } .note { color: #123456; font-size: 18px; }';
+const parsed=html.parse(markup,css);assert.equal(parsed.tree[0].children[1].children[0].text,'The temperature rises.');assert.equal(parsed.rules.note.color,'#123456');
+Scene.validate({state:{},scene:{title:'Demo',blocks:[{type:'html',html:markup,css}]}});
+for(const bad of ['<script>alert(1)</script>','<img src="https://example.com/x">','<p onclick="evil()">Hello</p>','<a href="https://example.com">link</a>','<p>unclosed','<p><svg></svg></p>'])assert.throws(()=>html.parse(bad,''));
+for(const bad of ['.x { background-image: url(https://example.com); }','body { color: #ffffff; }','.x { position: fixed; }','@import "https://example.com";','.x { color: red; }'])assert.throws(()=>html.parse('<p class="x">Hi</p>',bad));
+console.log('LiveLab HTML and CSS subset validation passed');

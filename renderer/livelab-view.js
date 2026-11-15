@@ -11,6 +11,9 @@
     // Put the visual first while keeping source-order among visuals and controls.
     const blocks=[...scene.blocks.filter(block=>block.type==='diagram'),...scene.blocks.filter(block=>block.type!=='diagram')];
     for(const block of blocks){
+      if(block.type==='html'){
+        const el=document.createElement('div');el.className='livelab-html';root.LiveLabHTML.render(el,block.html,block.css);fragment.append(el);continue;
+      }
       if(block.type==='heading' || block.type==='text'){
         const el=document.createElement(block.type==='heading'?'h3':'p');el.textContent=block.text;fragment.append(el);continue;
       }

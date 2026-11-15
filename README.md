@@ -172,3 +172,17 @@ The source includes the final renderer. `scripts/vendor-pdf.cjs` copies the pinn
 
 The desktop wrapper follows the [Electron security guidance](https://www.electronjs.org/docs/latest/tutorial/security).
 
+
+### LiveLab web authoring
+
+LiveLab Architect may write its `update(state, event)` function in JavaScript or TypeScript. TypeScript is transpiled inside the worker and executes in the same isolated QuickJS runtime as JavaScript; browser APIs, network, filesystem and modules are unavailable. LiveLabs can include a validated `html` block with `html` and `css` strings for styled explanatory content. HTML allows only balanced `div`, `section`, `p`, `span`, `strong`, `em`, `h3`, `h4`, `ul`, `ol`, `li` and `code` elements with optional class attributes. CSS is limited to class selectors and a small allowlist of color, spacing, font and layout declarations. The renderer creates nodes without executing markup. Scripts, links, images, external resources, arbitrary CSS, DOM access and HTML event handlers are not supported; use the host's validated controls and diagram blocks for interaction. A diagram and independently checked visual change remain required.
+
+### Pathway quiz evidence
+
+New Pathway lessons use three reviewed questions (single choice, multiple select and numeric). A learner may request up to two targeted follow-ups after a mistake; retries reuse the existing question. The independent AI review and validation reduce errors but cannot guarantee correctness. Each local attempt records the response, correctness, topic, difficulty and time. Lesson completion requires a correct response to every current question. Topic status is a planning signal based on the first attempt per distinct question: at least three questions and 80% correct for Demonstrated, at least two and 50% for Developing, otherwise Needs practice. Suggested review intervals are seven, three and one day respectively after the last recorded attempt. Older single-question lessons remain available, but missing timestamps and question history are not inferred. Generated lessons and their attempts are included in local backups.
+
+### StudyShow
+
+From a Pathway lesson, choose Create StudyShow to generate a short reviewed visual explanation. The interactive player reveals AI-generated diagrams across scenes and presents checkpoints before continuing. Captions advance with each spoken sentence. Narration uses an installed local browser voice or Windows System.Speech; captions-only playback is available if narration fails. Storyboards and checkpoint progress are saved locally with the lesson and included in backups; synthesized audio is temporary. The LiveLab button opens the lesson’s existing interactive lab. This version is a real-time player and does not export an MP4. AI review reduces errors but does not guarantee correctness.
+
+New StudyShows use separately checked diagram frames for spoken beats, with scene navigation and replay. Older saved StudyShows keep their original visuals.

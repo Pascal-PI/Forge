@@ -5,6 +5,12 @@ const {getQuickJS,shouldInterruptAfterDeadline}=require('quickjs-emscripten');
 parentPort.once('message',async ({source,state,event,timeoutMs})=>{
   let runtime,context;
   try {
+    // TypeScript is compiled inside this disposable worker. Both languages
+    // then run under the same QuickJS resource and capability limits.
+    const ts=require('typescript');
+    const compiled=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2020,module:ts.ModuleKind.None},reportDiagnostics:true,fileName:'livelab.ts'});
+    if(compiled.diagnostics?.some(d=>d.category===ts.DiagnosticCategory.Error))throw Error('The activity has invalid JavaScript or TypeScript syntax.');
+    if(Buffer.byteLength(compiled.outputText,'utf8')>65536)throw Error('The compiled activity is too large.');
     const quickjs=await getQuickJS();
     runtime=quickjs.newRuntime();
     runtime.setMemoryLimit(16*1024*1024);
@@ -13,7 +19,7 @@ parentPort.once('message',async ({source,state,event,timeoutMs})=>{
     context=runtime.newContext();
     // The guest receives only JSON values. No filesystem, network, Node, DOM,
     // callbacks, module loader, or other host objects are installed in the VM.
-    const program=`'use strict';\n${source}\n;JSON.stringify({value:update(${JSON.stringify(state)},${JSON.stringify(event)})})`;
+    const program=`'use strict';\n${compiled.outputText}\n;JSON.stringify({value:update(${JSON.stringify(state)},${JSON.stringify(event)})})`;
     const result=context.evalCode(program,'livelab.js');
     if(result.error){result.error.dispose();throw Error('The activity code failed or exceeded its execution limit.');}
     const value=context.getString(result.value); result.value.dispose();

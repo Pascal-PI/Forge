@@ -25,7 +25,7 @@ const Scene=require('../renderer/livelab-scene.js');
   const restored=createLiveLabSession(motion,simulation.snapshot());
   assert.equal(restored.snapshot().state.speed,4);
   assert.equal((await restored.step({type:'change',id:'speed',value:5})).blocks[2].shapes[0].x,50);
-  assert.throws(()=>createLiveLabSession(motion,{state:{},scene:{title:'x',blocks:[{type:'html',text:'bad'}]}}),/Unknown activity block/);
+  assert.throws(()=>createLiveLabSession(motion,{state:{},scene:{title:'x',blocks:[{type:'html',text:'bad'}]}}),/Invalid HTML/);
 
   const story=`function update(state,event){
     const day=state ? state.day+(event.type==='click'?1:0) : 0;
@@ -53,7 +53,7 @@ const Scene=require('../renderer/livelab-scene.js');
   await assert.rejects(inputSession.step({type:'submit',id:'answer',value:'x'.repeat(41)}),/Invalid activity event/);
   assert.equal(inputSession.snapshot().state.answer,'<script>alert(1)</script>');inputSession.close();
   const bad=createLiveLabSession(`function update(s,e){if(e.type==='click')return {state:{broken:true},scene:{title:'Oops',blocks:[{type:'html',text:'<script>'}]}};return {state:{safe:true},scene:{title:'Safe',blocks:[{type:'button',id:'next',label:'Next'}]}}}`);
-  await bad.step({type:'init'});await assert.rejects(bad.step({type:'click',id:'next'}),/Unknown activity block/);
+  await bad.step({type:'init'});await assert.rejects(bad.step({type:'click',id:'next'}),/Invalid HTML/);
   assert.equal(bad.snapshot().state.safe,true);
   assert.throws(()=>Scene.validate({state:{},scene:{title:'x',blocks:[{type:'diagram',label:'x',shapes:[{type:'circle',x:0,y:0,r:5,color:'url(evil)'}]}]}}),/Invalid diagram shape/);
   const curve={state:{},scene:{title:'Curve',blocks:[{type:'diagram',label:'Curve',shapes:[{type:'polyline',points:[[0,0],[100,50],[200,200]],width:5,color:'#123456'},{type:'polygon',points:[[0,0],[20,0],[10,20]],color:'#abcdef'}]}]}};

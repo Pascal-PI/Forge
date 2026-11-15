@@ -12,6 +12,7 @@
     const ids=new Set();
     for(const b of scene.blocks){
       if(!b || typeof b!=='object' || Array.isArray(b)) throw Error('Invalid activity block');
+      if(b.type==='html') { const html=root.LiveLabHTML || (typeof require==='function' ? require('./livelab-html.js') : null); html.parse(b.html,b.css); continue; }
       if(b.type==='text' || b.type==='heading') { if(!text(b.text,1200)) throw Error('Invalid text block'); continue; }
       if(b.type==='button' || b.type==='slider' || b.type==='animation' || b.type==='input'){
         if(!id(b.id) || ids.has(b.id) || !text(b.label,120) || !b.label.trim()) throw Error('Invalid activity control');
